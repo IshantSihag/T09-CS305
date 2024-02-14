@@ -23,6 +23,7 @@ export default class FaceDetector extends Component {
       noFaceFrames: 0,
       highFaceFrames: 0,
       framesSinceUpdate: 0,
+      numFaces: 0
     }
   }
 
@@ -58,10 +59,11 @@ export default class FaceDetector extends Component {
 
   render() {
     const { facesData } = this.state
+    const { numFaces } = this.state;
     const relativeFacesData = facesData.length ? 
       facesData.map(face => this.relativeFaceLocation(face)) :
       [{x: null, y: null, size: null, strength: null}]
-  
+    const errorMessage = numFaces > 1 ? 'More than one face detected!' : null;
     return (
       <React.Fragment>
         <canvas 
@@ -69,6 +71,7 @@ export default class FaceDetector extends Component {
           style={{ display: this.props.showCanvas ? 'inline' : 'none' }} 
         />
         {this.props.children && this.props.children(relativeFacesData)}
+        {errorMessage && <p>{errorMessage}</p>}
       </React.Fragment>
     )
   }
@@ -223,7 +226,8 @@ export default class FaceDetector extends Component {
         this.state.currentCanvasSizeIndex * 3,
         this.state.currentCanvasSizeIndex * 4
       ).filter(face => face[3] > 20)
-
+      const numFaces = detectedFacesData.length;
+      this.setState({ numFaces });
       let newFacesData = []
       let bestDetectionData = [0, 0]
 
