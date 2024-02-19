@@ -1,6 +1,7 @@
 
 
 import React, { useState } from 'react';
+import { Button,Input,Textarea } from '@material-tailwind/react/';
 
 const EditInstitutionProfile = ({ stored, editCompleteCallback }) => {
 
@@ -22,74 +23,79 @@ const EditInstitutionProfile = ({ stored, editCompleteCallback }) => {
     }
 
     return (
-        <div className="p-4">
-            <h2 className="text-2xl font-bold mb-4">Edit Information</h2>
-
-            <form>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600">Name:</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        className="mt-1 p-2 border rounded-md w-full"
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600">Email:</label>
-                    <input
-                        type="text"
-                        name="Email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        className="mt-1 p-2 border rounded-md w-full"
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600">Address:</label>
-                    <input
-                        type="text"
-                        name="Address"
-                        value={address}
-                        onChange={e => setAddress(e.target.value)}
-                        className="mt-1 p-2 border rounded-md w-full"
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600">About:</label>
-                    <input
-                        type="textarea"
-                        name="About"
-                        value={about}
-                        onChange={e => setAbout(e.target.value)}
-                        className="mt-1 p-2 border rounded-md w-full"
-                    />
-                </div>
-
-                
-
-                <div className="mt-4">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
-                    >
-                        Save
-                    </button>
-                </div>
-                <div className="mt-4">
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
+        <div className="p-6 max-w-md mx-auto bg-white shadow-md rounded-md">
+        <h2 className="text-2xl font-bold mb-4">Edit Information</h2>
+  
+        <form>
+          <div className="mb-4">
+            <label className="text-sm font-semibold text-gray-600 mb-1">Name:</label>
+            <Input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              color="blue"
+              size="lg"
+              placeholder="Enter your name"
+            />
+          </div>
+  
+          <div className="mb-4">
+            <label className="text-sm font-semibold text-gray-600 mb-1">Email:</label>
+            <Input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              color="blue"
+              size="lg"
+              placeholder="Enter your email"
+            />
+          </div>
+  
+          <div className="mb-4">
+            <label className="text-sm font-semibold text-gray-600 mb-1">Address:</label>
+            <Input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              color="blue"
+              size="lg"
+              placeholder="Enter your address"
+            />
+          </div>
+  
+          <div className="mb-4">
+            <label className="text-sm font-semibold text-gray-600 mb-1">About:</label>
+            <Textarea
+              type="textarea"
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+              color="blue"
+              size="lg"
+              placeholder="Tell us about yourself"
+              rows={4}
+            />
+          </div>
+  
+          <div className="flex justify-between">
+            <Button
+              color="blue"
+              onClick={handleSave}
+              ripple="light"
+              className="focus:outline-none focus:ring focus:border-blue-300"
+            >
+              Save
+            </Button>
+            <Button
+              color="gray"
+              onClick={handleCancel}
+              ripple="light"
+              className="focus:outline-none focus:ring focus:border-gray-300"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </div>
     );
 };
 
