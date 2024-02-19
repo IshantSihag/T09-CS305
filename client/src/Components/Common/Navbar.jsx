@@ -10,6 +10,7 @@ const Navbar = () => {
             <button onClick={()=>navigate('/student/signup')}>Student SignUp</button>
             <button onClick={()=>navigate('/institution/login')}>Institution Login</button>
             <button onClick={()=>navigate('/institution/signup')}>Institution SignUp</button>
+            <button onClick={()=>navigate('/institution/profile')}>Institution Profile</button>
         </div>
     )
 }
