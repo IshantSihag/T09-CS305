@@ -1,0 +1,35 @@
+/* Improved Style for DisplayJSON component */
+
+/* Container style */
+.display-json {
+    font-family: 'Arial', sans-serif;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-width: 600px; /* Limit the width for better readability */
+    margin: 20px auto; /* Center the display */
+  }
+  
+  /* List style */
+  .display-json ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  /* List items style */
+  .display-json li {
+    margin-bottom: 8px;
+  }
+  
+  /* Key style */
+  .display-json strong {
+    color: #555;
+  }
+  
+  /* Nested lists style */
+  .display-json ul ul {
+    border-left: 1px solid #ccc;
+    padding-left: 20px;
+  }
+  
