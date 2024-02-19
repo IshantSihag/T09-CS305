@@ -3,7 +3,7 @@ import React from "react";
 const InstitutionLogin=()=>
 {
     return(
-        <div className="bg-red-100">
+        <div >
             Institution Login Page
         </div>
     )
