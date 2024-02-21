@@ -29,16 +29,16 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="h-screen flex flex-col">
       <Navbar />
 
-      <div className="p-4">
+      <div className="flex-grow p-4 flex flex-col items-center">
         <div className="text-2xl font-bold mb-4">Student Dashboard</div>
 
         <Button
           color="black"
           onClick={handleProfile}
-          className="mb-4 px-6 py-3 mx-5"
+          className="mb-4 px-6 py-3 w-full max-w-md"
           ripple="light"
         >
           Profile
@@ -47,7 +47,7 @@ const StudentDashboard = () => {
         <Button
           color="black"
           onClick={handleAttemptTest}
-          className="mb-4 px-6 py-3 mx-5  "
+          className="mb-4 px-6 py-3 w-full max-w-md"
           ripple="light"
         >
           Attempt Test
@@ -56,7 +56,7 @@ const StudentDashboard = () => {
         <Button
           color="black"
           onClick={handleLogout}
-          className="mb-4 px-6 py-3 mx-5  "
+          className="mb-4 px-6 py-3 w-full max-w-md"
           ripple="light"
         >
           Logout
