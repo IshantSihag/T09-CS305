@@ -2,18 +2,21 @@ import React, { Component } from 'react';
 import * as pico from './pico'
 
 export default class FaceDetector extends Component {
+
+  // Constructor for the FaceDetector class
   constructor(props) {
     super(props)
 
-    this.ctx = null
-    this.imageData = null
-    this.video = document.createElement("video")
-    this.baseFaceSize = 100
+    this.ctx = null // Canvas context
+    this.imageData = null // Image data
+    this.video = document.createElement("video") // Video element
+    this.baseFaceSize = 100 // Base face size
 
-    this.workQueue = []
-    this.taskTimes = {}
+    this.workQueue = [] // Work queue
+    this.taskTimes = {} // Task times
     this.carryOverData = null
 
+    // Current canvas state with all relevant data
     this.state = { 
       currentCanvasSizeIndex: 100,
       facesData: {},
@@ -27,6 +30,7 @@ export default class FaceDetector extends Component {
     }
   }
 
+  // Component did mount lifecycle method
   async componentDidMount() {
     const { stream } = this.props;
   
@@ -46,6 +50,7 @@ export default class FaceDetector extends Component {
     }
   }
 
+  // Component did update lifecycle method
   async componentDidUpdate(prevProps) {
     if (this.props.active && !this.workQueue.length) {
       this.newWorkQueue()
@@ -63,6 +68,8 @@ export default class FaceDetector extends Component {
     const relativeFacesData = facesData.length ? 
       facesData.map(face => this.relativeFaceLocation(face)) :
       [{x: null, y: null, size: null, strength: null}]
+
+    // Error message if more than one face is detected
     const errorMessage = numFaces > 1 ? 'More than one face detected!' : null;
     return (
       <React.Fragment>
@@ -163,31 +170,17 @@ export default class FaceDetector extends Component {
   calculateFaceSizeScale = detectionStrength => {
     const s = detectionStrength
 
-    if (s > 1000) {
-        return 1.2
-    } else if (s < 1000 && s > 900) {
-        return 1.1
-    } else if (s < 900 && s > 800) {
-        return 1.075
-    } else if (s < 800 && s > 700) {
-        return 1.05
-    } else if (s < 700 && s > 600) {
-        return 1.03
-    } else if (s < 600 && s > 500) {
-        return 1.01
-    } else if (s < 500 && s > 400) {
-        return 1.005
-    } else if (s < 400 && s > 300) {
-        return 0.995 
-    } else if (s < 300 && s > 200) {
-        return 0.99 
-    } else if (s < 200 && s > 100) {
-        return 0.95 
-    } else if (s < 100 && s > 50) {
-        return 0.9 
-    } else {
-        return 0.8
-    } 
+    // thresholds and values are determined experimentally
+    const thresholds = [1000, 900, 800, 700, 600, 500, 400, 300, 200, 100, 50];
+    const values = [1.2, 1.1, 1.075, 1.05, 1.03, 1.01, 1.005, 0.995, 0.99, 0.95, 0.9, 0.8];
+
+    for (let i = 0; i < thresholds.length; i++) {
+        if (s > thresholds[i]) {
+            return values[i];
+        }
+    }
+
+    return 0.8;
 }
 
   updatePerformanceQueue = (detectionStart, detectionEnd, queue) => {
