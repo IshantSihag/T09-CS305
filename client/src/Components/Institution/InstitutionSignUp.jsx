@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -8,12 +9,18 @@ import {
   Checkbox,
   Button,
 } from "@material-tailwind/react";
-
 import { useNavigate } from "react-router-dom";
 
 export default function InstitutionSignUp() {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-	const navigate=useNavigate()
+  const handleSignup = () => {
+    // Handle signup logic here
+    console.log("Signing up with:", name, email, password);
+  };
 
   return (
     <div className="h-screen flex items-center place-content-center">
@@ -28,37 +35,49 @@ export default function InstitutionSignUp() {
           </Typography>
         </CardHeader>
         <CardBody className="flex flex-col gap-4">
-					<Input label="Name" type="lg" />
-          <Input label="Email" size="lg" />
-          <Input label="Password" size="lg" />
+          <Input
+            label="Name"
+            type="lg"
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Input
+            label="Email"
+            size="lg"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            label="Password"
+            size="lg"
+            onChange={(e) => setPassword(e.target.value)}
+          />
           <div className="-ml-2.5">
             <Checkbox label="Remember Me" />
           </div>
         </CardBody>
         <CardFooter className="pt-0">
-          <Button variant="gradient" fullWidth>
+          <Button variant="gradient" fullWidth onClick={handleSignup}>
             Sign Up
           </Button>
           <Typography variant="small" className="mt-6 flex justify-center">
             Already have an account?
             <Typography
               as="a"
-              onClick={()=>navigate('/institution/login')}
+              onClick={() => navigate("/institution/login")}
               variant="small"
               color="blue-gray"
               className="ml-1 font-bold cursor-pointer"
             >
               Sign In
             </Typography>
-						<Typography
-							as="a"
-							onClick={()=>navigate('/student/signup')}
-							variant="small"
-							color="blue"
-							className="ml-1 font-bold cursor-pointer"
-						>
-							Student?
-						</Typography>
+            <Typography
+              as="a"
+              onClick={() => navigate("/student/signup")}
+              variant="small"
+              color="blue"
+              className="ml-1 font-bold cursor-pointer"
+            >
+              Student?
+            </Typography>
           </Typography>
         </CardFooter>
       </Card>

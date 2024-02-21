@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -8,11 +9,28 @@ import {
   Checkbox,
   Button,
 } from "@material-tailwind/react";
-
 import { useNavigate } from "react-router-dom";
 
 export default function InstitutionSignUp() {
   const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isValidEmail, setIsValidEmail] = useState(true);
+
+  const validateEmail = () => {
+    // Simple email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsValidEmail(emailRegex.test(email));
+  };
+
+  const handleSignup = () => {
+    if (isValidEmail) {
+      console.log("Signup with name : ", name, "email:", email, "and password:", password);
+    } else {
+      console.error("Invalid email address");
+    }
+  };
 
   return (
     <div className="h-screen flex items-center place-content-center">
@@ -27,15 +45,15 @@ export default function InstitutionSignUp() {
           </Typography>
         </CardHeader>
         <CardBody className="flex flex-col gap-4">
-          <Input label="Name" type="lg" />
-          <Input label="Email" size="lg" />
-          <Input label="Password" size="lg" />
+          <Input label="Name" type="lg" onChange={(e) => setName(e.target.value)} />
+          <Input label="Email" size="lg" onChange={(e) => setEmail(e.target.value)} />
+          <Input label="Password" size="lg" onChange={(e) => setPassword(e.target.value)} />
           <div className="-ml-2.5">
             <Checkbox label="Remember Me" />
           </div>
         </CardBody>
         <CardFooter className="pt-0">
-          <Button variant="gradient" fullWidth>
+          <Button variant="gradient" fullWidth onClick={handleSignup}>
             Sign Up
           </Button>
           <Typography variant="small" className="mt-6 flex justify-center">
