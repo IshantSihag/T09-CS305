@@ -10,7 +10,6 @@ const Navbar = () => {
           <nav class="navbar navbar-dark bg-dark border-bottom border-body">
             <div class="container-fluid">
               <a href="http://localhost:3000/" class="navbar-brand">
-                Procortex
               </a>
               <div class="d-flex">
                 <a href="/student/login" class="btn btn-outline-success me-2">Student Login</a>
