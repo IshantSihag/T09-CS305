@@ -1,0 +1,142 @@
+.test-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+/* header */
+
+.test-header {
+    display: flex;
+    flex-direction: row; 
+    justify-content: space-around;
+    padding: 20px 10px;
+}
+
+.test-header-timer {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.test-header div {
+    display: flex;
+    align-items: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* body */
+
+.test-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* display: flex;
+    flex-direction: row; */
+}
+
+/* TODO : check height */
+.question-container, .answer-container {
+    border: 2px solid #000;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+    height: 70vh;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    max-width: 50vw;
+}
+
+.question-meta-data {
+    display: flex;
+    justify-content: space-around;
+    border: 2px solid #000;
+    border-radius: 5px;
+}
+
+.question-statement {
+    flex-grow: 1;
+    justify-self: center;
+    align-self: center;
+} 
+
+
+/* footer  */
+.test-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.test-submit-btn, .test-prev-btn, .test-next-btn {
+    width: 12rem; 
+    margin: 20px; 
+    height: 2.5rem;
+}
+
+.test-submit-btn {
+    margin-top: 0px;
+}
+
+.test-nav-btns {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+
+
+
+
+
+
+/* large screens */
+@media screen and (min-width: 768px) {
+    .test-footer {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .test-nav-btns {
+        flex-direction: row;
+        gap: 0.5rem; 
+    }
+
+    .test-submit-btn, .test-prev-btn {
+        margin-bottom: 0; 
+    }
+}
+
+/* small screens */
+@media screen and (max-width: 768px) {
+    .test-header {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .test-body {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .question-container, .answer-container {
+        height: 60vh;
+    }
+}
