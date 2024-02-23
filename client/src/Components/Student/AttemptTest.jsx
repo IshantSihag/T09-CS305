@@ -12,6 +12,9 @@ import Pagination from "../Common/Pagination";
 //utils 
 import secondsToHMS from "../../Utils/secondsToHMS";
 
+//icons 
+import { ClockIcon } from "@heroicons/react/24/outline";
+
 const AttemptTest=()=>
 {
     const [totalQuestions, setTotalQuestions] = useState(10);
@@ -36,7 +39,7 @@ const AttemptTest=()=>
         <div>
             <div className="test-container">
                 <div className="test-header">
-                    <div>ProctorX Test</div>
+                    <div className="test-header-heading">ProctorX Test</div>
                     <div>
                         <Pagination 
                             total={totalQuestions}
@@ -44,7 +47,7 @@ const AttemptTest=()=>
                             setCurrentIndex={setCurrentQuestion}
                         />
                     </div>
-                    <div className="test-header-timer">Time Left<span style={{ color: timeLeft >= 5*60 ? "green" : "red" }}>{secondsToHMS(timeLeft)}</span></div>
+                    <div className="test-header-timer"><ClockIcon />Time Left<span style={{ color: timeLeft >= 5*60 ? "green" : "red" }}>{secondsToHMS(timeLeft)}</span></div>
                 </div>   
                 <div className="test-body">
                     <div className="question-container">

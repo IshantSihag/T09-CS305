@@ -6,12 +6,16 @@
 
 
 /* header */
-
 .test-header {
     display: flex;
     flex-direction: row; 
     justify-content: space-around;
     padding: 20px 10px;
+}
+
+.test-header-timer span {
+    font-size: 20px;
+    font-weight: 500;
 }
 
 .test-header-timer {
@@ -25,15 +29,11 @@
     align-items: center;
 }
 
+.test-header-heading {
+    font-size: 30px;
+    font-weight: 600;
 
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -95,11 +95,6 @@
     display: flex;
     flex-direction: column;
 }
-
-
-
-
-
 
 
 
