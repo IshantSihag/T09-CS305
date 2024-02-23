@@ -4,12 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-<<<<<<< HEAD
 from .serializers import SignUpViewSerializer, MyTokenObtainPairSerializer,ProfileViewSerializer
 from .models import UserProfile
-=======
-from .serializers import SignUpViewSerializer, MyTokenObtainPairSerializer
->>>>>>> main
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -28,6 +24,7 @@ class HomeView(APIView):
 class LogoutView(APIView):
      permission_classes = (IsAuthenticated,)
      def post(self, request):
+          
           try:
                refresh_token = request.data["refresh_token"]
                token = RefreshToken(refresh_token)
@@ -41,7 +38,6 @@ class SignUpView(APIView):
           serializer = SignUpViewSerializer(data=request.data)
           serializer.is_valid(raise_exception=True)
           serializer.save()
-<<<<<<< HEAD
           return Response(serializer.data, status=status.HTTP_201_CREATED)
      
 class ProfileView(APIView):
@@ -60,6 +56,3 @@ class ProfileView(APIView):
                print(str(e))
                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
           
-=======
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
->>>>>>> main
