@@ -11,7 +11,7 @@ const Pagination = ({
     const getItemProps = (index) => ({
         variant: currentIndex === index ? "filled" : "text",
         color: "gray",
-        onClick: () => setActive(index),
+        onClick: () => setCurrentIndex(index),
     });
   
     const next = () => {
