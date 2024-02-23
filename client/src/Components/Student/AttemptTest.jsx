@@ -8,6 +8,7 @@ import "../../styles/AttemptTest.css";
 
 //custom components
 import Pagination from "../Common/Pagination";
+import CheckList from "../Common/CheckList";
 
 //utils 
 import secondsToHMS from "../../Utils/secondsToHMS";
@@ -55,11 +56,17 @@ const AttemptTest=()=>
                             <div className="question-number">Question No. 1</div>
                             <div className="question-points">Points: 10</div>
                         </div>
-                        <div className="question-statement">Question Statement</div>
+                        <div className="question-statement">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+                        Duis aute irure dolor in reprehenderit in 
+                        voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+                        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
                     </div>
                     <div className="answer-container">
                         <div className="answer-statement">Answer Statement</div>
-                        <div className="answer-option">Answer Options</div>
+                        <div className="answer-option">
+                            <CheckList />
+                        </div>
                     </div>
                 </div>
                 <div className="test-footer">

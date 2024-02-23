@@ -49,29 +49,51 @@
 
 /* TODO : check height */
 .question-container, .answer-container {
-    border: 2px solid #000;
+    border: 2px solid #d3d3d5;
     border-radius: 10px;
     padding: 20px;
     margin: 20px;
-    height: 70vh;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
-    max-width: 50vw;
 }
 
 .question-meta-data {
     display: flex;
-    justify-content: space-around;
-    border: 2px solid #000;
+    justify-content: space-between;
+    border: 2px solid #d3d3d5;
     border-radius: 5px;
+    padding: 2px 10px;
 }
 
 .question-statement {
     flex-grow: 1;
     justify-self: center;
     align-self: center;
+    margin-top: 10px;
 } 
+
+.answer-statement {
+    padding-bottom: 10px;
+}
+
+
+/* check list */
+.checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checklist-item {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    border: 0.5px solid #d3d3d5;
+    border-radius: 10px;
+    padding: 10px;
+}
+
 
 
 /* footer  */
@@ -128,10 +150,13 @@
     .test-body {
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        align-items: center;
         gap: 2rem;
+        width: 100%;
     }
 
     .question-container, .answer-container {
-        height: 60vh;
+        height: 100%;
     }
 }
