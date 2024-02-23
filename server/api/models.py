@@ -38,7 +38,7 @@ class Response(models.Model):
     test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
     question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
     response = models.TextField()
-    timestamp = models.DateTimeField(auto_add_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     
 class Result(models.Model):
     student_id = models.IntegerField()
