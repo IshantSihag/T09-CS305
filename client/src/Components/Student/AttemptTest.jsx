@@ -1,19 +1,31 @@
-import React from "react";
+import React, {useState} from "react";
 import { 
     Button
- } from "@material-tailwind/react";
+} from "@material-tailwind/react";
 
- //css 
+//css 
 import "../../styles/AttemptTest.css";
+
+//custom components
+import Pagination from "../Common/Pagination";
 
 const AttemptTest=()=>
 {
+    const [totalQuestions, setTotalQuestions] = useState(10);
+    const [currentQuestion, setCurrentQuestion] = useState(1);
+
     return (
         <div>
             <div className="test-container">
                 <div className="test-header">
                     <div>ProctorX Test</div>
-                    <div>Pagination</div>
+                    <div>
+                        <Pagination 
+                            total={totalQuestions}
+                            currentIndex={currentQuestion}
+                            setCurrentIndex={setCurrentQuestion}
+                        />
+                    </div>
                     <div className="test-header-timer">Time Left<span>00:00:00</span></div>
                 </div>   
                 <div className="test-body">
