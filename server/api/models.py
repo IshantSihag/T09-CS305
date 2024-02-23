@@ -34,7 +34,7 @@ class Response(models.Model):
     test_id = models.IntegerField()
     question_id = models.IntegerField()
     response = models.TextField()
-    timestamp = models.DateTimeField(auto_add_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     
 class Result(models.Model):
     student_id = models.IntegerField()
