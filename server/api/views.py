@@ -43,15 +43,16 @@ class SignUpView(APIView):
 class ProfileView(APIView):
      def get(self,request):
           try:
-               username_ = request.GET.get("username")
-               print(username_)
-               queryset_=UserProfile.objects.get(username=username_)
-               serialiser=ProfileViewSerializer(queryset_,many=True)
-               if(serialiser.data['type']=="Student"):
+               username = request.GET.get("username")
+               print(username)
+               user_profile=UserProfile.objects.get(username=username)
+               serialiser=ProfileViewSerializer(user_profile,many=True)
+               if(serialiser.data['type']=="student"):
+                    return Response(serialiser.data,status=status.HTTP_200_OK)
+               elif(serialiser.data["type"]=="institute"):
                     return Response(serialiser.data,status=status.HTTP_200_OK)
                else:
                     return Response(status=status.HTTP_404_NOT_FOUND)
-
           except Exception as e:
                print(str(e))
                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
