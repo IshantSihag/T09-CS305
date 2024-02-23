@@ -1,39 +1,39 @@
-import React from "react";
-import { Button } from "@material-tailwind/react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../Common/Navbar";
-import Footer from "../Common/Footer";
+// import React from "react";
+// import { Button } from "@material-tailwind/react";
+// import { useNavigate } from "react-router-dom";
+// import Navbar from "../Common/Navbar";
+// import Footer from "../Common/Footer";
 
-const InstituteDashboard = () => {
-  const navigate = useNavigate();
+// const InstituteDashboard = () => {
+//   const navigate = useNavigate();
 
-  // Function to handle logout
-  const handleLogout = () => {
-    // Perform logout logic here
-    // For example, redirect to the login page
-    navigate("/login");
-  };
+//   // Function to handle logout
+//   const handleLogout = () => {
+//     // Perform logout logic here
+//     // For example, redirect to the login page
+//     navigate("/login");
+//   };
 
-  // Function to handle profile click
-  const handleProfile = () => {
-    // Redirect to the profile page
-    // Adjust the route as needed
-    navigate("/profile");
-  };
+//   // Function to handle profile click
+//   const handleProfile = () => {
+//     // Redirect to the profile page
+//     // Adjust the route as needed
+//     navigate("/profile");
+//   };
 
-  // Function to handle create test click
-  const handleCreateTest = () => {
-    // Redirect to the create test page
-    // Adjust the route as needed
-    navigate("/create-test");
-  };
+//   // Function to handle create test click
+//   const handleCreateTest = () => {
+//     // Redirect to the create test page
+//     // Adjust the route as needed
+//     navigate("/create-test");
+//   };
 
-  // Function to handle view all tests click
-  const handleViewAllTests = () => {
-    // Redirect to the view all tests page
-    // Adjust the route as needed
-    navigate("/all-tests");
-  };
+//   // Function to handle view all tests click
+//   const handleViewAllTests = () => {
+//     // Redirect to the view all tests page
+//     // Adjust the route as needed
+//     navigate("/all-tests");
+//   };
 
   return (
     <div className="h-screen flex flex-col">
