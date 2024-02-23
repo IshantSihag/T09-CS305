@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import { 
     Button
 } from "@material-tailwind/react";
@@ -9,10 +9,28 @@ import "../../styles/AttemptTest.css";
 //custom components
 import Pagination from "../Common/Pagination";
 
+//utils 
+import secondsToHMS from "../../Utils/secondsToHMS";
+
 const AttemptTest=()=>
 {
     const [totalQuestions, setTotalQuestions] = useState(10);
     const [currentQuestion, setCurrentQuestion] = useState(1);
+
+    const [timeLeft, setTimeLeft] = useState(1000);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeLeft(prevTimeLeft => {
+                if (prevTimeLeft <= 0) {
+                    clearInterval(interval); 
+                    return 0; 
+                }
+                return prevTimeLeft - 1;
+            });
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <div>
@@ -26,7 +44,7 @@ const AttemptTest=()=>
                             setCurrentIndex={setCurrentQuestion}
                         />
                     </div>
-                    <div className="test-header-timer">Time Left<span>00:00:00</span></div>
+                    <div className="test-header-timer">Time Left<span style={{ color: timeLeft >= 5*60 ? "green" : "red" }}>{secondsToHMS(timeLeft)}</span></div>
                 </div>   
                 <div className="test-body">
                     <div className="question-container">
