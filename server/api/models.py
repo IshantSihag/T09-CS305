@@ -26,7 +26,7 @@ class Question(models.Model):
     test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
     
 class UserProfile(models.Model):
-    username = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100, unique=True, default='')
     name = models.CharField(max_length=100)
     profile_url = models.TextField(blank=True)
     bio = models.TextField(blank=True)
@@ -38,7 +38,7 @@ class Response(models.Model):
     test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
     question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
     response = models.TextField()
-    timestamp = models.DateTimeField(auto_add_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     
 class Result(models.Model):
     student_id = models.IntegerField()
