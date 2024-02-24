@@ -41,8 +41,28 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
+# class LoginViewSerializer(serializers.Serializer):  # contains email, password
+#     class Meta:
+#         model = User
+#         fields = ('id', 'username', 'email', 'password')
+#         extra_kwargs = {'password': {'write_only': True}}
+        
     
+#     def validate(self, data):
+#         email = data.get('email', None)
+#         password = data.get('password', None)
+#         if not User.objects.filter(email=email, password=password).exists():
+#             return serializers.ValidationError({'email': 'Email or password is incorrect'})
+#         return super().validate(data)
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = ( 'name', 'profile_url', 'bio', 'tests','type')
+
 class ProfileViewSerializer(serializers.ModelSerializer):
-    class meta:
-        model=UserProfile
-        fields="__all__"
+    userdetails=UserProfileSerializer(many=False)
+    class Meta:
+        model=User
+        fields=('username','email','userdetails')
