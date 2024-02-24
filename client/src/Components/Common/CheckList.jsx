@@ -4,15 +4,15 @@ import {
 } from "@material-tailwind/react";
 
 //css 
-import "../../styles/AttempTest.css"; 
+import "../../styles/AttemptTest.css";
 
 const CheckList = ({}) => {
     return (
         <div className="checklist">
             <div className="checklist-item">
                 <Checkbox 
-                    id="vertical-list-vue"
-                    ripple={false}
+                    id="checkbox-1"
+                    ripple={true}
                     className="hover:before:opacity-0"
                     containerProps={{
                     className: "p-0",
@@ -25,7 +25,7 @@ const CheckList = ({}) => {
             </div>
             <div className="checklist-item">
                 <Checkbox 
-                    id="vertical-list-vue"
+                    id="checkbox-2"
                     ripple={false}
                     className="hover:before:opacity-0"
                     containerProps={{
@@ -39,7 +39,7 @@ const CheckList = ({}) => {
             </div>
             <div className="checklist-item">
                 <Checkbox 
-                    id="vertical-list-vue"
+                    id="checkbox-3"
                     ripple={false}
                     className="hover:before:opacity-0"
                     containerProps={{
@@ -53,7 +53,7 @@ const CheckList = ({}) => {
             </div>
             <div className="checklist-item">
                 <Checkbox 
-                    id="vertical-list-vue"
+                    id="checkbox-4"
                     ripple={false}
                     className="hover:before:opacity-0"
                     containerProps={{

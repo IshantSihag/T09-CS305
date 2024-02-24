@@ -9,12 +9,13 @@ import "../../styles/AttemptTest.css";
 //custom components
 import Pagination from "../Common/Pagination";
 import CheckList from "../Common/CheckList";
+import QuickLink from "../Common/QuickLink";
 
 //utils 
 import secondsToHMS from "../../Utils/secondsToHMS";
 
 //icons 
-import { ClockIcon } from "@heroicons/react/24/outline";
+import { ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 
 const AttemptTest=()=>
 {
@@ -22,6 +23,10 @@ const AttemptTest=()=>
     const [currentQuestion, setCurrentQuestion] = useState(1);
 
     const [timeLeft, setTimeLeft] = useState(1000);
+    
+    //for quicks links
+    const [open, setOpen] = useState(false);
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -41,12 +46,22 @@ const AttemptTest=()=>
             <div className="test-container">
                 <div className="test-header">
                     <div className="test-header-heading">ProctorX Test</div>
-                    <div>
+                    <div className="test-header-content">
                         <Pagination 
                             total={totalQuestions}
                             currentIndex={currentQuestion}
                             setCurrentIndex={setCurrentQuestion}
                         />
+                        <div className="quick-links-container">
+                            <Squares2X2Icon className="ml-2 h-6 w-6 text-gray-500 cursor-pointer quick-links-icon" onClick={() => setOpen(!open)} />
+                            {open && <QuickLink
+                                className="quick-links" 
+                                total={totalQuestions}
+                                currentIndex={currentQuestion}
+                                setCurrentIndex={setCurrentQuestion}
+                                setOpen={setOpen}
+                            />}
+                        </div>
                     </div>
                     <div className="test-header-timer"><ClockIcon />Time Left<span style={{ color: timeLeft >= 5*60 ? "green" : "red" }}>{secondsToHMS(timeLeft)}</span></div>
                 </div>   
