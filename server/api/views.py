@@ -8,7 +8,7 @@ from .serializers import SignUpViewSerializer, MyTokenObtainPairSerializer,Profi
 from .models import UserProfile
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from django.contrib.auth.models import User
 
 class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
@@ -41,15 +41,19 @@ class SignUpView(APIView):
           return Response(serializer.data, status=status.HTTP_201_CREATED)
      
 class ProfileView(APIView):
+     permission_classes = (IsAuthenticated,)
      def get(self,request):
           try:
                username = request.GET.get("username")
                print(username)
-               user_profile=UserProfile.objects.get(username=username)
-               serialiser=ProfileViewSerializer(user_profile,many=True)
-               if(serialiser.data['type']=="student"):
+               user=User.objects.get(username=username)
+               # print(user.email)
+               # userProfile=UserProfile.objects.get(user=user)
+               serialiser=ProfileViewSerializer(user,many=False)
+               print(serialiser.data)
+               if(serialiser.data['userdetails']['type']=="student"):
                     return Response(serialiser.data,status=status.HTTP_200_OK)
-               elif(serialiser.data["type"]=="institute"):
+               elif(serialiser.data['userdetails']['type']=="institute"):
                     return Response(serialiser.data,status=status.HTTP_200_OK)
                else:
                     return Response(status=status.HTTP_404_NOT_FOUND)

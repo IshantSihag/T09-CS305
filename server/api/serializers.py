@@ -52,7 +52,15 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #         if not User.objects.filter(email=email, password=password).exists():
 #             return serializers.ValidationError({'email': 'Email or password is incorrect'})
 #         return super().validate(data)
-    class ProfileViewSerializer(serializers.ModelSerializer):
-        class meta:
-            model=UserProfile
-            fields="__all__"
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = ( 'name', 'profile_url', 'bio', 'tests','type')
+
+class ProfileViewSerializer(serializers.ModelSerializer):
+    userdetails=UserProfileSerializer(many=False)
+    class Meta:
+        model=User
+        fields=('username','email','userdetails')
