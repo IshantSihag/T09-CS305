@@ -37,11 +37,6 @@ const InstituteDashboard = () => {
 
   return (
 
-    <div>
-      <Navbar />
-
-      <div className="p-4">
-
     <div className="h-screen flex flex-col">
       <Navbar />
 
