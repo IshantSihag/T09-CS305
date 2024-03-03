@@ -12,7 +12,8 @@ class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
+        user = User.objects.create_user(username=validated_data['username'], email=validated_data['username'], password=validated_data['password'])
+        self.userProfileUpdateCreate(user)
         return user
     
     def update(self, instance, validated_data):
@@ -20,6 +21,7 @@ class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email
         instance.email = validated_data.get('email', instance.email)
         instance.set_password(validated_data.get('password', instance.password))
         instance.save()
+        self.userProfileUpdateCreate(instance)
         return instance
     
     def validate(self, data):
@@ -27,6 +29,10 @@ class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError({'email': 'Email is already in use'})
         return super().validate(data)
+    def userProfileUpdateCreate(self,user):
+        userprofile=UserProfile.objects.update_or_create(
+            user_id=user
+        )
 
 
 
