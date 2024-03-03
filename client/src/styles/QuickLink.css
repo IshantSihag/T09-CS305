@@ -1,0 +1,17 @@
+.quick-links {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    border: 2px solid #d3d3d5;
+    padding: .5rem;
+}
+
+.quick-link-row {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.IconButton {
+    margin: 5px;
+}
