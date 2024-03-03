@@ -36,22 +36,16 @@ const InstituteDashboard = () => {
   };
 
   return (
-
     <div className="h-screen flex flex-col">
       <Navbar />
 
       <div className="flex-grow p-4 flex flex-col items-center">
-
         <div className="text-2xl font-bold mb-4">Institute Dashboard</div>
 
         <Button
           color="black"
           onClick={handleProfile}
-
-          className="mb-4 px-6 py-3 mx-5"
-
           className="mb-4 px-6 py-3 w-full max-w-md"
-
           ripple="light"
         >
           Profile
@@ -60,11 +54,7 @@ const InstituteDashboard = () => {
         <Button
           color="black"
           onClick={handleCreateTest}
-
-          className="mb-4 px-6 py-3 mx-5"
-
           className="mb-4 px-6 py-3 w-full max-w-md"
-
           ripple="light"
         >
           Create Test
@@ -73,11 +63,7 @@ const InstituteDashboard = () => {
         <Button
           color="black"
           onClick={handleViewAllTests}
-
-          className="mb-4 px-6 py-3 mx-5"
-
           className="mb-4 px-6 py-3 w-full max-w-md"
-
           ripple="light"
         >
           All Tests
@@ -86,11 +72,7 @@ const InstituteDashboard = () => {
         <Button
           color="black"
           onClick={handleLogout}
-
-          className="mb-4 px-6 py-3 mx-5"
-
           className="mb-4 px-6 py-3 w-full max-w-md"
-
           ripple="light"
         >
           Logout
@@ -101,5 +83,4 @@ const InstituteDashboard = () => {
     </div>
   );
 };
-
 export default InstituteDashboard;
