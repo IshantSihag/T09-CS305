@@ -1,0 +1,13 @@
+.avatar-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: -100px; /* Adjust this value to position the avatar as desired */
+  }
+  
+  .avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid #fff; /* Optional: Add a border to the avatar */
+  }
