@@ -8,9 +8,6 @@ import {
   CardFooter,
   CardHeader,
   Input,
-  List,
-  ListItem,
-  ListItemPrefix,
   Radio,
   Textarea,
   Select,
@@ -23,23 +20,149 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 
-const Ques_Types = ["MCQ", "Short answer", "Long answer"];
+const Ques_Types = ["single_correct", "multi_correct", "long_answer"];
 
-// function
+const SingleCorrect = ({
+  currentQuestion_,
+  handleAddChoice_,
+  handleChoiceChange_,
+  handleDeleteChoice_,
+}) => {
+  return (
+    <div>
+      <Typography variant="h6">Options</Typography>
+      {currentQuestion_.choices.map((choice, index) => (
+        <div className="flex content-center">
+          <Radio
+            name="type"
+            ripple={false}
+            className="flex-row"
+            containerProps={{
+              className: "p-0",
+            }}
+          />
+          <input
+            placeholder={`Enter Choice ${index + 1}`}
+            className="w-1/3 m-1.5 p-1.5 border-1 border-blue-gray-100 rounded-md"
+            value={choice.value}
+            onChange={(e) => {
+              handleChoiceChange_(index, e.target.value);
+            }}
+          />
+          <TrashIcon
+            className="mt-2.5 h-7 w-7 cursor-pointer"
+            onClick={() => {
+              handleDeleteChoice_(index);
+            }}
+          />
+        </div>
+      ))}
+      <div className="mt-2">
+        <div className="flex items-center mb-2">
+          <Button
+            className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2"
+            onClick={() => handleAddChoice_()}
+          >
+            + Add Choice
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MultiCorrect = ({
+  currentQuestion_,
+  handleAddChoice_,
+  handleChoiceChange_,
+  handleDeleteChoice_,
+  handleSelectCorrectAnswer_,
+}) => {
+  return (
+    <div>
+      <Typography variant="h6">Options</Typography>
+      {currentQuestion_.choices.map((choice, index) => (
+        <div className="flex content-center">
+          <Checkbox
+            // icon={}
+            color="red"
+            checked={choice.isCorrect}
+            onChange={() => {
+              handleSelectCorrectAnswer_(
+                index,
+                !choice.isCorrect
+              );
+            }}
+          />
+          <input
+            placeholder={`Enter Choice ${index + 1}`}
+            className="w-1/3 m-1.5 p-1.5 border-1 border-blue-gray-100 rounded-md"
+            value={choice.value}
+            onChange={(e) => {
+              handleChoiceChange_(index, e.target.value);
+            }}
+          />
+          <TrashIcon
+            className="mt-2.5 h-7 w-7 cursor-pointer"
+            onClick={() => {
+              handleDeleteChoice_(index);
+            }}
+          />
+        </div>
+      ))}
+      <div className="mt-2">
+        <div className="flex items-center mb-2">
+          <Button
+            className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2"
+            onClick={() => handleAddChoice_()}
+          >
+            + Add Choice
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LongAnswer = ({
+  currentQuestion_,
+  handleQuestionAnswerChange_
+}) => {
+  return (
+    <div>
+      <Typography variant="h6">Answer</Typography>
+      <Textarea
+        variant="outlined"
+        placeholder="Type answer here"
+        // label="question"
+        className="mt-2 border-1 flex-1 rounded-lg w-full h-32"
+        labelProps={{
+          className: "before:content-none after:content-none",
+        }}
+        containerProps={{
+          className: "border-black",
+        }}
+        onChange={(e) => {handleQuestionAnswerChange_(e.target.value);}}
+        value={currentQuestion_.answer}
+      />
+    </div>
+  );
+};
 
 export default function CreattTest() {
   const [questions, setQuestions] = useState([
     {
       id: 1,
-      title: "--",
-      value: "--",
-      type: "MCQ",
+      title: "",
+      value: "",
+      type: "single_correct",
       choices: [
-        { value: "", isCorrect: false },
         { value: "", isCorrect: false },
         { value: "", isCorrect: false },
       ],
       answer: "",
+      marks: "",
+      negative_marks: "",
     },
   ]);
 
@@ -47,68 +170,27 @@ export default function CreattTest() {
 
   const currentQuestion = questions[currentQuestionIndex];
 
-  // useEffect(() => {
-  //   if (questions.length > 0) {
-  //     setCurrentQuestionIndex(0);
-  //   }
-  // }, [questions]);
-
   // Function to handle adding a choice for a multiple-choice question
-  const handleAddChoice = (questionId) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((question, index) =>
-        index === currentQuestionIndex
-          ? {
-              ...question,
-              choices: [...question.choices, { value: "", isCorrect: false }],
-            }
-          : question
-      )
-    );
-  };
-
-  const handleSelectCorrectAnswer = (questionId, choiceId, isCorrect) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((question, index) =>
-        index === currentQuestionIndex
-          ? {
-              ...question,
-              choices: question.choices.map((choice, choiceIndex) =>
-                choiceIndex === choiceId ? { ...choice, isCorrect } : choice
-              ),
-            }
-          : question
-      )
-    );
-  };
 
   const handleAddQuestion = () => {
     setQuestions((prevQuestions) => [
       ...prevQuestions,
       {
         id: prevQuestions.length + 1,
-        title: "--",
-        value: "--",
-        type: "MCQ",
+        title: "",
+        value: "",
+        type: "single_correct",
         choices: [{ value: "", isCorrect: false }],
         answer: "",
       },
     ]);
   };
 
-  const handleChoiceChange = (choiceId, value) => {
+  const handleDeleteQuestion = () => {
     setQuestions((prevQuestions) =>
-      prevQuestions.map((question, index) =>
-        index === currentQuestionIndex
-          ? {
-              ...question,
-              choices: question.choices.map((choice, choiceIndex) =>
-                choiceIndex === choiceId ? { ...choice, value } : choice
-              ),
-            }
-          : question
-      )
+      prevQuestions.filter((question, index) => index !== currentQuestionIndex)
     );
+    setCurrentQuestionIndex(currentQuestionIndex-1)
   };
 
   const handleQuestionTitleChange = (value) => {
@@ -128,6 +210,51 @@ export default function CreattTest() {
       )
     );
   };
+
+  const handleQuestionTypeChange = (value) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((question, index) =>
+        index === currentQuestionIndex ? { ...question, type: value } : question
+      )
+    );
+  };
+
+  const handleQuestionAnswerChange = (value) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((question, index) =>
+        index === currentQuestionIndex ? { ...question, answer: value } : question
+      )
+    );
+  };
+
+  const handleAddChoice = () => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((question, index) =>
+        index === currentQuestionIndex
+          ? {
+              ...question,
+              choices: [...question.choices, { value: "", isCorrect: false }],
+            }
+          : question
+      )
+    );
+  };
+
+  const handleChoiceChange = (choiceId, value) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((question, index) =>
+        index === currentQuestionIndex
+          ? {
+              ...question,
+              choices: question.choices.map((choice, index) =>
+                index === choiceId ? { ...choice, value } : choice
+              ),
+            }
+          : question
+      )
+    );
+  };
+
   const handleDeleteChoice = (choiceId) => {
     setQuestions((prevQuestions) =>
       prevQuestions.map((question, index) =>
@@ -140,11 +267,18 @@ export default function CreattTest() {
       )
     );
   };
-
-  const handleQuestionTypeChange = (value) => {
+  
+  const handleSelectCorrectAnswer = (choiceId, isCorrect) => {
     setQuestions((prevQuestions) =>
       prevQuestions.map((question, index) =>
-        index === currentQuestionIndex ? { ...question, type: value } : question
+        index === currentQuestionIndex
+          ? {
+              ...question,
+              choices: question.choices.map((choice, choiceIndex) =>
+                choiceIndex === choiceId ? { ...choice, isCorrect } : choice
+              ),
+            }
+          : question
       )
     );
   };
@@ -167,7 +301,7 @@ export default function CreattTest() {
       <div className="flex p-6 gap-x-2 items-center bg-gray-50">
         <Card className="w-96 h-svh">
           <CardHeader
-            className="flex justify-between border-b pb-2 rounded-none"
+            className="flex justify-between border-b-2 mx-0 px-4 pb-2 rounded-none"
             floated={false}
             shadow={false}
           >
@@ -190,6 +324,9 @@ export default function CreattTest() {
                   index === currentQuestionIndex ? "bg-blue-100" : ""
                 }`}
                 key={question.id}
+                onClick={() => {
+                  setCurrentQuestionIndex(index);
+                }}
               >
                 <div className="flex justify-between">
                   <Typography
@@ -197,144 +334,150 @@ export default function CreattTest() {
                     color="gray"
                     className="font-bold justify-between"
                   >
-                    Q. {question.id} {question.title}
+                    Q. {index+1}{" "}
+                    {question.title.size > 15
+                      ? question.title.slice() + ".."
+                      : question.title}
                   </Typography>
                   <Chip
                     variant="ghost"
                     color="blue"
                     value={question.type}
-                    className="w-fit"
+                    className="w-fit h-8"
                   />
                 </div>
 
-                <Typography variant="paragraph" color="gray" className="flex-1">
+                {/* <Typography variant="paragraph" color="gray" className="flex-1">
                   {question.value}
-                </Typography>
+                </Typography> */}
               </div>
             ))}
           </CardBody>
         </Card>
         <Card className="flex-1 place-content-between h-svh">
           <CardHeader
-            className=" relative z-100 flex justify-between border-b pb-2 rounded-none"
+            className="flex justify-between border-b-2 px-4 mx-0 pb-2 mt-3 rounded-none overflow-visible"
             floated={false}
             shadow={false}
           >
             <div className="w-44">
               <Select
+                size="md"
                 value={currentQuestion.type}
                 onChange={(val) => handleQuestionTypeChange(val)}
+                labelProps={{ className: "before:content-none" }}
               >
-                <Option value="MCQ">Multiple Choice</Option>
-                <Option value="short_answer">Short Answer</Option>
-                <Option value="long_answer">Long</Option>
+                <Option value="single_correct" className="mb-1">
+                  Single Correct (MCQ)
+                </Option>
+                <Option value="multi_correct" className="mb-1">
+                  Multi Correct
+                </Option>
+                <Option value="long_answer" className="mb-1">
+                  Long Answer
+                </Option>
               </Select>
             </div>
-            <Button
-              className="rounded-full"
-              size="sm"
-              ripple={false}
-              onClick={() => handleMoveQuestionUp()}
-              disabled={currentQuestionIndex === 0}
-            >
-              Up
-            </Button>
-            <Button
-              className="rounded-full"
-              size="sm"
-              ripple={false}
-              onClick={() => handleMoveQuestionDown()}
-              disabled={currentQuestionIndex === questions.length - 1}
-            >
-              Down
-            </Button>
+            <div>
+              <Button
+                className="rounded-full mx-2"
+                size="sm"
+                ripple={false}
+                onClick={() => handleMoveQuestionUp()}
+                disabled={currentQuestionIndex === 0}
+              >
+                Up
+              </Button>
+              <Button
+                className="rounded-full mr-2"
+                size="sm"
+                ripple={false}
+                onClick={() => handleMoveQuestionDown()}
+                disabled={currentQuestionIndex === questions.length - 1}
+              >
+                Down
+              </Button>
+              <Button
+                className="rounded-full"
+                size="sm"
+                ripple={false}
+                onClick={() => handleDeleteQuestion()}
+                disabled={currentQuestionIndex === 0}
+              >
+                Delete
+              </Button>
+            </div>
           </CardHeader>
           <CardBody className="flex-1 overflow-scroll">
             <div>
-              <Typography className="font-medium">Question</Typography>
-              {/* <Input 
+              <Typography variant="h6">Question</Typography>
+              <input
                 placeholder="Question Title"
-                labelProps={{
-                  placeholder:"Question Title",
-                  style:{
-                    pointerEvents: "none",
-                  }
-                }}
-              /> */}
+                className="w-1/3 p-1.5 border-1 border-blue-gray-100 rounded-md"
+                value={currentQuestion.title}
+                onChange={(e) => handleQuestionTitleChange(e.target.value)}
+              />
               <Textarea
+                variant="outlined"
                 placeholder="Type question here"
+                // label="question"
+                className="mt-2 border-1 flex-1 rounded-lg w-full h-32"
+                labelProps={{
+                  className: "before:content-none after:content-none",
+                }}
+                containerProps={{
+                  className: "border-black",
+                }}
                 onChange={(e) => handleQuestionChange(e.target.value)}
                 value={currentQuestion.value}
               />
             </div>
-            <div>
-              <Typography className="font-medium">Answers</Typography>
-              <List className="w-1/2" key={currentQuestion.id}>
-                {currentQuestion.choices.map((choice, index) => (
-                  <ListItem className="p-0" key={choice.value}>
-                    <ListItemPrefix className="mr-3">
-                      <Radio
-                        ripple={false}
-                        className="hover:before:opacity-0"
-                        containerProps={{
-                          className: "p-0",
-                        }}
-                      />
-                    </ListItemPrefix>
-                    <div
-                      key={choice.value}
-                      className="flex-1 items-center mb-2"
-                    >
-                      <Input
-                        label={`Enter Choice ${index + 1}`}
-                        className="w-full mr-2"
-                        inputProps={{ maxLength: 255 }}
-                        value={choice.value}
-                        onChange={(e) =>
-                          handleChoiceChange(index, e.target.value)
-                        }
-                      />
-                      {/* {currentQuestion.type === "MCQ" && (
-                        <Checkbox
-                          className="ml-2"
-                          label="Correct"
-                          checked={choice.isCorrect}
-                          onChange={() =>
-                            handleSelectCorrectAnswer(
-                              currentQuestionIndex,
-                              index,
-                              !choice.isCorrect
-                            )
-                          }
-                        />
-                      )} */}
-                    </div>
-                    <TrashIcon
-                      className="ml-2 mb-3 h-7 w-7"
-                      onClick={() => {
-                        handleDeleteChoice(index);
-                      }}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-              <div className="mt-2">
-                <div className="flex items-center mb-2">
-                  <Button
-                    className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2"
-                    onClick={() => handleAddChoice(currentQuestionIndex)}
-                  >
-                    + Add Choice
-                  </Button>
-                </div>
-              </div>
-            </div>
+            {currentQuestion.type === "single_correct" && (
+              <SingleCorrect
+                currentQuestion_={currentQuestion}
+                currentQuestionIndex_={currentQuestionIndex}
+                handleAddChoice_={handleAddChoice}
+                handleDeleteChoice_={handleDeleteChoice}
+                handleChoiceChange_={handleChoiceChange}
+              />
+            )}
+
+            {currentQuestion.type === "multi_correct" && (
+              <MultiCorrect
+                currentQuestion_={currentQuestion}
+                currentQuestionIndex_={currentQuestionIndex}
+                handleAddChoice_={handleAddChoice}
+                handleDeleteChoice_={handleDeleteChoice}
+                handleChoiceChange_={handleChoiceChange}
+                handleSelectCorrectAnswer_={handleSelectCorrectAnswer}
+              />
+            )}
+
+            {currentQuestion.type === "long_answer" && (
+              <LongAnswer
+                currentQuestion_={currentQuestion}
+                handleQuestionAnswerChange_={handleQuestionAnswerChange}
+              />
+            )}
+
           </CardBody>
           <CardFooter className="flex-wrap-reverse py-3" divider={true}>
             <Typography className="font-medium">Marks</Typography>
             <div className="grid grid-cols-2 gap-4 w-1/2">
-              <Input label="Overall *"/>
-              <Input label="Negative" />
+              <Input label="Overall *" onChange={(value)=>{
+                setQuestions((prevQuestions) =>
+                  prevQuestions.map((question, index) =>
+                    index === currentQuestionIndex ? { ...question, marks: value } : question
+                  )
+                );
+              }}/>
+              <Input label="Negative" onChange={(value)=>{
+                setQuestions((prevQuestions) =>
+                  prevQuestions.map((question, index) =>
+                    index === currentQuestionIndex ? { ...question, negative_marks: value } : question
+                  )
+                );
+              }}/>
             </div>
           </CardFooter>
         </Card>
