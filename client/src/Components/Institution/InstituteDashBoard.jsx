@@ -83,5 +83,4 @@ const InstituteDashboard = () => {
     </div>
   );
 };
-
 export default InstituteDashboard;
