@@ -20,10 +20,11 @@ class LoginView(TokenObtainPairView):
         serializer = self.get_serializer(data=request.data)
         try:
             if serializer.is_valid():
-                username = request.data["email"]
+                email = request.data["username"]
                 type = request.data["type"]
-                user_profile = UserProfile.objects.get(username=username, type=type)
-                user_profile_serializer = UserProfileSerializer(user_profile, many=False)
+                user = User.objects.get(email=email)
+                user_profile = UserProfile.objects.get(user_id=user.id, type=type)
+                user_profile_serializer = UserProfileSerializer(user_profile)
                 user_profile_serializer = user_profile_serializer.data
                 tests = user_profile_serializer['tests']
                 jsonresponse = {
@@ -32,12 +33,18 @@ class LoginView(TokenObtainPairView):
                     "refresh": serializer.validated_data['refresh'],
                     "type": user_profile_serializer['type'],
                     "name": user_profile_serializer['name'],
-                    "email": user_profile_serializer['email'],
+                    "email": user.email,
                     "profile_url": user_profile_serializer['profile_url'],
                     "bio": user_profile_serializer['bio'],
                     "expires_in": 3600,
                 }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
+            else:
+                jsonresponse = {
+                    "ok": False,
+                    "error": "Invalid input"
+                }
+                return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
         except:
             jsonresponse = {
                 "ok": False,
