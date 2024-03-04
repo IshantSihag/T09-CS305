@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 QUESTION_TYPES = (
     ('single', 'Single Correct'),
@@ -26,7 +27,7 @@ class Question(models.Model):
     test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
     
 class UserProfile(models.Model):
-    username = models.CharField(max_length=100)
+    user_id = models.OneToOneField(User,related_name='userdetails',default=1,on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     profile_url = models.TextField(blank=True)
     bio = models.TextField(blank=True)
@@ -38,7 +39,7 @@ class Response(models.Model):
     test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
     question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
     response = models.TextField()
-    timestamp = models.DateTimeField(auto_add_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     
 class Result(models.Model):
     student_id = models.IntegerField()

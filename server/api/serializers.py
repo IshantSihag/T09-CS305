@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from .models import UserProfile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from .models import UserProfile
 
 class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email, password
     class Meta:
@@ -9,7 +12,7 @@ class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
+        user = User.objects.create_user(username=validated_data['username'], email=validated_data['username'], password=validated_data['password'])
         return user
     
     def update(self, instance, validated_data):
@@ -24,6 +27,7 @@ class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError({'email': 'Email is already in use'})
         return super().validate(data)
+  
 
 
 
@@ -51,3 +55,15 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #         if not User.objects.filter(email=email, password=password).exists():
 #             return serializers.ValidationError({'email': 'Email or password is incorrect'})
 #         return super().validate(data)
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = ( 'name', 'profile_url', 'bio', 'tests','type')
+
+class ProfileViewSerializer(serializers.ModelSerializer):
+    userdetails=UserProfileSerializer(many=False)
+    class Meta:
+        model=User
+        fields=('username','email','userdetails')
