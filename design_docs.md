@@ -10,6 +10,9 @@
     - [Refresh Token Flow](#refresh-token-flow)
     - [Logout Flow](#logout-flow)
 3. [Test](#test)
+    - [Get Test](#get-test)
+    - [Start Test](#start-test)
+    - [Delete Test](#delete-test)
 
 
 ## Introduction
@@ -217,4 +220,122 @@ Content-Type: application/json
 
 
 ## Test
-Under development
+
+### Get Test
+
+This endpoint retrieves tests associated with the authenticated user.
+
+Get Test Request:
+```http
+GET /getTest
+```
+
+Get Test Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing the user's tests.
+```http
+HTTP/1.1 200 OK
+[
+    {
+        "start": "YYYY-MM-DDTHH:MM:SSZ",
+        "duration": "HH:MM:SS",
+        "author": "Author's Email",
+        "questions": ["Question ID 1", "Question ID 2", ...],
+        "registrations": ["User Email 1", "User Email 2", ...]
+    },
+    ...
+]
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Invalid request"
+}
+```
+
+
+### Start Test
+
+This endpoint starts a test for the authenticated user.
+
+Start Test Request:
+```http
+POST /startTest
+Content-Type: application/json
+{
+    "test_id": "Test ID"
+}
+```
+
+Start Test Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "start": "YYYY-MM-DDTHH:MM:SSZ",
+    "duration": "HH:MM:SS",
+    "author": "Author's Email",
+    "questions": [
+        {
+            "statement": "Question Statement",
+            "type": "Question Type",
+            "marks": "Question Marks",
+            "options": ["Option 1", "Option 2", ...]
+        },
+        ...
+    ]
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Invalid request"
+}
+```
+
+### Delete Test
+
+This endpoint deletes a test for the authenticated institute.
+
+Delete Test Request:
+```http
+DELETE /deleteTest
+Content-Type: application/json
+{
+    "test_id": "Test ID"
+}
+```
+
+Delete Test Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "message": "Test deleted successfully"
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Invalid request"
+}
+```
+
