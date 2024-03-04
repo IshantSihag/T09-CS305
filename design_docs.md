@@ -235,16 +235,19 @@ Get Test Response:
 1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing the user's tests.
 ```http
 HTTP/1.1 200 OK
-[
-    {
-        "start": "YYYY-MM-DDTHH:MM:SSZ",
-        "duration": "HH:MM:SS",
-        "author": "Author's Email",
-        "questions": ["Question ID 1", "Question ID 2", ...],
-        "registrations": ["User Email 1", "User Email 2", ...]
-    },
-    ...
-]
+{
+    "ok": true,
+    "tests": [
+        {
+            "test_id": "Test ID",
+            "title": "Test Title",
+            "author": "Author's Email",
+            "start": "YYYY-MM-DDTHH:MM:SSZ",
+            "duration": "3600"  // in seconds
+        },
+        ...
+    ]
+}
 ```
 
 2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
@@ -280,8 +283,9 @@ Content-Type: application/json
 {
     "ok": true,
     "start": "YYYY-MM-DDTHH:MM:SSZ",
-    "duration": "HH:MM:SS",
+    "duration": "3600",      // in seconds
     "author": "Author's Email",
+    "title": "Test Title",
     "questions": [
         {
             "statement": "Question Statement",
