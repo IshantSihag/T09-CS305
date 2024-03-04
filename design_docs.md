@@ -33,7 +33,7 @@ POST /signup
 Content-Type: application/json
 
 {
-    "username": "testuser",
+    "name": "Test User",
     "password": "testpassword",
     "email": "testuser@example.com",
     "type": "student",          // or "institute"
@@ -49,7 +49,6 @@ Content-Type: application/json
     "ok": true,
     "type": "student",          // or "institute"
     "name": "Test User",
-    "username": "testuser",
     "email": "testuser@example.com",
     "bio": "",
     "profile_url": "https://cdn.example.com/default.jpg"
@@ -57,15 +56,6 @@ Content-Type: application/json
 ```
 
 2. If the signup is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message. Below are the possible error messages.
-
-```http
-HTTP/1.1 400 Bad Request
-Content-Type: application/json
-{
-    "ok": false,
-    "error": "Username already exists"
-}
-```
 
 ```http
 HTTP/1.1 400 Bad Request
@@ -94,8 +84,9 @@ POST /login
 Content-Type: application/json
 
 {
-    "username": "testuser",
-    "password": "testpassword"
+    "username": "testuser@example.com",
+    "password": "testpassword",
+    "type": "student"          // or "institute"
 }
 ```
 
@@ -108,7 +99,6 @@ Content-Type: application/json
     "ok": true,
     "type": "student",          // or "institute"
     "name": "Test User",
-    "username": "testuser",
     "email": "testuser@example.com",
     "bio": "IIT Ropar 2025",
     "profile_url": "https://cdn.example.com/testuser.jpg",
@@ -137,7 +127,7 @@ Generate Token Request:
 POST /token
 Content-Type: application/json
 {
-    "username": "testuser",
+    "email": "testuser@example.com",
     "password": "testpassword"
 }
 ```
