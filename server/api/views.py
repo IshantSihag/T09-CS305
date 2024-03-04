@@ -38,7 +38,15 @@ class SignUpView(APIView):
           serializer = SignUpViewSerializer(data=request.data)
           serializer.is_valid(raise_exception=True)
           serializer.save()
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+          response = {
+               "ok": True,
+               "type": serializer.data["type"],
+               "name": serializer.data["name"],
+               "email": serializer.data["email"],
+               "bio": "",
+               "profile_url": ""
+          }
+          return Response(response, status=status.HTTP_201_CREATED)
      
 class ProfileView(APIView):
      permission_classes = (IsAuthenticated,)
