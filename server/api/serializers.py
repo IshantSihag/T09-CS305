@@ -67,3 +67,14 @@ class ProfileViewSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
         fields=('username','email','userdetails')
+class UpdateUserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ( 'name', 'profile_url', 'bio',)
+    
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.profile_url = validated_data.get('profile_url', instance.profile_url)
+        instance.bio = validated_data.get('bio', instance.bio)
+        instance.save()
+        return instance

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import SignUpViewSerializer, MyTokenObtainPairSerializer,ProfileViewSerializer
+from .serializers import SignUpViewSerializer, MyTokenObtainPairSerializer,ProfileViewSerializer,UpdateUserProfileSerializer
 from .models import UserProfile
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -60,4 +60,35 @@ class ProfileView(APIView):
           except Exception as e:
                print(str(e))
                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+          
+class UpdateProfileView(APIView):
+     permission_classes = (IsAuthenticated,)
+     def post(self,request):
+          jsonresponse={
+               "ok":False,
+               "message":"error"
+          }
+          try:
+
+               try:
+                    user = User.objects.get(email=request.data['email'])
+               except User.DoesNotExist:
+                    jsonresponse["message"] = "No user with the given email"
+                    return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
+               userProfile=UserProfile.objects.get(user_id=user.id)
+               serializer=UpdateUserProfileSerializer(userProfile,data=request.data)
+               if not serializer.is_valid():
+                    print("invalid data")
+                    jsonresponse["message"]="invalid data"
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+               serializer.save()
+               jsonresponse={
+                    "ok":True,
+                    "message":"successfully updated"
+               }
+               return Response(jsonresponse,status=status.HTTP_200_OK)
+          except Exception as e:
+               print(e)
+               return Response(jsonresponse,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
           
