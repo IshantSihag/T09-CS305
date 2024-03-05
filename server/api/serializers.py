@@ -4,8 +4,6 @@ from .models import UserProfile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import UserProfile
 
-from .models import UserProfile
-
 class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email, password
     class Meta:
         model = User
@@ -14,6 +12,8 @@ class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email
 
     def create(self, validated_data):
         user = User.objects.create_user(username=validated_data['username'], email=validated_data['username'], password=validated_data['password'])
+        UserProfile.objects.create(user_id=user)
+        
         return user
     
     def update(self, instance, validated_data):
@@ -29,7 +29,6 @@ class SignUpViewSerializer(serializers.ModelSerializer):  # contains name, email
             raise serializers.ValidationError({'email': 'Email is already in use'})
         return super().validate(data)
   
-
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):

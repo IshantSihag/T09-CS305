@@ -73,19 +73,44 @@ class LogoutView(APIView):
            
 class SignUpView(APIView):
     def post(self, request):
-        serializer = SignUpViewSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        response = {
-             "ok": True,
-             "type": serializer.data["type"],
-             "name": serializer.data["name"],
-             "email": serializer.data["email"],
-             "bio": "",
-             "profile_url": ""
-        }
-        return Response(response, status=status.HTTP_201_CREATED)
-     
+        try:
+            if User.objects.filter(email=request.data["username"]).exists():
+                return Response({"ok": False, "error": "Email already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data["type"] != "student" and request.data["type"] != "institute":
+                return Response({"ok": False, "error": "Invalid user type"}, status=status.HTTP_400_BAD_REQUEST)
+            serializer = SignUpViewSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                user = User.objects.get(email=request.data["username"])
+                
+                user_profile = UserProfile.objects.get(user_id=user.id)
+                user_profile.name = request.data["name"]
+                user_profile.type = request.data["type"]
+                user_profile.save()
+                response = {
+                    "ok": True,
+                    "type": user_profile.type,
+                    "name": user_profile.name,
+                    "email": serializer.data["email"],
+                    "bio": "",
+                    "profile_url": ""
+                }
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                response = {
+                    "ok": False,
+                    "error": "Invalid user type"
+                }
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            response = {
+                "ok": False,
+                "error": "Invalid input"
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            
+        
+            
 class getTest(APIView):
      permission_classes = (IsAuthenticated, )
      def get(self, request):
