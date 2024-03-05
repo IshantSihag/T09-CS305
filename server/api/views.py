@@ -196,3 +196,37 @@ class startTest(APIView):
                 "error": "You are not registered for this test"
             }
             return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class deleteTest(APIView):
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        try:
+            test_id = request.data['test_id']
+        except:
+            jsonresponse = {
+                "ok": False,
+                "error": "Invalid input. test_id required"
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        user_email = request.user.email
+        if not Test.objects.filter(id=test_id).exists():
+            jsonresponse = {
+                "ok": False,
+                "error": "Test not found"
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        test = Test.objects.get(id=test_id)
+        if test.author != user_email:
+            jsonresponse = {
+                "ok": False,
+                "error": "You are not authorized to delete this test"
+            }
+            return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+        test.delete()
+        jsonresponse = {
+            "ok": True,
+            "message": "Test deleted successfully"
+        }
+        return Response(jsonresponse, status=status.HTTP_200_OK)
+    
