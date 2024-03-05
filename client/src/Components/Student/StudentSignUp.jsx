@@ -24,10 +24,41 @@ export default function InstitutionSignUp() {
     setIsValidEmail(emailRegex.test(email));
   };
 
-  const handleSignup = () => {
+  const handleSignup = async() => {
+    validateEmail();
     if (isValidEmail) {
       console.log("Signup with name : ", name, "email:", email, "and password:", password);
+       
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('password', password);
+      formData.append('username', email);
+      formData.append('type', "student");
+ 
+      const response = await fetch('http://127.0.0.1:8000/signup/', {
+        method: "POST",
+        body: formData
+      });
+
+      console.log(response);
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.ok) {
+          console.log("Signup Successfully");
+          navigate("/student/login");  
+        } else {
+          const errMsg = data?.error || "Error in Signup, Please try again";
+          alert(errMsg);
+          console.log(errMsg);
+        }
+      } else {
+        console.log("Signup Failed Please try again");
+      }
+
+
     } else {
+      alert("Please enter a valid email");
       console.error("Invalid email address");
     }
   };

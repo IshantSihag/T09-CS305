@@ -10,6 +10,8 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
+
 
 const StudentLogin = () => {
   const navigate = useNavigate();
@@ -23,9 +25,44 @@ const StudentLogin = () => {
     setIsValidEmail(emailRegex.test(email));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async() => {
+    validateEmail();
     if (isValidEmail) {
       console.log("Login with email:", email, "and password:", password);
+      
+      const formData = new FormData();
+      
+      formData.append('password', password);
+      formData.append('username', email);
+      formData.append('type', "student");
+ 
+      const response = await fetch('http://127.0.0.1:8000/login/', {
+        method: "POST",
+        body: formData
+      });
+
+      console.log("student response: ", response);
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.ok) {
+          console.log("Login Successfully");
+
+          //setting up the cookies with the fetched data
+          Cookies.set('access', data.access, { expires: 1, path: '/' });          
+          Cookies.set('refresh', data.refresh, { expires: 1, path: '/' });          
+          Cookies.set('type', data.type, { expires: 1, path: '/' });          
+
+          navigate("/");  
+        } else {
+          const errMsg = data?.error || "Error in Signup, Please try again";
+          alert(errMsg);
+          console.log(errMsg);
+        }
+      } else {
+        console.log("Login Failed Please try again");
+      }
+
       // Perform login action here
     } else {
       console.error("Invalid email address");
