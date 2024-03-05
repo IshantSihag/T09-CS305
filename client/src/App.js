@@ -12,7 +12,6 @@ import CreateTest from "./Components/Institution/CreateTest";
 import AttemptTest from "./Components/Student/AttemptTest";
 import StartTest from "./Components/Student/StartTest";
 
-
 const App = () => {
   return (
     <div>

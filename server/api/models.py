@@ -9,6 +9,7 @@ QUESTION_TYPES = (
 # Create your models here.
 class Test(models.Model):
     id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100, blank=False, null=False)
     start = models.DateTimeField()
     duration = models.IntegerField()        # Number of seconds
     author = models.CharField(max_length=100, blank=False, null=False)
@@ -31,7 +32,7 @@ class UserProfile(models.Model):
     name = models.CharField(max_length=100)
     profile_url = models.TextField(blank=True)
     bio = models.TextField(blank=True)
-    tests = models.TextField()
+    tests = models.TextField(blank=True)
     type = models.CharField(max_length=32, default='student', choices=(('student', 'Student'), ('institute', 'Institute')))
     
 class Response(models.Model):
