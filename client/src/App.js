@@ -11,7 +11,6 @@ import InstituteDashBoard from "./Components/Institution/InstituteDashBoard";
 import CreateTest from "./Components/Institution/CreateTest";
 import AttemptTest from "./Components/Student/AttemptTest";
 import StartTest from "./Components/Student/StartTest";
-import InstitutionProfile from "./Components/Institution/InstitutionProfilePage";
 
 const App = () => {
   return (
