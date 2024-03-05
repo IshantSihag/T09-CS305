@@ -7,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import SignUpViewSerializer, MyTokenObtainPairSerializer,ProfileViewSerializer, UserProfileSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Test, UserProfile
+from .models import Test, UserProfile, Question
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 
@@ -152,3 +152,47 @@ class ProfileView(APIView):
                print(str(e))
                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
           
+class startTest(APIView):
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        try:
+            test_id = request.data['test_id']
+        except:
+            jsonresponse = {
+                "ok": False,
+                "error": "test_id required"
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        user_email = request.user.email
+        if not Test.objects.filter(id=test_id).exists():
+            jsonresponse = {
+                "ok": False,
+                "error": "Test not found"
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        test = Test.objects.get(id=test_id)
+        registrations = test.registrations.split(',')
+        if user_email in registrations:
+            questions = []
+            listquestions = Question.objects.filter(test_id=test_id)
+            for question in listquestions:
+                questions.append({
+                    "statement": question.statement,
+                    "type": question.type,
+                    "marks": question.marks,
+                    "options": question.options.split(','),
+                })
+            jsonresponse={
+                "ok": True,
+                "start": test.start,
+                "duration": test.duration,
+                "author": test.author,
+                "questions": questions
+            }
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+        else:
+            jsonresponse = {
+                "ok": False,
+                "error": "You are not registered for this test"
+            }
+            return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
