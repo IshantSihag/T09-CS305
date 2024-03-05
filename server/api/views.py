@@ -285,9 +285,9 @@ class updateTest(APIView):
         
         question_ids = []   
         for question in question_array:
-            question_ids.append(f"{question["id"],}")
+            question_ids.append(f"{question["id"]},")
         test.questions = question_ids
-        
+
         test.save()
 
         jsonresponse = {
