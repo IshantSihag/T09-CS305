@@ -229,4 +229,69 @@ class deleteTest(APIView):
             "message": "Test deleted successfully"
         }
         return Response(jsonresponse, status=status.HTTP_200_OK)
-    
+
+class updateTest(APIView):
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        try:
+            test_id = request.data["test_id"]
+
+        except:
+            jsonresponse = {
+                "ok": False,
+                "error": "Invalid input. test_id required"
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        user_email = request.user.email
+        if not Test.objects.filter(id=test_id).exists():
+            jsonresponse = {
+                "ok": False,
+                "error": "Test not found"
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        test = Test.objects.get(id=test_id)
+        if test.author != user_email:
+            jsonresponse = {
+                "ok": False,
+                "error": "You are not authorized to update this test"
+            }
+            return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+        
+        test.title = request.data["title"]
+        test.start = request.data["start"]
+        test.duration = request.data["duration"]
+
+        question_array = request.data["questions"]
+
+        test = Test.objects.get(id=test_id)
+        for question in question_array:
+            if not Question.objects.filter(id=question["id"]).exists():
+                question = Question.objects.create(
+                    statement=question["statement"],
+                    type=question["type"],
+                    marks=question["marks"],
+                    options=question["options"],
+                    answer=question["answer"],
+                    test_id=test
+                )
+            else:
+                question = Question.objects.get(id=question["id"])
+                question.statement = question["statement"]
+                question.type = question["type"]
+                question.marks = question["marks"]
+                question.options = question["options"]
+                question.answer = question["answer"]
+                question.save()
+        
+        question_ids = []   
+        for question in question_array:
+            question_ids.append(f"{question["id"],}")
+        test.questions = question_ids
+        
+        test.save()
+
+        jsonresponse = {
+            "ok": True,
+            "message": "Test updated successfully"
+        }
+        return Response(jsonresponse, status=status.HTTP_200_OK)
