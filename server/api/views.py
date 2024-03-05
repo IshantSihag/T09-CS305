@@ -75,7 +75,7 @@ class UpdateProfileView(APIView):
                except User.DoesNotExist:
                     jsonresponse["message"] = "No user with the given email"
                     return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
-               userProfile=UserProfile.objects.get(user_id=user.id)
+               userProfile=UserProfile.objects.get(user_id=user.id,type=request.data["type"])
                serializer=UpdateUserProfileSerializer(userProfile,data=request.data)
                if not serializer.is_valid():
                     print("invalid data")
