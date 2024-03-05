@@ -62,6 +62,7 @@ class HomeView(APIView):
 class LogoutView(APIView):
      permission_classes = (IsAuthenticated,)
      def post(self, request):
+          
           try:
                refresh_token = request.data["refresh_token"]
                token = RefreshToken(refresh_token)
@@ -76,6 +77,19 @@ class SignUpView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def post(self, request):
+        serializer = SignUpViewSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response = {
+             "ok": True,
+             "type": serializer.data["type"],
+             "name": serializer.data["name"],
+             "email": serializer.data["email"],
+             "bio": "",
+             "profile_url": ""
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
      
 class getTest(APIView):
      permission_classes = (IsAuthenticated, )
@@ -95,3 +109,26 @@ class getTest(APIView):
                })
                
           return jsonresponse
+     
+     
+class ProfileView(APIView):
+     permission_classes = (IsAuthenticated,)
+     def get(self,request):
+          try:
+               username = request.GET.get("username")
+               print(username)
+               user=User.objects.get(username=username)
+               # print(user.email)
+               # userProfile=UserProfile.objects.get(user=user)
+               serialiser=ProfileViewSerializer(user,many=False)
+               print(serialiser.data)
+               if(serialiser.data['userdetails']['type']=="student"):
+                    return Response(serialiser.data,status=status.HTTP_200_OK)
+               elif(serialiser.data['userdetails']['type']=="institute"):
+                    return Response(serialiser.data,status=status.HTTP_200_OK)
+               else:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+          except Exception as e:
+               print(str(e))
+               return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+          

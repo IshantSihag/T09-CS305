@@ -4,6 +4,7 @@ import StudentLogin from "./Components/Student/StudentLoginPage";
 import InstitutionLogin from "./Components/Institution/InstitutionLoginPage";
 import StudentSignUp from "./Components/Student/StudentSignUp";
 import InstitutionSignUp from "./Components/Institution/InstitutionSignUp";
+import InstitutionProfile from "./Components/Institution/InstitutionProfilePage";
 import StudentDashBoard from "./Components/Student/StudentDashBoard";
 import StudentProfilePage from "./Components/Student/StudentProfilePage";
 import InstituteDashBoard from "./Components/Institution/InstituteDashBoard";
@@ -25,10 +26,9 @@ const App = () => {
           <Route exact path="/student/profile" element={<StudentProfilePage />} />
           <Route exact path="/institution/login" element={<InstitutionLogin />} />
           <Route exact path="/institution/signup" element={<InstitutionSignUp />} />
+          <Route exact path="/institution/profile" element={<InstitutionProfile />} />
           <Route exact path="/institution/" element={<InstituteDashBoard />} />
           <Route exact path="/institution/createtest" element={<CreateTest />} />
-
-
         </Routes>
       </Router>
 
