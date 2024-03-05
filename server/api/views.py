@@ -60,16 +60,23 @@ class HomeView(APIView):
         return Response(content)
 
 class LogoutView(APIView):
-     permission_classes = (IsAuthenticated,)
-     def post(self, request):
-          
-          try:
-               refresh_token = request.data["refresh_token"]
-               token = RefreshToken(refresh_token)
-               token.blacklist()
-               return Response(status=status.HTTP_205_RESET_CONTENT)
-          except Exception as e:
-               return Response(status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            jsonresponse = {
+                "ok": True,
+                "message": "Successfully logged out"
+            }
+            return Response(jsonresponse, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            jsonresponse = {
+                "ok": False,
+                "error": "Invalid refresh token",
+            }
+            return Response(status=status.HTTP_400_BAD_REQUEST)
            
 class SignUpView(APIView):
     def post(self, request):
@@ -229,4 +236,32 @@ class deleteTest(APIView):
             "message": "Test deleted successfully"
         }
         return Response(jsonresponse, status=status.HTTP_200_OK)
-    
+
+class GetAllTestStudentView(APIView):
+     permission_classes = (IsAuthenticated,)
+     def get(self,request):
+          jsonresponse={
+               "ok":False,
+               "error":"backend error",
+          }
+          try:
+               try:
+                    user = User.objects.get(email=request.data['email'])
+               except User.DoesNotExist:
+                    jsonresponse["error"] = "No user with the given email"
+                    return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
+               userProfile=UserProfile.objects.get(user_id=user.id)
+               if(userProfile.type not in ('Student','student')):
+                   jsonresponse["error"] = "user must be student"
+                   return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+               jsonresponse={
+                    "ok":True,
+                    "tests":userProfile.tests.split(","),
+               }
+               return Response(jsonresponse,status=status.HTTP_200_OK)
+          except Exception as e:
+               jsonresponse={
+                    "ok":False,
+                    "error":e,
+               }
+               return(jsonresponse,status.HTTP_500_INTERNAL_SERVER_ERROR)  
