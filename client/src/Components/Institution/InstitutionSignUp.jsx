@@ -17,9 +17,46 @@ export default function InstitutionSignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignup = () => {
+  const handleValidation = async() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);  
+  };
+
+  const handleSignup = async() => {
     // Handle signup logic here
     console.log("Signing up with:", name, email, password);
+    if (handleValidation()) {
+      const formData = new FormData();
+
+      formData.append('name', name);
+      formData.append('password', password);
+      formData.append('username', email);
+      formData.append('type', "institute");
+ 
+      const response = await fetch('http://127.0.0.1:8000/signup/', {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.ok) {
+          console.log("Signup Successfully");
+          navigate("/institution/login");  
+        } else {
+          const errMsg = data?.error || "Error in Signup, Please try again";
+          alert(errMsg);
+          console.log(errMsg);
+        }
+      } else {
+        console.log("Signup Failed Please try again");
+      }
+
+      console.log(response);
+    } else {
+      alert("Please enter a valid email");
+      console.error("Invalid email address");
+    }
   };
 
   return (
