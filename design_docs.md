@@ -343,3 +343,122 @@ Content-Type: application/json
 }
 ```
 
+### Register Student for Test
+
+This endpoint registers a student for a test.
+
+Register Student for Test Request:
+```http
+POST /register_student_for_test
+Content-Type: application/json
+{
+    "test_id": "ID of the test to register for",
+    "test_code": "Test code for registration"
+}
+```
+
+Register Student for Test Response:
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "message": "successfully registered"
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message describing the issue"
+}
+```
+
+3. If the user or test doesn't exist, the server will respond with a 404 Not Found status code and a JSON object containing an error message.
+```http
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "User/Test not found"
+}
+```
+
+4. If the test code is incorrect, the server will respond with a 406 Not Acceptable status code and a JSON object containing an error message.
+```http
+HTTP/1.1 406 Not Acceptable
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Incorrect Test code"
+}
+```
+
+5. If the student is already registered for the test, the server will respond with a 409 Conflict status code and a JSON object containing an error message.
+```http
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "You are already registered for the Test"
+}
+```
+
+### Get Result for Student
+
+This endpoint retrieves the test result for a student.
+
+Get Result for Student Request:
+```http
+GET /get_result_for_student?test_id=ID of the test to get the result for
+```
+
+Get Result for Student Response:
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing the test result.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "total": "Total marks of the test",
+    "score": "Score obtained by the student",
+    "questionwise_score": [
+        {
+            "id": "ID of the question",
+            "statement": "Question statement",
+            "total_marks": "Total marks of the question",
+            "type": "Question type",
+            "marks_scored": "Marks scored by the student for the question",
+            "options": ["Option 1", "Option 2", ...],
+            "answer_options_indices": [0, 2, ...],
+            "attempted_options_indices": [1, 3, ...]
+        },
+        ...
+    ]
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message describing the issue"
+}
+```
+
+3. If the user or test doesn't exist, the server will respond with a 404 Not Found status code and a JSON object containing an error message.
+```http
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "User/Test not found"
+}
+```
+
