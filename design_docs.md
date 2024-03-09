@@ -349,7 +349,7 @@ This endpoint registers a student for a test.
 
 Register Student for Test Request:
 ```http
-POST /register_student_for_test
+POST /student/registerForTest/
 Content-Type: application/json
 {
     "test_id": "ID of the test to register for",
@@ -414,7 +414,7 @@ This endpoint retrieves the test result for a student.
 
 Get Result for Student Request:
 ```http
-GET /get_result_for_student?test_id=ID of the test to get the result for
+GET /student/getResultForTest?test_id=ID of the test to get the result for
 ```
 
 Get Result for Student Response:
