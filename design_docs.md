@@ -13,7 +13,11 @@
     - [Get Test](#get-test)
     - [Start Test](#start-test)
     - [Delete Test](#delete-test)
-
+    - [Register Student for Test](#register-student-for-test)
+    - [Get Result for Student](#get-result-for-student)
+    - [Test Result](#test-result)
+    - [Submit Test](#submit-test)
+    
 
 ## Introduction
 >Welcome to the ProctorX REST API documentation. This documentation is intended for developers who want to write front end clients using out REST API.
