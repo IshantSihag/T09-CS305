@@ -462,3 +462,86 @@ Content-Type: application/json
 }
 ```
 
+
+
+### Test Result
+
+This endpoint retrieves the test result for a student.
+
+Test Result Request:
+```http
+GET /testresult?test_id=ID of the test to get the result for
+```
+
+Test Result Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing the test result.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "result": [
+        {
+            "name": "Student Name",
+            "score": "Score obtained by the student"
+        },
+        ...
+    ]
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message describing the issue"
+}
+```
+
+
+### Submit Test
+
+This endpoint submits a test for the authenticated student.
+
+Submit Test Request:
+```http
+POST /submitTest
+Content-Type: application/json
+{
+    "test_id": "ID of the test to submit",
+    "user_response": [
+        {
+            "id": "ID of the question",
+            "answerList": ["Index of the selected option", ...]
+        },
+        ...
+    ]
+}
+```
+
+Submit Test Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message and the score obtained by the student.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "message": "Test submitted successfully",
+    "score": "Score obtained by the student"
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message describing the issue"
+}
+```
+
