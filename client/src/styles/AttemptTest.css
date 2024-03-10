@@ -190,6 +190,7 @@
 
     .question-container, .answer-container {
         height: 100%;
+        min-width: 80vw;
     }
 
     .test-header-content {

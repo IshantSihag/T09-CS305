@@ -11,7 +11,7 @@ const CheckList = ({
 }) => {
     return (
         <div className="checklist">
-            {userQuestions.length !== 0 && userQuestions[currentQuestion-1].options[0].map((opt, index) => (
+            {userQuestions.length !== 0 && userQuestions[currentQuestion-1].options.map((opt, index) => (
                 <div className="checklist-item" key={index} onClick={(e) => handleOptionClick(e, index)}>
                     <Checkbox 
                         id="checkbox-1"
