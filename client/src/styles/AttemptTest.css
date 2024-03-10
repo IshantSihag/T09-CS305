@@ -93,7 +93,7 @@
 .question-statement {
     flex-grow: 1;
     justify-self: center;
-    align-self: center;
+    align-self: left;
     margin-top: 10px;
 } 
 
@@ -131,6 +131,10 @@
     width: 12rem; 
     margin: 20px; 
     height: 2.5rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .test-submit-btn {
@@ -159,6 +163,10 @@
 
     .test-submit-btn, .test-prev-btn {
         margin-bottom: 0; 
+    }
+
+    .question-container, .answer-container {
+        min-height: 60vh;
     }
 }
 
