@@ -1,10 +1,8 @@
 from django.shortcuts import render
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-
 from api.models import Test, UserProfile, Question, Response as ResponseModel
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
@@ -173,9 +171,9 @@ class GetResultForStudent(APIView):
                     options.index(option) for option in answer_options
                 ]
                 questionObject["answer_options_indices"].sort()
-                questionObject[
-                    "attempted_options_indices"
-                ] = []  # just a placeholder updated later
+                questionObject["attempted_options_indices"] = (
+                    []
+                )  # just a placeholder updated later
 
                 try:
                     student_response_question = studentResponse.get(
