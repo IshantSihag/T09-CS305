@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 QUESTION_TYPES = (
     ('single', 'Single Correct'),
     ('multiple', 'Multiple Correct'),
-    ('text', 'Text'),
 )
 # Create your models here.
 class Test(models.Model):
@@ -14,8 +13,8 @@ class Test(models.Model):
     duration = models.IntegerField()        # Number of seconds
     author = models.CharField(max_length=100, blank=False, null=False)
     questions = models.TextField()
-    is_public = models.BooleanField()
-    registrations = models.TextField()
+    testCode=models.CharField(max_length=100,blank=False,null=False)
+    registrations = models.TextField(blank=True)
     
     
 class Question(models.Model):
