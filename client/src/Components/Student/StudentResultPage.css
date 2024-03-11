@@ -1,0 +1,19 @@
+.result-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 30px;
+    margin: 20px;
+}
+
+.result-list {
+    margin-left: 10vw;
+    margin-top: 5vw;
+}
+
+.result-type {
+    margin: 2vw;
+}
+
+strong {
+    margin: 20px;
+}

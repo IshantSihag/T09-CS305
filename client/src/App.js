@@ -12,13 +12,14 @@ import CreateTest from "./Components/Institution/CreateTest";
 import AttemptTest from "./Components/Student/AttemptTest";
 import StartTest from "./Components/Student/StartTest";
 import RegisterTest from "./Components/Student/RegisterTest";
+import StudentResultPage from "./Components/Student/StudentResultPage"
 
 const App = () => {
   return (
     <div>
       <Router>
         <Routes>
-          <Route exact path="/" element={<HomePage />} />
+          {/* <Route exact path="/" element={<HomePage />} />
           <Route exact path="/student/" element={<StudentDashBoard />} />
           <Route exact path="/student/registertest" element={<RegisterTest />} />
           <Route exact path="/student/attemptest" element={<AttemptTest />} />
@@ -30,7 +31,8 @@ const App = () => {
           <Route exact path="/institution/signup" element={<InstitutionSignUp />} />
           <Route exact path="/institution/profile" element={<InstitutionProfile />} />
           <Route exact path="/institution/" element={<InstituteDashBoard />} />
-          <Route exact path="/institution/createtest" element={<CreateTest />} />
+          <Route exact path="/institution/createtest" element={<CreateTest />} /> */}
+          <Route exact path="/" element={<StudentResultPage />} />
         </Routes>
       </Router>
 
