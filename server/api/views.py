@@ -119,24 +119,30 @@ class SignUpView(APIView):
         
             
 class getTest(APIView):
-     permission_classes = (IsAuthenticated, )
-     def get(self, request):
-          institutename = request.get.GET('username')
-          tests = Test.objects.filter(institutename=institutename)
-          jsonresponse = []
-          
-          for test in tests:
-               jsonresponse.append({
-                    'start': test.start,
-                    'duration': test.duration,
-                    'author': test.author,
-                    'questions': test.registrations.split(','),
-                    'is_public': test.is_public,
-                    'registrations': test.registrations.split(','),
-               })
-               
-          return jsonresponse
-     
+    permission_classes = (IsAuthenticated, )
+    def get(self, request):
+        try:
+            username = request.user.email
+            tests = Test.objects.filter(author=username)
+            jsonresponse = {
+                "ok": True,
+                "tests": [],
+            }
+            for test in tests:
+                jsonresponse["tests"].append({
+                    "id": test.id,
+                    "title": test.title,
+                    "start": test.start,
+                    "duration": test.duration,
+                    "author": test.author,
+                })
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+        except:
+            jsonresponse = {
+                "ok": False,
+                "error": "Test not found"
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
      
 class ProfileView(APIView):
      permission_classes = (IsAuthenticated,)
