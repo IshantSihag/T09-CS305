@@ -12,7 +12,7 @@ from api.serializers import (
 )
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from api.models import Test, UserProfile, Question, Result
+from api.models import Test, UserProfile, Question, Result, Response as ResponseModel
 from django.contrib.auth.models import User
 
 # Create your views here.
@@ -67,3 +67,85 @@ class TestResultView(APIView):
             )
 
         return Response(jsonresponse, status=status.HTTP_200_OK)
+
+
+class SubmitTestView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            test_id = request.data["test_id"]
+            user_response = request.data["user_response"]
+        except:
+            # If test_id or answers are not provided
+            jsonresponse = {
+                "ok": False,
+                "error": "test_id or user_response not provided",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        # If test_id is not valid
+        if not Test.objects.filter(id=test_id).exists():
+            return Response(
+                {
+                    "ok": False,
+                    "error": "No test with the given id found",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        test = Test.objects.get(id=test_id)
+        for question in user_response:
+            if not Question.objects.filter(id=question["id"]).exists():
+                return Response(
+                    {
+                        "ok": False,
+                        "error": "No question with the given id found",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            act_question = Question.objects.get(id=question["id"])
+            if act_question.test_id != test:
+                return Response(
+                    {
+                        "ok": False,
+                        "error": "The question is not part of the test",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        student_id = request.user.id
+        score = 0
+        for question in user_response:
+            question_id = question["id"]
+            act_question = Question.objects.get(id=question_id)
+            answerList = question["answerList"]
+            options = act_question.options.split(",")
+            try:
+                answers = [options[i] for i in answerList]
+            except:
+                return Response(
+                    {
+                        "ok": False,
+                        "error": "Invalid answerList",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            res = ",".join(answers)
+            ResponseModel.objects.create(
+                student_id=student_id,
+                test_id=test,
+                question_id=act_question,
+                response=res,
+            )
+            if sorted(act_question.answer.split(",")) == sorted(answers):
+                score += act_question.marks
+        Result.objects.create(student_id=student_id, test_id=test, score=score)
+
+        return Response(
+            {
+                "ok": True,
+                "message": "Test submitted successfully",
+                "score": score,
+            },
+            status=status.HTTP_200_OK,
+        )
