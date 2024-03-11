@@ -37,7 +37,7 @@ class TestResultView(APIView):
                 "error":"You are not the author of this test",
                 }, status=status.HTTP_401_UNAUTHORIZED)
         
-        result = Result.objects.filter(test_id=test_id).values()
+        result = Result.objects.filter(test_id=test_id)
         jsonresponse = {
             "ok": True,
             "result": []
