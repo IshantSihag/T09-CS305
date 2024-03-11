@@ -11,7 +11,7 @@ urlpatterns = [
     path("home/profile", views.ProfileView.as_view(), name="profile"),
     path("deleteTest/", views.deleteTest.as_view(), name="deleteTest"),
     path(
-        "getAllTestsStudent/",
+        "student/getAllTests/",
         views.GetAllTestStudentView.as_view(),
         name="getAllTestsStudent",
     ),
