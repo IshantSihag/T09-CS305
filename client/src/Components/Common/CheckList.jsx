@@ -20,7 +20,7 @@ const CheckList = ({
                         containerProps={{
                             className: "p-0",
                         }}
-                        // onClick={(e) => handleOptionClick(e, index)}
+                        // onChange={() => {}}
                         checked={userQuestions[currentQuestion-1].answerList.includes(index)}
                     />
                     <Typography color="blue-gray" className="font-medium">{opt}</Typography>

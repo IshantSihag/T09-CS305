@@ -22,10 +22,6 @@ import { ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 
 const AttemptTest=()=>
 {
-    // const [totalQuestions, setTotalQuestions] = useState(10);
-    // const [currentQuestion, setCurrentQuestion] = useState(1);
-    // const [timeLeft, setTimeLeft] = useState(1000);
-    
     //for quicks links
     const [open, setOpen] = useState(false);
     
@@ -43,6 +39,7 @@ const AttemptTest=()=>
     const storeListToCookies = async(usrQ, usrT) => {
         // console.log("COOKIES");
 
+        console.log("userT = " + usrT); 
         Cookies.set(`ques/${testId}`, JSON.stringify({ usrQ }), { expires: 1 });
         Cookies.set(`time/${testId}`, JSON.stringify({ usrT }), { expires: 1 });
     };
@@ -58,7 +55,7 @@ const AttemptTest=()=>
                 
                 // filling values with the cookies data
                 if (cookiesQuesData && cookiesTimeData) {
-                    // console.log("Data found in cookies");
+                    console.log("Data found in cookies");
                     const parsedQ = await JSON.parse(cookiesQuesData);
                     const parsedT = await JSON.parse(cookiesTimeData);
                     
@@ -71,7 +68,7 @@ const AttemptTest=()=>
                     return ;
                 }
 
-                // console.log("No data found in cookies, fetching the questions list from API...");
+                console.log("No data found in cookies, fetching the questions list from API...");
                 
                 //accessing access token from cookies 
                 const accessToken = Cookies.get('access');
@@ -110,12 +107,17 @@ const AttemptTest=()=>
                     setUserQuestions(questionsList);
 
                     //setting cookies data
-                    // console.log("Data fetched, setting up cookies with fetched data..."); 
+                    console.log("Data fetched, setting up cookies with fetched data..."); 
                     await storeListToCookies(questionsList, data.duration); 
 
-                    // console.log(questionsList);
+                    // console.log("stored cookies questionList : ", questionsList);
                 } else {
-                    console.log(`Fetch Error : ${res}`);
+                    //CHECK: for unauthorized request, user redirected to login
+                    if (res.status === 401) {
+                        console.log("Unauthorized : Please login");
+                        navigate('/student/login');
+                    }
+                    console.log(`Fetch Error : ${res.status}`);
                 }
             } catch (err) {
                 console.log(`Error while fetching test: ${err.message}`); 
@@ -150,12 +152,21 @@ const AttemptTest=()=>
         }
     };
 
+    const handleTestSubmit = (e) => {
+        e.preventDefault();
+
+        //TODO: handle test submission
+    }; 
+
     const handleOptionClick = async(e, index) => {
+        // console.log("userQuestion before option clicked : ", userQuestions);    
         const newAnswerList = [...userQuestions];
-        // console.log("newAnswerList : ", newAnswerList);
+        // console.log("currentQuestion : ", currentQuestion);
         
         const question = userQuestions[currentQuestion-1];
+        
         // console.log("question : ", question);
+        // console.log("index : ", index);
 
         if (question.type === 'single') {
             //user wants to remove a already selected option
@@ -166,10 +177,10 @@ const AttemptTest=()=>
             else {
                 newAnswerList[currentQuestion-1].answerList = [index];
             } 
-        } else {
+        } else if (question.type === 'multiple') {
             //user wants to remove a already selected option
             if (question.answerList.includes(index)) {
-                newAnswerList[currentQuestion-1].answerList = userQuestions.filter(opt => opt !== index); 
+                newAnswerList[currentQuestion-1].answerList = question.answerList.filter(opt => opt !== index); 
             } 
             //user wants to select a new option
             else {
@@ -227,7 +238,7 @@ const AttemptTest=()=>
                     </div>
                 </div>
                 <div className="test-footer">
-                    <Button className="test-submit-btn">Submit</Button>
+                    <Button className="test-submit-btn" onClick={(e) => handleTestSubmit(e)}>Submit</Button>
                     <div className="test-nav-btns">
                         <Button className="test-prev-btn" disabled={currentQuestion === 1} onClick={(e) => handleButtonClick(e, "prev")}>Previous</Button>
                         <Button className="test-next-btn" disabled={currentQuestion === totalQuestions} onClick={(e) => handleButtonClick(e, "next")}>Next</Button>
