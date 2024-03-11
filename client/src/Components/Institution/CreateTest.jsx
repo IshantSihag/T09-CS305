@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 
 import {
   Card,
@@ -169,6 +170,29 @@ export default function CreattTest() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const currentQuestion = questions[currentQuestionIndex];
+  const [cookiesLoaded, setCookiesLoaded] = useState(false);
+
+  useEffect(() => {
+    const questions_ = Cookies.get("questions");
+    const currentQuestionIndex_ = Cookies.get("currentQuestionIndex");
+    if (questions_ && currentQuestionIndex_ && !cookiesLoaded) {
+      console.log("Setting questions from cookies");
+      console.log(JSON.parse(questions_));
+      console.log(JSON.parse(currentQuestionIndex_));
+      setQuestions(JSON.parse(questions_));
+      setCurrentQuestionIndex(JSON.parse(currentQuestionIndex_));
+      setCookiesLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (cookiesLoaded){
+      console.log("Setting cookies");
+      Cookies.set("questions", JSON.stringify(questions));
+      Cookies.set("currentQuestionIndex", JSON.stringify(currentQuestionIndex));
+      console.log(JSON.stringify(questions), questions, currentQuestionIndex);
+    }
+  }, [questions, currentQuestionIndex]);
 
   // Function to handle adding a choice for a multiple-choice question
 
@@ -182,6 +206,7 @@ export default function CreattTest() {
         type: "single_correct",
         choices: [{ value: "", isCorrect: false }],
         answer: "",
+        marks: "",
       },
     ]);
   };
@@ -459,25 +484,46 @@ export default function CreattTest() {
                 handleQuestionAnswerChange_={handleQuestionAnswerChange}
               />
             )}
-
           </CardBody>
-          <CardFooter className="flex-wrap-reverse py-3" divider={true}>
-            <Typography className="font-medium">Marks</Typography>
-            <div className="grid grid-cols-2 gap-4 w-1/2">
-              <Input label="Overall *" onChange={(value)=>{
-                setQuestions((prevQuestions) =>
-                  prevQuestions.map((question, index) =>
-                    index === currentQuestionIndex ? { ...question, marks: value } : question
-                  )
-                );
-              }}/>
-              <Input label="Negative" onChange={(value)=>{
-                setQuestions((prevQuestions) =>
-                  prevQuestions.map((question, index) =>
-                    index === currentQuestionIndex ? { ...question, negative_marks: value } : question
-                  )
-                );
-              }}/>
+          <CardFooter className="flex-wrap-reverse py-2" divider={true}>
+            <div className="flex justify-between">
+              <div className="flex-row">
+                <Typography className="ml-2 font-medium">Marks</Typography>
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <Input
+                    label="Overall *"
+                    onChange={(value) => {
+                      setQuestions((prevQuestions) =>
+                        prevQuestions.map((question, index) =>
+                          index === currentQuestionIndex
+                            ? { ...question, marks: value }
+                            : question
+                        )
+                      );
+                    }}
+                  />
+                  <Input
+                    label="Negative"
+                    onChange={(value) => {
+                      setQuestions((prevQuestions) =>
+                        prevQuestions.map((question, index) =>
+                          index === currentQuestionIndex
+                            ? { ...question, negative_marks: value }
+                            : question
+                        )
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+              <Button
+                className="rounded-full h-9"
+                size="sm"
+                ripple={false}
+                onClick={() => {}}
+              >
+                Save
+              </Button>
             </div>
           </CardFooter>
         </Card>
