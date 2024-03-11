@@ -30,4 +30,5 @@ jobs:
         black --check .
     - name: Run Tests
       run: |
+        python server/manage.py makemigrations
         python server/manage.py test
