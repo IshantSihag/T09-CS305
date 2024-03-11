@@ -38,7 +38,6 @@ class SignUpViewSerializer(
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-
     @classmethod
     def get_token(cls, user):
         token = super(MyTokenObtainPairSerializer, cls).get_token(user)
