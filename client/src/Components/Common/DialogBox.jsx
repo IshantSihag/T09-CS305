@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Button,
     Dialog,
@@ -11,9 +11,17 @@ import {
 const DialogBox = ({
     dialogBtnText, dialogHeading, dialogText, dialogConfirmBtnText 
 }) => {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
+    const [testLink, setTestLink] = useState("");
 
     const handleOpen = () => setOpen(!open);
+
+    const handleSubmitLink = (e) => {
+        e.preventDefault();
+        if (!testLink) return ;
+        
+        // TODO: make API request 
+    };
 
     return (
         <>
@@ -24,7 +32,12 @@ const DialogBox = ({
                 <DialogHeader>{dialogHeading}</DialogHeader>
                 <DialogBody>
                     {dialogText}
-                    <Input label="Test Link" />
+                    <Input 
+                        label="Test Link" 
+                        value={testLink}
+                        onChange={(e) => setTestLink(e.target.value)}  
+                        required={true}  
+                    />
                 </DialogBody>
                 <DialogFooter>
                     <Button
@@ -35,7 +48,7 @@ const DialogBox = ({
                     >
                         <span>Cancel</span>
                     </Button>
-                    <Button variant="gradient" color="green" onClick={handleOpen}>
+                    <Button variant="gradient" color="green" onClick={(e) => handleSubmitLink(e)}>
                         <span>{dialogConfirmBtnText || "Confirm"}</span>
                     </Button>
                 </DialogFooter>
