@@ -16,18 +16,17 @@ class RegisterStudentForTestView(APIView):
 
     def post(self, request):
         try:
-            student_email = request.data["username"]
-            test_id = int(request.data["test_id"])
-            test_code = request.data["test_code"]
+            student_email = request.user.username
+            test_id=int(request.data['test_id'])
+            test_code=request.data["test_code"]
         except:
-            jsonresponse = {
-                "ok": False,
-                "error": "Invlaid Input format. required username , test_id, test_code",
+            jsonresponse={
+                "ok":False,
+                "error":"Invlaid Input format. required test_id, test_code. Also ensure that you are logged in."
             }
         try:
             jsonresponse = {"ok": False, "error": "error while registering try again"}
             try:
-                print(student_email)
                 user = User.objects.get(email=student_email)
 
             except User.DoesNotExist:
@@ -85,7 +84,7 @@ class GetResultForStudent(APIView):
     def get(self,request):
         #if the parameters are in the correct format
         try:
-            student_email = request.GET.get('username')
+            student_email = request.user.email
             test_id=int(request.GET.get('test_id'))
         except:
             jsonresponse={
@@ -109,6 +108,7 @@ class GetResultForStudent(APIView):
                 jsonresponse["error"] = "user must be student"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             
+            
             #if there exists such test
             try:
                     test=Test.objects.get(id=test_id)
@@ -126,12 +126,17 @@ class GetResultForStudent(APIView):
             #if student attempted the test
             #doubtful about my method to check if student attempted the test,
             #say student did attempt the test but didnt do any question
+            
             try:
-                studentResponse=ResponseModel.objects.get(student_id=userProfile.user_id,
+                
+                studentResponse=ResponseModel.objects.filter(student_id=user.id,
                                                       test_id=test_id)
             except ResponseModel.DoesNotExist:
-                jsonresponse["error"]= "Seems that you didn't attempted the test"
-                Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+                # jsonresponse["error"]= "Seems that you didn't attempted the test"
+                # return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+                    #for Now I'm not testing if student attempted the test or not
+                pass
+            # print(studentResponse)
             
             questions=test.questions.split(",")
             questions=[int(question.strip()) for question in questions]
@@ -144,10 +149,12 @@ class GetResultForStudent(APIView):
             score_student=0
             total_test=0
             questionwise_score=[]
+            
             for question_id in questions:
                 questionObject={}
-                question=Question.objects.get(id=question_id,test_id=test.id)
-                if(question == None):
+                try:
+                    question=Question.objects.get(id=question_id,test_id=test.id)
+                except Question.DoesNotExist:
                     raise Exception("question not Found")
                 
                 #update the total_score
@@ -162,24 +169,32 @@ class GetResultForStudent(APIView):
                                     question.options.split(',')]
                     
                 answer_options=[option.strip() for option in 
-                                    question.answer.split(',')].sort()
-                
+                                    question.answer.split(',')]
+                answer_options.sort()
                 questionObject['options']=options
                 #would it better to give indices of the options that are correct
-                questionObject['answer_options_indices']=[options.index(option) for option in answer_options].sort()
-                questionObject['attempted_options_indices']=[]
-
-                student_response_question =studentResponse.get(question_id=question.id)
+                questionObject['answer_options_indices']=[options.index(option) for option in answer_options]
+                questionObject['answer_options_indices'].sort()
+                questionObject['attempted_options_indices']=[]  #just a placeholder updated later
+                
+                try:
+                    student_response_question =studentResponse.get(question_id=question.id)
                 #currently assumed that if student do not attempt a question then its 
                 #response for that question won't be stored
-                if student_response_question == None:
+                
+                
+                
+                except ResponseModel.DoesNotExist:
+                    questionwise_score.append(questionObject)
                     continue
 
                 attempted_options =[option.strip() for option in 
-                                    student_response_question.response.split(',')].sort()
+                                    student_response_question.response.split(',')]
+                attempted_options.sort()
 
                 #would it better to give indices of the options that are correct
-                questionObject['attempted_options_indices']=[options.index(option) for option in attempted_options].sort()
+                questionObject['attempted_options_indices']=[options.index(option) for option in attempted_options]
+                questionObject['attempted_options_indices'].sort()
                 question_score=0
                 if(attempted_options==answer_options):
                     question_score=int(question.marks)
@@ -201,7 +216,7 @@ class GetResultForStudent(APIView):
         except Exception as e:
             jsonresponse={
                     "ok":False,
-                    "error":e,
+                    "error":str(e),
             }
-            return(jsonresponse,status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(jsonresponse,status.HTTP_500_INTERNAL_SERVER_ERROR)
         

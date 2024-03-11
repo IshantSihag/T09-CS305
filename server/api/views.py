@@ -150,28 +150,26 @@ class getTest(APIView):
 
 
 class ProfileView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        try:
-            username = request.GET.get("username")
-            print(username)
-            user = User.objects.get(username=username)
-            # print(user.email)
-            # userProfile=UserProfile.objects.get(user=user)
-            serialiser = ProfileViewSerializer(user, many=False)
-            print(serialiser.data)
-            if serialiser.data["userdetails"]["type"] == "student":
-                return Response(serialiser.data, status=status.HTTP_200_OK)
-            elif serialiser.data["userdetails"]["type"] == "institute":
-                return Response(serialiser.data, status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            print(str(e))
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
+     permission_classes = (IsAuthenticated,)
+     def get(self,request):
+          try:
+               username = request.user.email
+               print(username)
+               user=User.objects.get(username=username)
+               # print(user.email)
+               # userProfile=UserProfile.objects.get(user=user)
+               serialiser=ProfileViewSerializer(user,many=False)
+               print(serialiser.data)
+               if(serialiser.data['userdetails']['type']=="student"):
+                    return Response(serialiser.data,status=status.HTTP_200_OK)
+               elif(serialiser.data['userdetails']['type']=="institute"):
+                    return Response(serialiser.data,status=status.HTTP_200_OK)
+               else:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+          except Exception as e:
+               print(str(e))
+               return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+          
 class startTest(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -301,31 +299,31 @@ class updateTest(APIView):
 
 
 class GetAllTestStudentView(APIView):
-    permission_classes = (IsAuthenticated,)
+     permission_classes = (IsAuthenticated,)
+     def get(self,request):
+          jsonresponse={
+               "ok":False,
+               "error":"backend error",
+          }
+          try:
+               try:
+                    user = User.objects.get(email=request.user.email)
+               except User.DoesNotExist:
+                    jsonresponse["error"] = "No user with the given email"
+                    return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
+               userProfile=UserProfile.objects.get(user_id=user.id)
+               if(userProfile.type not in ('Student','student')):
+                   jsonresponse["error"] = "user must be student"
+                   return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+               jsonresponse={
+                    "ok":True,
+                    "tests":userProfile.tests.split(","),
+               }
+               return Response(jsonresponse,status=status.HTTP_200_OK)
+          except Exception as e:
+               jsonresponse={
+                    "ok":False,
+                    "error":str(e),
+               }
+               return(jsonresponse,status.HTTP_500_INTERNAL_SERVER_ERROR)  
 
-    def get(self, request):
-        jsonresponse = {
-            "ok": False,
-            "error": "backend error",
-        }
-        try:
-            try:
-                user = User.objects.get(email=request.data["email"])
-            except User.DoesNotExist:
-                jsonresponse["error"] = "No user with the given email"
-                return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
-            userProfile = UserProfile.objects.get(user_id=user.id)
-            if userProfile.type not in ("Student", "student"):
-                jsonresponse["error"] = "user must be student"
-                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-            jsonresponse = {
-                "ok": True,
-                "tests": userProfile.tests.split(","),
-            }
-            return Response(jsonresponse, status=status.HTTP_200_OK)
-        except Exception as e:
-            jsonresponse = {
-                "ok": False,
-                "error": e,
-            }
-            return (jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)
