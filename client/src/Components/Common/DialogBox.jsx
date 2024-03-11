@@ -25,7 +25,7 @@ const DialogBox = ({
 
     return (
         <>
-            <Button onClick={handleOpen} variant="gradient">
+            <Button onClick={handleOpen} variant="gradient" className="rounded-xl m-2">
                 {dialogBtnText}
             </Button>
             <Dialog open={open} handler={handleOpen}>
