@@ -11,6 +11,7 @@ import InstituteDashBoard from "./Components/Institution/InstituteDashBoard";
 import CreateTest from "./Components/Institution/CreateTest";
 import AttemptTest from "./Components/Student/AttemptTest";
 import StartTest from "./Components/Student/StartTest";
+import RegisterTest from "./Components/Student/RegisterTest";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Routes>
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/student/" element={<StudentDashBoard />} />
+          <Route exact path="/student/registertest" element={<RegisterTest />} />
           <Route exact path="/student/attemptest" element={<AttemptTest />} />
           <Route exact path="/student/starttest" element={<StartTest />} />
           <Route exact path="/student/login" element={<StudentLogin />} />
