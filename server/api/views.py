@@ -117,7 +117,8 @@ class SignUpView(APIView):
             else:
                 response = {"ok": False, "error": "Invalid user type"}
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        except:
+        except Exception as e:
+            print(str(e))
             response = {"ok": False, "error": "Invalid input"}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
@@ -238,6 +239,57 @@ class deleteTest(APIView):
         test.delete()
         jsonresponse = {"ok": True, "message": "Test deleted successfully"}
         return Response(jsonresponse, status=status.HTTP_200_OK)
+
+
+class createTest(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            title = request.data["title"]
+            start = request.data["start"]
+            duration = request.data["duration"]
+            questions = request.data["questions"]
+        except:
+            jsonresponse = {
+                "ok": False,
+                "error": "Invalid input. title, start, duration, questions required",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        user_email = request.user.email
+        test = Test.objects.create(
+            title=title,
+            start=start,
+            duration=duration,
+            author=user_email,
+            questions="",
+            testCode="",
+            registrations="",
+        )
+        question_ids = ""
+        for question in questions:
+            question = Question.objects.create(
+                statement=question["statement"],
+                type=question["type"],
+                marks=question["marks"],
+                options=question["options"],
+                answer=question["answer"],
+                test_id=test,
+            )
+            question_ids += str(question.id) + ","
+        question_ids = question_ids[:-1]
+        test.questions = question_ids
+        test.save()
+        testCode = "test" + str(test.id)
+        test.testCode = testCode
+        test.save()
+        jsonresponse = {
+            "ok": True,
+            "message": "Test created successfully",
+            "test_id": test.id,
+            "testCode": testCode,
+        }
+        return Response(jsonresponse, status=status.HTTP_201_CREATED)
 
 
 class updateTest(APIView):
