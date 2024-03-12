@@ -15,6 +15,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Test, UserProfile, Question
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
+from django.utils.crypto import get_random_string
 
 
 class LoginView(TokenObtainPairView):
@@ -250,46 +251,46 @@ class createTest(APIView):
             start = request.data["start"]
             duration = request.data["duration"]
             questions = request.data["questions"]
-        except:
+            user_email = request.user.email
+            test = Test.objects.create(
+                title=title,
+                start=start,
+                duration=duration,
+                author=user_email,
+                questions="",
+                testCode="",
+                registrations="",
+            )
+            question_ids = ""
+            for question in questions:
+                question = Question.objects.create(
+                    statement=question["statement"],
+                    type=question["type"],
+                    marks=question["marks"],
+                    options=question["options"],
+                    answer=question["answer"],
+                    test_id=test,
+                )
+                question_ids += str(question.id) + ","
+            question_ids = question_ids[:-1]
+            test.questions = question_ids
+            test.save()
+            testCode = get_random_string(8, allowed_chars="1234567890abcdefghijklmnopqrstuvwxyz")
+            test.testCode = testCode
+            test.save()
+            jsonresponse = {
+                "ok": True,
+                "message": "Test created successfully",
+                "test_id": test.id,
+                "testCode": testCode,
+            }
+            return Response(jsonresponse, status=status.HTTP_201_CREATED)
+        except Exception as e:
             jsonresponse = {
                 "ok": False,
-                "error": "Invalid input. title, start, duration, questions required",
+                "error": str(e),
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        user_email = request.user.email
-        test = Test.objects.create(
-            title=title,
-            start=start,
-            duration=duration,
-            author=user_email,
-            questions="",
-            testCode="",
-            registrations="",
-        )
-        question_ids = ""
-        for question in questions:
-            question = Question.objects.create(
-                statement=question["statement"],
-                type=question["type"],
-                marks=question["marks"],
-                options=question["options"],
-                answer=question["answer"],
-                test_id=test,
-            )
-            question_ids += str(question.id) + ","
-        question_ids = question_ids[:-1]
-        test.questions = question_ids
-        test.save()
-        testCode = "test" + str(test.id)
-        test.testCode = testCode
-        test.save()
-        jsonresponse = {
-            "ok": True,
-            "message": "Test created successfully",
-            "test_id": test.id,
-            "testCode": testCode,
-        }
-        return Response(jsonresponse, status=status.HTTP_201_CREATED)
 
 class updateTest(APIView):
     permission_classes = (IsAuthenticated,)
