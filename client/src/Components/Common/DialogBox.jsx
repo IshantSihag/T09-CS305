@@ -26,10 +26,10 @@ const DialogBox = ({
     return (
         <>
             <Button onClick={handleOpen} variant="gradient" className="rounded-xl m-2">
-                {dialogBtnText}
+                {dialogBtnText || "Register Test"}
             </Button>
             <Dialog open={open} handler={handleOpen}>
-                <DialogHeader>{dialogHeading}</DialogHeader>
+                <DialogHeader>{dialogHeading || "Enter Test Code"}</DialogHeader>
                 <DialogBody>
                     {dialogText}
                     <Input 
