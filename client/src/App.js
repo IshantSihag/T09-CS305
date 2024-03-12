@@ -12,7 +12,9 @@ import CreateTest from "./Components/Institution/CreateTest";
 import AttemptTest from "./Components/Student/AttemptTest";
 import StartTest from "./Components/Student/StartTest";
 import RegisterTest from "./Components/Student/RegisterTest";
+import StudentResultPage from "./Components/Student/StudentResultPage"
 import InstituteTestResult from "./Components/Institution/InstitutionTestResult";
+
 
 const App = () => {
   return (
@@ -32,6 +34,7 @@ const App = () => {
           <Route exact path="/institution/profile" element={<InstitutionProfile />} />
           <Route exact path="/institution/" element={<InstituteDashBoard />} />
           <Route exact path="/institution/createtest" element={<CreateTest />} />
+          <Route exact path="/student/result" element={<StudentResultPage />} />
           <Route exact path="/institution/testresult" element={<InstituteTestResult />} />
         </Routes>
       </Router>
