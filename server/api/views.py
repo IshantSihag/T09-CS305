@@ -155,7 +155,7 @@ class ProfileView(APIView):
 
     def get(self, request):
         try:
-            username = request.GET.get("username")
+            username = request.user.email
             print(username)
             user = User.objects.get(username=username)
             # print(user.email)
@@ -361,7 +361,7 @@ class GetAllTestStudentView(APIView):
         }
         try:
             try:
-                user = User.objects.get(email=request.data["email"])
+                user = User.objects.get(email=request.user.email)
             except User.DoesNotExist:
                 jsonresponse["error"] = "No user with the given email"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
@@ -377,6 +377,6 @@ class GetAllTestStudentView(APIView):
         except Exception as e:
             jsonresponse = {
                 "ok": False,
-                "error": e,
+                "error": str(e),
             }
             return (jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)

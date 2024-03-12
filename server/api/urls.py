@@ -12,7 +12,7 @@ urlpatterns = [
     path("deleteTest/", views.deleteTest.as_view(), name="deleteTest"),
     path("createTest/", views.createTest.as_view(), name="createTest"),
     path(
-        "getAllTestsStudent/",
+        "student/getAllTests/",
         views.GetAllTestStudentView.as_view(),
         name="getAllTestsStudent",
     ),
