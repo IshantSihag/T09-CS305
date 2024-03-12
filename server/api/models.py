@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
 
 QUESTION_TYPES = (
     ("single", "Single Correct"),
@@ -9,7 +10,9 @@ QUESTION_TYPES = (
 
 # Create your models here.
 class Test(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, primary_key=True
+    )
     title = models.CharField(max_length=100, blank=False, null=False)
     start = models.DateTimeField()
     duration = models.IntegerField()  # Number of seconds
