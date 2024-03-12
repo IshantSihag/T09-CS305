@@ -275,7 +275,9 @@ class createTest(APIView):
             question_ids = question_ids[:-1]
             test.questions = question_ids
             test.save()
-            testCode = get_random_string(8, allowed_chars="1234567890abcdefghijklmnopqrstuvwxyz")
+            testCode = get_random_string(
+                8, allowed_chars="1234567890abcdefghijklmnopqrstuvwxyz"
+            )
             test.testCode = testCode
             test.save()
             jsonresponse = {
@@ -291,6 +293,7 @@ class createTest(APIView):
                 "error": str(e),
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
 
 class updateTest(APIView):
     permission_classes = (IsAuthenticated,)
