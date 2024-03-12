@@ -119,7 +119,7 @@ class SignUpView(APIView):
                 response = {"ok": False, "error": "Invalid user type"}
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(str(e))
+            # print(str(e))
             response = {"ok": False, "error": "Invalid input"}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
@@ -157,12 +157,12 @@ class ProfileView(APIView):
     def get(self, request):
         try:
             username = request.user.email
-            print(username)
+            # print(username)
             user = User.objects.get(username=username)
             # print(user.email)
             # userProfile=UserProfile.objects.get(user=user)
             serialiser = ProfileViewSerializer(user, many=False)
-            print(serialiser.data)
+            # print(serialiser.data)
             if serialiser.data["userdetails"]["type"] == "student":
                 return Response(serialiser.data, status=status.HTTP_200_OK)
             elif serialiser.data["userdetails"]["type"] == "institute":
@@ -170,7 +170,7 @@ class ProfileView(APIView):
             else:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            print(str(e))
+            # print(str(e))
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -293,7 +293,6 @@ class createTest(APIView):
                 "error": str(e),
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class updateTest(APIView):
