@@ -51,7 +51,8 @@ const StudentLogin = () => {
           //setting up the cookies with the fetched data
           Cookies.set('access', data.access, { expires: 1, path: '/' });          
           Cookies.set('refresh', data.refresh, { expires: 1, path: '/' });          
-          Cookies.set('type', data.type, { expires: 1, path: '/' });          
+          Cookies.set('type', data.type, { expires: 1, path: '/' });     
+          Cookies.set('name', data.name, { expires: 1, path: '/' })     
 
           navigate("/");  
         } else {
