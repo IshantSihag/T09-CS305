@@ -195,6 +195,7 @@ class startTest(APIView):
             for question in listquestions:
                 questions.append(
                     {
+                        "id": question.id,
                         "statement": question.statement,
                         "type": question.type,
                         "marks": question.marks,
