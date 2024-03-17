@@ -154,7 +154,6 @@ class SubmitTestView(APIView):
         )
 
 
-
 class clocksyncView(APIView):
     permission_classes = [IsAuthenticated]
 
