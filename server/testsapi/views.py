@@ -14,7 +14,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from api.models import Test, UserProfile, Question, Result, Response as ResponseModel
 from django.contrib.auth.models import User
-
+import json
 # Create your views here.
 
 
@@ -74,8 +74,10 @@ class SubmitTestView(APIView):
 
     def post(self, request):
         try:
-            test_id = request.data["test_id"]
-            user_response = request.data["user_response"]
+            data = request.data['data']
+            data = json.loads(data)
+            test_id = data["test_id"]
+            user_response = data["user_response"]
         except:
             # If test_id or answers are not provided
             jsonresponse = {
