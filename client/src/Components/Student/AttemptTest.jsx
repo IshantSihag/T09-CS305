@@ -152,10 +152,43 @@ const AttemptTest=()=>
         }
     };
 
-    const handleTestSubmit = (e) => {
+    const handleTestSubmit = async(e) => {
         e.preventDefault();
+        try {
+            const accessToken = Cookies.get('access');
+            if (!accessToken) {
+                console.log("Access token not found, User not authorized");
+                navigate('/student/login');
+                return;
+            }
 
-        //TODO: handle test submission
+            const data = {
+                test_id :testId,
+                user_response: userQuestions
+            };
+
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/submitTest/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                
+                //TODO: handle error message using toastify
+                
+                console.log("Test submitted successfully");
+                // Handle the response data as needed
+            } else {
+                // Handle the error response
+                console.log(`Test submission failed: ${res.status}`);
+            }
+        } catch (err) {
+            console.log(`Error while submitting test: ${err.message}`);
+        }
     }; 
 
     const handleOptionClick = async(e, index) => {
