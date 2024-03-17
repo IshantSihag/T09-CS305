@@ -15,6 +15,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from api.models import Test, UserProfile, Question, Result, Response as ResponseModel
 from django.contrib.auth.models import User
 import json
+
 # Create your views here.
 
 
@@ -74,7 +75,7 @@ class SubmitTestView(APIView):
 
     def post(self, request):
         try:
-            data = request.data['data']
+            data = request.data["data"]
             data = json.loads(data)
             test_id = data["test_id"]
             user_response = data["user_response"]
