@@ -11,6 +11,7 @@ from rest_framework.decorators import api_view
 # Create your views here.
 class RegisterStudentForTestView(APIView):
     permission_classes = (IsAuthenticated,)
+
     def post(self, request):
         try:
             student_email = request.user.username
@@ -21,7 +22,7 @@ class RegisterStudentForTestView(APIView):
                 "ok": False,
                 "error": "Invlaid Input format. required test_id, test_code. Also ensure that you are logged in.",
             }
-            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
             jsonresponse = {"ok": False, "error": "error while registering try again"}
             try:
@@ -88,7 +89,7 @@ class GetResultForStudent(APIView):
                 "ok": False,
                 "error": "Invlaid Input format. required username , test_id, test_code",
             }
-            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
             jsonresponse = {"ok": False, "error": "error while registering try again"}
 
@@ -223,9 +224,11 @@ class GetResultForStudent(APIView):
             }
             return Response(jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 class GetTestID(APIView):
     permission_classes = (IsAuthenticated,)
-    def get(self,request):
+
+    def get(self, request):
         try:
             try:
                 test_code = request.GET.get("test_code")
@@ -234,24 +237,21 @@ class GetTestID(APIView):
                     "ok": False,
                     "error": "Invlaid Input format or user not logged in. Required test_code",
                 }
-                return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             try:
-                test=Test.objects.get(testCode=test_code)
+                test = Test.objects.get(testCode=test_code)
                 jsonresponse = {
                     "ok": True,
-                    "test_id":test.id,
+                    "test_id": test.id,
                 }
-                return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             except Test.DoesNotExist:
                 jsonresponse = {
                     "ok": False,
-                    "error":"Test not found",
+                    "error": "Test not found",
                 }
-                return Response(jsonresponse,status=status.HTTP_404_NOT_FOUND)
+                return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(e)
-            jsonresponse={
-                "ok":False,
-                "error":"Error while processing the api"
-            }
-            return Response(jsonresponse,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            jsonresponse = {"ok": False, "error": "Error while processing the api"}
+            return Response(jsonresponse, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

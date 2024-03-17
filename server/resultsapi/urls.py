@@ -17,5 +17,5 @@ urlpatterns = [
         "getTestID/",
         views.GetTestID.as_view(),
         name="GetTestID",
-    )
+    ),
 ]

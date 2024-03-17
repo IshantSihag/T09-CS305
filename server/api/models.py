@@ -18,7 +18,7 @@ class Test(models.Model):
     duration = models.IntegerField()  # Number of seconds
     author = models.CharField(max_length=100, blank=False, null=False)
     questions = models.TextField()
-    testCode = models.CharField(max_length=100, blank=False, null=False,unique=True)
+    testCode = models.CharField(max_length=100, blank=False, null=False, unique=True)
     registrations = models.TextField(blank=True)
 
 
