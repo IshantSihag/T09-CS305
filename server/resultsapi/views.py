@@ -11,7 +11,6 @@ from rest_framework.decorators import api_view
 # Create your views here.
 class RegisterStudentForTestView(APIView):
     permission_classes = (IsAuthenticated,)
-
     def post(self, request):
         try:
             student_email = request.user.username
@@ -229,7 +228,7 @@ class GetTestID(APIView):
     def get(self,request):
         try:
             try:
-                test_code = int(request.GET.get("test_code"))
+                test_code = request.GET.get("test_code")
             except:
                 jsonresponse = {
                     "ok": False,
@@ -237,7 +236,7 @@ class GetTestID(APIView):
                 }
                 return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
             try:
-                test=Test.objects.get(test_code=test_code)
+                test=Test.objects.get(testCode=test_code)
                 jsonresponse = {
                     "ok": True,
                     "test_id":test.id,
