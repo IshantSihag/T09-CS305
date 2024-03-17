@@ -22,6 +22,7 @@ class RegisterStudentForTestView(APIView):
                 "ok": False,
                 "error": "Invlaid Input format. required test_id, test_code. Also ensure that you are logged in.",
             }
+            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
         try:
             jsonresponse = {"ok": False, "error": "error while registering try again"}
             try:
@@ -88,6 +89,7 @@ class GetResultForStudent(APIView):
                 "ok": False,
                 "error": "Invlaid Input format. required username , test_id, test_code",
             }
+            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
         try:
             jsonresponse = {"ok": False, "error": "error while registering try again"}
 
@@ -221,3 +223,36 @@ class GetResultForStudent(APIView):
                 "error": str(e),
             }
             return Response(jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class GetTestID(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self,request):
+        try:
+            try:
+                test_code = int(request.GET.get("test_code"))
+            except:
+                jsonresponse = {
+                    "ok": False,
+                    "error": "Invlaid Input format or user not logged in. Required test_code",
+                }
+                return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            try:
+                test=Test.objects.get(test_code=test_code)
+                jsonresponse = {
+                    "ok": True,
+                    "test_id":test.id,
+                }
+                return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            except Test.DoesNotExist:
+                jsonresponse = {
+                    "ok": False,
+                    "error":"Test not found",
+                }
+                return Response(jsonresponse,status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(e)
+            jsonresponse={
+                "ok":False,
+                "error":"Error while processing the api"
+            }
+            return Response(jsonresponse,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
