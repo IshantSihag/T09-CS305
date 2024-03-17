@@ -152,3 +152,39 @@ class SubmitTestView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+
+class clocksyncView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            test_id = request.data["test_id"]
+        except:
+            # If test_id or answers are not provided
+            jsonresponse = {
+                "ok": False,
+                "error": "test_id or time not provided",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        # If test_id is not valid
+        if not Test.objects.filter(id=test_id).exists():
+            return Response(
+                {
+                    "ok": False,
+                    "error": "No test with the given id found",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        test = Test.objects.get(id=test_id)
+        startTime = test.start
+        duration = test.duration
+        return Response(
+            {
+                "ok": True,
+                "start_time": startTime,
+                "duration": duration,
+            },
+            status=status.HTTP_200_OK,
+        )
