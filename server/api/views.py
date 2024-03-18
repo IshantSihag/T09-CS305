@@ -305,9 +305,9 @@ class createTest(APIView):
 
             profile = UserProfile.objects.get(user_id=request.user)
             if profile.tests == "":
-                profile.tests = test.id
+                profile.tests = str(test.id)
             else:
-                profile.tests += "," + test.id
+                profile.tests += "," + str(test.id)
 
             profile.save()
             return Response(jsonresponse, status=status.HTTP_201_CREATED)
