@@ -1,11 +1,14 @@
 import React , { useState , useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { DropdownButton, Dropdown } from 'react-bootstrap';
 import Cookies from 'js-cookie';
-
+import './Navbar.css';
 const Navbar = () => {
     const [name, setName] = useState('');
     const [type, setType] = useState('');
     const [access, setAccess] = useState(false);
+    const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+    const [showInstitutionDropdown, setShowInstitutionDropdown] = useState(false);
 
     useEffect(() => {
         const name = Cookies.get('name');
@@ -78,12 +81,31 @@ const Navbar = () => {
                     </a>
                   </div>
                 ):(
-                  <div class="d-flex">
-                    <a href="/student/login" class="btn btn-outline-success me-2">Student Login</a>
-                    <a href="/student/signup" class="btn btn-outline-success me-2">Student SignUp</a>
-                    <a href="/institution/login" class="btn btn-outline-success me-2">Institution Login</a>
-                    <a href="/institution/signup" class="btn btn-outline-success">Institution SignUp</a>
-                  </div>
+                  <div className="d-flex">
+            <DropdownButton
+                variant="outline-info"
+                title="Student"
+                className="me-2"
+                onMouseEnter={() => setShowStudentDropdown(true)}
+                onMouseLeave={() => setShowStudentDropdown(false)}
+                show={showStudentDropdown}
+            >
+                <Dropdown.Item href="/student/login" style={{ color: '#17a2b8' }}>Login</Dropdown.Item>
+                <Dropdown.Item href="/student/signup" style={{ color: '#17a2b8' }}>SignUp</Dropdown.Item>
+            </DropdownButton>
+
+            <DropdownButton
+                variant="outline-info"
+                title="Institution"
+                onMouseEnter={() => setShowInstitutionDropdown(true)}
+                onMouseLeave={() => setShowInstitutionDropdown(false)}
+                show={showInstitutionDropdown}
+            >
+              
+                <Dropdown.Item href="/institution/login" style={{ color: '#17a2b8' }}>Login</Dropdown.Item>
+                <Dropdown.Item href="/institution/signup" style={{ color: '#17a2b8' }}>SignUp</Dropdown.Item>
+            </DropdownButton>
+        </div>
                 )
               }
             </div>
