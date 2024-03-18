@@ -6,6 +6,7 @@ from rest_framework import status
 from api.models import Test, UserProfile, Question, Response as ResponseModel
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
+import traceback
 
 
 # Create your views here.
@@ -17,6 +18,7 @@ class RegisterStudentForTestView(APIView):
             student_email = request.user.username
             test_id = request.data["test_id"]
         except:
+            print(traceback.format_exc())
             jsonresponse = {
                 "ok": False,
                 "error": "Invlaid Input format. required test_id, test_code. Also ensure that you are logged in.",
@@ -28,6 +30,7 @@ class RegisterStudentForTestView(APIView):
                 user = User.objects.get(email=student_email)
 
             except User.DoesNotExist:
+                print(traceback.format_exc())
                 jsonresponse["error"] = "No user with the given email or username"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
             userProfile = UserProfile.objects.get(user_id=user.id)
@@ -38,6 +41,7 @@ class RegisterStudentForTestView(APIView):
             try:
                 test = Test.objects.get(id=test_id)
             except Test.DoesNotExist:
+                print(traceback.format_exc())
                 jsonresponse["error"] = "Test not found"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
             registrations = test.registrations.split(",")
@@ -64,6 +68,7 @@ class RegisterStudentForTestView(APIView):
 
             return Response(jsonresponse, status=status.HTTP_200_OK)
         except Exception as e:
+            print(traceback.format_exc())
             jsonresponse = {
                 "ok": False,
                 "error": str(e),
@@ -79,6 +84,7 @@ class GetResultForStudent(APIView):
             student_email = request.user.email
             test_id = request.data["test_id"]
         except:
+            print(traceback.format_exc())
             jsonresponse = {
                 "ok": False,
                 "error": "Invalid Input format. required username , test_id, test_code",
@@ -91,6 +97,7 @@ class GetResultForStudent(APIView):
             try:
                 user = User.objects.get(email=student_email)
             except User.DoesNotExist:
+                print(traceback.format_exc())
                 jsonresponse["error"] = "No user with the given email"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
             userProfile = UserProfile.objects.get(user_id=user.id)
@@ -102,6 +109,7 @@ class GetResultForStudent(APIView):
             try:
                 test = Test.objects.get(id=test_id)
             except Test.DoesNotExist:
+                print(traceback.format_exc())
                 jsonresponse["error"] = "Test not found"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
 
@@ -122,6 +130,7 @@ class GetResultForStudent(APIView):
                     student_id=user.id, test_id=test_id
                 )
             except ResponseModel.DoesNotExist:
+                print(traceback.format_exc())
                 # jsonresponse["error"]= "Seems that you didn't attempted the test"
                 # return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
                 # for Now I'm not testing if student attempted the test or not
@@ -145,7 +154,9 @@ class GetResultForStudent(APIView):
                 try:
                     question = Question.objects.get(id=question_id, test_id=test.id)
                 except Question.DoesNotExist:
+                    print(traceback.format_exc())
                     raise Exception("question not Found")
+                    print(traceback.format_exc())
 
                 # update the total_score
                 total_test += int(question.marks)
@@ -179,6 +190,7 @@ class GetResultForStudent(APIView):
                 # response for that que stion won't be stored
 
                 except ResponseModel.DoesNotExist:
+                    print(traceback.format_exc())
                     questionwise_score.append(questionObject)
                     continue
 
@@ -212,6 +224,7 @@ class GetResultForStudent(APIView):
             return Response(resultResponse, status=status.HTTP_200_OK)
 
         except Exception as e:
+            print(traceback.format_exc())
             jsonresponse = {
                 "ok": False,
                 "error": str(e),
@@ -227,6 +240,7 @@ class GetTestID(APIView):
             try:
                 test_code = request.GET.get("test_code")
             except:
+                print(traceback.format_exc())
                 jsonresponse = {
                     "ok": False,
                     "error": "Invlaid Input format or user not logged in. Required test_code",
@@ -240,12 +254,14 @@ class GetTestID(APIView):
                 }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             except Test.DoesNotExist:
+                print(traceback.format_exc())
                 jsonresponse = {
                     "ok": False,
                     "error": "Test not found",
                 }
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            print(traceback.format_exc())
             print(e)
             jsonresponse = {"ok": False, "error": "Error while processing the api"}
             return Response(jsonresponse, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
