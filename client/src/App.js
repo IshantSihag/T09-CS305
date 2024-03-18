@@ -14,7 +14,7 @@ import StartTest from "./Components/Student/StartTest";
 import RegisterTest from "./Components/Student/RegisterTest";
 import StudentResultPage from "./Components/Student/StudentResultPage"
 import InstituteTestResult from "./Components/Institution/InstitutionTestResult";
-
+import StudentReview from "./Components/Student/StudentReview";
 
 const App = () => {
   return (
@@ -36,6 +36,7 @@ const App = () => {
           <Route exact path="/institution/createtest" element={<CreateTest />} />
           <Route exact path="/student/result" element={<StudentResultPage />} />
           <Route exact path="/institution/testresult" element={<InstituteTestResult />} />
+          <Route exact path="/student/review" element={<StudentReview />} />
         </Routes>
       </Router>
 
