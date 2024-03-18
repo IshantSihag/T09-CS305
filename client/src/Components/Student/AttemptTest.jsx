@@ -20,6 +20,8 @@ import secondsToHMS from "../../Utils/secondsToHMS";
 //icons 
 import { ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 
+//TODO: REPLACE ALL ALERTS TO REACT TOAST
+
 const AttemptTest=()=>
 {
     //for quicks links
@@ -34,12 +36,10 @@ const AttemptTest=()=>
     const navigate = useNavigate();
 
     //TODO: fetch correct test id
-    const testId = 1;
+    const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
 
     const storeListToCookies = async(usrQ, usrT) => {
         // console.log("COOKIES");
-
-        console.log("userT = " + usrT); 
         Cookies.set(`ques/${testId}`, JSON.stringify({ usrQ }), { expires: 1 });
         Cookies.set(`time/${testId}`, JSON.stringify({ usrT }), { expires: 1 });
     };
@@ -75,6 +75,7 @@ const AttemptTest=()=>
 
                 if (!accessToken) {
                     console.log("Access token not found, User not authorized");
+                    alert("User not authorized, Please Login");
                     navigate('/student/login');
                     return ;
                 }  
@@ -106,8 +107,11 @@ const AttemptTest=()=>
 
                     setUserQuestions(questionsList);
 
+                    const logMsg = "Data fetched, setting up cookies with fetched data...";
+                    console.log(logMsg); 
+                    alert("Data fetched successfully");
+                    
                     //setting cookies data
-                    console.log("Data fetched, setting up cookies with fetched data..."); 
                     await storeListToCookies(questionsList, data.duration); 
 
                     // console.log("stored cookies questionList : ", questionsList);
@@ -116,10 +120,13 @@ const AttemptTest=()=>
                     if (res.status === 401) {
                         console.log("Unauthorized : Please login");
                         navigate('/student/login');
+
+                        return ;
                     }
                     console.log(`Fetch Error : ${res.status}`);
                 }
             } catch (err) {
+                console.log("Fetch Error : ", err.message);
                 console.log(`Error while fetching test: ${err.message}`); 
             }
         };
@@ -156,38 +163,66 @@ const AttemptTest=()=>
         e.preventDefault();
         try {
             const accessToken = Cookies.get('access');
+            
             if (!accessToken) {
                 console.log("Access token not found, User not authorized");
+                alert("User not authorized, Please Login");
                 navigate('/student/login');
                 return;
             }
 
             const data = {
-                test_id :testId,
+                test_id: testId,
                 user_response: userQuestions
             };
+
+            const sendData = JSON.stringify(data);
+            
+            const sendFormData = new FormData();
+            sendFormData.append("data", sendData);
 
             const res = await fetch(`${process.env.REACT_APP_API_URL}/submitTest/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(data)
+                body: sendFormData
             });
+            
+            const resData = await res.json();
+
+            // console.log("res = ", res);
+            // console.log("resData = ", resData);
 
             if (res.ok) {
-                const data = await res.json();
+                const receievedMsg = resData.message;
                 
-                //TODO: handle error message using toastify
-                
-                console.log("Test submitted successfully");
-                // Handle the response data as needed
+                if (resData.ok) {
+                    //removing cookies data after successfully submitting the test
+                    Cookies.remove(`ques/${testId}`);
+                    Cookies.remove(`time/${testId}`);
+                    
+                    console.log(receievedMsg);
+                    alert(receievedMsg);
+
+                    //navigating to student dashboard
+                    navigate("/student");
+                } else {
+                    // Handle the error response
+                    let errMsg = `Test submission failed: ${resData.error}` || "Error (submit-test)" ;
+                    console.log(`Error (submit-test) : ${errMsg}`);
+                    alert("Submit test failed");
+                }
             } else {
                 // Handle the error response
-                console.log(`Test submission failed: ${res.status}`);
-            }
+                let errMsg = `Error while submitting test`;   
+                console.log(errMsg);
+                alert("Submit test failed");
+            };
         } catch (err) {
-            console.log(`Error while submitting test: ${err.message}`);
+            let errMsg = `Error while submitting test: ${err.message}`;   
+            console.log(`Error (submit-test) : ${err}`);
+            alert(errMsg);
         }
     }; 
 
