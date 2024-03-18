@@ -19,7 +19,7 @@ class RegisterStudentForTestView(APIView):
         except:
             jsonresponse = {
                 "ok": False,
-                "error": "Invlaid Input format. required test_id, test_code. Also ensure that you are logged in.",
+                "error": "Invlaid Input format. required test_id .",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -54,10 +54,11 @@ class RegisterStudentForTestView(APIView):
             test.save()
 
             # adding test_id to registrations for the student
+            # I have used str convertion otherwise it would show error
             if len(userProfile.tests):
-                userProfile.tests += "," + test.id
+                userProfile.tests += "," + str(test.id)
             else:
-                userProfile.tests += test.id
+                userProfile.tests += str(test.id)
             userProfile.save()
 
             jsonresponse = {"ok": True, "message": "successfully registered"}
