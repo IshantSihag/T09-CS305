@@ -235,7 +235,7 @@ class GetTestID(APIView):
             except:
                 jsonresponse = {
                     "ok": False,
-                    "error": "Invlaid Input format or user not logged in. Required test_code",
+                    "error": "Invlaid Input format. Required test_code",
                 }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             try:
@@ -244,7 +244,7 @@ class GetTestID(APIView):
                     "ok": True,
                     "test_id": test.id,
                 }
-                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+                return Response(jsonresponse, status=status.HTTP_200_OK)
             except Test.DoesNotExist:
                 jsonresponse = {
                     "ok": False,
