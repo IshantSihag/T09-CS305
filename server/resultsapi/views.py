@@ -15,8 +15,7 @@ class RegisterStudentForTestView(APIView):
     def post(self, request):
         try:
             student_email = request.user.username
-            test_id = int(request.data["test_id"])
-            test_code = request.data["test_code"]
+            test_id = request.data["test_id"]
         except:
             jsonresponse = {
                 "ok": False,
@@ -47,22 +46,18 @@ class RegisterStudentForTestView(APIView):
                 jsonresponse["error"] = "You are already registered for the Test"
                 return Response(jsonresponse, status=status.HTTP_409_CONFLICT)
 
-            if test_code != test.testCode:
-                jsonresponse["error"] = "Incorrect Test code"
-                return Response(jsonresponse, status=status.HTTP_406_NOT_ACCEPTABLE)
-
             # adding student_id to registrations for the test
             if len(test.registrations):
-                test.registrations += ", " + str(user.id)
+                test.registrations += "," + str(user.id)
             else:
                 test.registrations += str(user.id)
             test.save()
 
             # adding test_id to registrations for the student
             if len(userProfile.tests):
-                userProfile.tests += ", " + str(test.id)
+                userProfile.tests += "," + test.id
             else:
-                userProfile.tests += str(test.id)
+                userProfile.tests += test.id
             userProfile.save()
 
             jsonresponse = {"ok": True, "message": "successfully registered"}
@@ -80,14 +75,13 @@ class GetResultForStudent(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        # if the parameters are in the correct format
         try:
             student_email = request.user.email
-            test_id = int(request.GET.get("test_id"))
+            test_id = request.data["test_id"]
         except:
             jsonresponse = {
                 "ok": False,
-                "error": "Invlaid Input format. required username , test_id, test_code",
+                "error": "Invalid Input format. required username , test_id, test_code",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -182,7 +176,7 @@ class GetResultForStudent(APIView):
                         question_id=question.id
                     )
                 # currently assumed that if student do not attempt a question then its
-                # response for that question won't be stored
+                # response for that que stion won't be stored
 
                 except ResponseModel.DoesNotExist:
                     questionwise_score.append(questionObject)
