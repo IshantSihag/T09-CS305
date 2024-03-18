@@ -19,7 +19,7 @@ class RegisterStudentForTestView(APIView):
         except:
             jsonresponse = {
                 "ok": False,
-                "error": "Invlaid Input format. required test_id, test_code. Also ensure that you are logged in.",
+                "error": "Invlaid Input format. required test_id.",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
