@@ -40,33 +40,31 @@ const DialogBox = ({
                 return ;
             }
 
-            const sendData = new FormData();
-            sendData.append("test_code", testCode);
-            
-            //TODO: Verify the API url
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/getTestID/`, {
-                method: "POST",
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/getTestID/?test_code=${testCode}`, {
+                method: "GET",
                 headers: {
                     "Authorization": `Bearer ${access}`
-                },
-                body: sendData
+                }
             });
 
             const resData = await res.json();
-            if (res.ok && resData?.ok) {
-                const resMsg = "Test Id fetched successfully";
-                
-                const testId = resData.test_id;  
+            if (res.ok) {
+                if (resData.ok) {
+                    const resMsg = "Test Id fetched successfully";
+                    const testId = resData.test_id;  
 
-                console.log("fetched test_id : ", testId);
-
-                console.log(resMsg);
-                alert(resMsg);
-                
-                //TODO: navigate to the startTest page along with testId
-                navigate("/student");
+                    console.log("fetched test_id : ", testId);
+                    console.log(resMsg);
+                    alert(resMsg);
+                    
+                    //TODO: navigate to the startTest page along with testId
+                    navigate("/student"); 
+                } else {
+                    console.log(`Failed to fetch Test Id : ${resData.error}`);
+                    alert("Error in fetching data from server. Please try again later.");
+                }
             } else {
-                console.log(`Failed to fetch Test Id : ${resData.error}`);
+                console.log(`Failed to fetch Test Id`);
                 alert("Error in fetching data from server. Please try again later.");
             }
         } catch (err) {
