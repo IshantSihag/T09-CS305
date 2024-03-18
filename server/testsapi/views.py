@@ -191,10 +191,9 @@ class clocksyncView(APIView):
         )
 
 
-
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request):
         email = request.user.email
         user = User.objects.get(email=email)
@@ -211,20 +210,26 @@ class DashboardView(APIView):
         for test_id in tests:
             if test_id != "":
                 test = Test.objects.get(id=test_id)
-                if test.start + timedelta(seconds=test.duration) > datetime.datetime.now():
-                    jsonresponse["upcomingtests"].append({
-                        "id": test.id,
-                        "title": test.title,
-                        "start": test.start,
-                        "duration": test.duration,
-                    })
+                if (
+                    test.start + timedelta(seconds=test.duration)
+                    > datetime.datetime.now()
+                ):
+                    jsonresponse["upcomingtests"].append(
+                        {
+                            "id": test.id,
+                            "title": test.title,
+                            "start": test.start,
+                            "duration": test.duration,
+                        }
+                    )
                 else:
-                    jsonresponse["pasttests"].append({
-                        "id": test.id,
-                        "title": test.title,
-                        "start": test.start,
-                        "duration": test.duration,
-                    })
-            
-            
+                    jsonresponse["pasttests"].append(
+                        {
+                            "id": test.id,
+                            "title": test.title,
+                            "start": test.start,
+                            "duration": test.duration,
+                        }
+                    )
+
         return Response(jsonresponse, status=status.HTTP_200_OK)
