@@ -46,7 +46,7 @@ class RegisterStudentForTestView(APIView):
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
             registrations = test.registrations.split(",")
             registrations = [registration.strip() for registration in registrations]
-            if str(user.id) in registrations:
+            if str(user.email) in registrations:
                 jsonresponse["error"] = "You are already registered for the Test"
                 return Response(jsonresponse, status=status.HTTP_409_CONFLICT)
 
