@@ -52,16 +52,16 @@ class RegisterStudentForTestView(APIView):
 
             # adding student_id to registrations for the test
             if len(test.registrations):
-                test.registrations += "," + str(user.id)
+                test.registrations += "," + str(user.email)
             else:
-                test.registrations += str(user.id)
+                test.registrations += str(user.email)
             test.save()
 
             # adding test_id to registrations for the student
             if len(userProfile.tests):
-                userProfile.tests += "," + test.id
+                userProfile.tests += "," + str(test.id)
             else:
-                userProfile.tests += test.id
+                userProfile.tests += str(test.id)
             userProfile.save()
 
             jsonresponse = {"ok": True, "message": "successfully registered"}
