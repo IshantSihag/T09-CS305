@@ -20,6 +20,7 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
+import axios from "axios";
 
 const Ques_Types = ["single_correct", "multi_correct", "long_answer"];
 
@@ -170,31 +171,29 @@ export default function CreattTest() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const currentQuestion = questions[currentQuestionIndex];
-  const [cookiesLoaded, setCookiesLoaded] = useState(false);
 
   useEffect(() => {
     const questions_ = Cookies.get("questions");
     const currentQuestionIndex_ = Cookies.get("currentQuestionIndex");
-    if (questions_ && currentQuestionIndex_ && !cookiesLoaded) {
-      console.log("Setting questions from cookies");
-      console.log(JSON.parse(questions_));
-      console.log(JSON.parse(currentQuestionIndex_));
+
+    if (questions_ && currentQuestionIndex_) {
+      // console.log("Setting questions from cookies");
       setQuestions(JSON.parse(questions_));
       setCurrentQuestionIndex(JSON.parse(currentQuestionIndex_));
-      setCookiesLoaded(true);
     }
   }, []);
 
-  useEffect(() => {
-    if (cookiesLoaded){
-      console.log("Setting cookies");
-      Cookies.set("questions", JSON.stringify(questions));
-      Cookies.set("currentQuestionIndex", JSON.stringify(currentQuestionIndex));
-      console.log(JSON.stringify(questions), questions, currentQuestionIndex);
-    }
-  }, [questions, currentQuestionIndex]);
 
-  // Function to handle adding a choice for a multiple-choice question
+  const setCookies = () => {
+    // console.log("Setting cookies");
+    Cookies.set("questions", JSON.stringify(questions));
+    Cookies.set("currentQuestionIndex", JSON.stringify(currentQuestionIndex));
+  };
+
+  const deleteCookies = () => {
+    Cookies.remove("questions");
+    Cookies.remove("currentQuestionIndex");
+  };
 
   const handleAddQuestion = () => {
     setQuestions((prevQuestions) => [
@@ -204,11 +203,15 @@ export default function CreattTest() {
         title: "",
         value: "",
         type: "single_correct",
-        choices: [{ value: "", isCorrect: false }],
+        choices: [
+          { value: "", isCorrect: false },
+          { value: "", isCorrect: false },
+        ],
         answer: "",
         marks: "",
       },
     ]);
+    setCookies();
   };
 
   const handleDeleteQuestion = () => {
@@ -216,6 +219,7 @@ export default function CreattTest() {
       prevQuestions.filter((question, index) => index !== currentQuestionIndex)
     );
     setCurrentQuestionIndex(currentQuestionIndex-1)
+    setCookies();
   };
 
   const handleQuestionTitleChange = (value) => {
@@ -226,6 +230,8 @@ export default function CreattTest() {
           : question
       )
     );
+
+    setCookies();
   };
 
   const handleQuestionChange = (value) => {
@@ -234,6 +240,8 @@ export default function CreattTest() {
         index === currentQuestionIndex ? { ...question, value } : question
       )
     );
+
+    setCookies();
   };
 
   const handleQuestionTypeChange = (value) => {
@@ -242,6 +250,8 @@ export default function CreattTest() {
         index === currentQuestionIndex ? { ...question, type: value } : question
       )
     );
+
+    setCookies();
   };
 
   const handleQuestionAnswerChange = (value) => {
@@ -250,6 +260,8 @@ export default function CreattTest() {
         index === currentQuestionIndex ? { ...question, answer: value } : question
       )
     );
+
+    setCookies();
   };
 
   const handleAddChoice = () => {
@@ -263,6 +275,8 @@ export default function CreattTest() {
           : question
       )
     );
+
+    setCookies();
   };
 
   const handleChoiceChange = (choiceId, value) => {
@@ -278,9 +292,14 @@ export default function CreattTest() {
           : question
       )
     );
+
+    setCookies();
   };
 
   const handleDeleteChoice = (choiceId) => {
+    if (questions[currentQuestionIndex].choices.length === 2) {
+      return;
+    }
     setQuestions((prevQuestions) =>
       prevQuestions.map((question, index) =>
         index === currentQuestionIndex
@@ -291,6 +310,8 @@ export default function CreattTest() {
           : question
       )
     );
+
+    setCookies();
   };
   
   const handleSelectCorrectAnswer = (choiceId, isCorrect) => {
@@ -306,18 +327,8 @@ export default function CreattTest() {
           : question
       )
     );
-  };
 
-  const handleMoveQuestionUp = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
-  const handleMoveQuestionDown = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
+    setCookies();
   };
 
   return (
@@ -336,7 +347,6 @@ export default function CreattTest() {
             <Button
               className="rounded-full"
               size="sm"
-              ripple={false}
               onClick={handleAddQuestion}
             >
               Add
@@ -360,8 +370,8 @@ export default function CreattTest() {
                     className="font-bold justify-between"
                   >
                     Q. {index+1}{" "}
-                    {question.title.size > 15
-                      ? question.title.slice() + ".."
+                    {question.title.length > 13
+                      ? question.title.slice(0,13) + "..."
                       : question.title}
                   </Typography>
                   <Chip
@@ -405,24 +415,6 @@ export default function CreattTest() {
             </div>
             <div>
               <Button
-                className="rounded-full mx-2"
-                size="sm"
-                ripple={false}
-                onClick={() => handleMoveQuestionUp()}
-                disabled={currentQuestionIndex === 0}
-              >
-                Up
-              </Button>
-              <Button
-                className="rounded-full mr-2"
-                size="sm"
-                ripple={false}
-                onClick={() => handleMoveQuestionDown()}
-                disabled={currentQuestionIndex === questions.length - 1}
-              >
-                Down
-              </Button>
-              <Button
                 className="rounded-full"
                 size="sm"
                 ripple={false}
@@ -433,7 +425,7 @@ export default function CreattTest() {
               </Button>
             </div>
           </CardHeader>
-          <CardBody className="flex-1 overflow-scroll">
+          <CardBody className="flex-1 overflow-auto">
             <div>
               <Typography variant="h6">Question</Typography>
               <input
@@ -519,8 +511,9 @@ export default function CreattTest() {
               <Button
                 className="rounded-full h-9"
                 size="sm"
-                ripple={false}
-                onClick={() => {}}
+                onClick={() => {
+                  deleteCookies();
+                }}
               >
                 Save
               </Button>
