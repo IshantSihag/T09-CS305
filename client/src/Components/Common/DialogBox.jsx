@@ -58,7 +58,7 @@ const DialogBox = ({
                     alert(resMsg);
                     
                     //TODO: navigate to the startTest page along with testId
-                    navigate("/student"); 
+                    navigate(`/student/registertest`); 
                 } else {
                     console.log(`Failed to fetch Test Id : ${resData.error}`);
                     alert("Error in fetching data from server. Please try again later.");
