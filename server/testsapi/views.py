@@ -18,7 +18,8 @@ import json
 import datetime
 from datetime import timedelta
 import pytz
-utc=pytz.UTC
+
+utc = pytz.UTC
 
 # Create your views here.
 
@@ -212,10 +213,9 @@ class DashboardView(APIView):
         for test_id in tests:
             if test_id != "":
                 test = Test.objects.get(id=test_id)
-                if (
-                    test.start.replace(tzinfo=utc) + timedelta(seconds=test.duration)
-                    > datetime.datetime.now().replace(tzinfo=utc)
-                ):
+                if test.start.replace(tzinfo=utc) + timedelta(
+                    seconds=test.duration
+                ) > datetime.datetime.now().replace(tzinfo=utc):
                     jsonresponse["upcomingtests"].append(
                         {
                             "id": test.id,
