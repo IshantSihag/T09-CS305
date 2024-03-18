@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import Footer from '../Common/Footer';
+import Navbar from '../Common/Navbar';
+import { Card, CardHeader, CardBody, CardFooter, Typography, Button } from '@material-tailwind/react'; // Import your component library
 
 const InstituteTestResult = () => {
   const [students, setStudents] = useState([
@@ -64,56 +67,75 @@ const InstituteTestResult = () => {
   };
 
   return (
-    <div className="container mx-auto mt-8 p-4 bg-gray-100 rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold mb-4 text-center">Student Marks</h1>
-      <table className="w-full mb-8">
-        <thead>
-          <tr>
-            <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-              Name
-            </th>
-            <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-              Marks
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student) => (
-            <tr key={student.id}>
-              <td className="border px-6 py-4">{student.name}</td>
-              <td className="border px-6 py-4">{student.marks}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex justify-between mb-4">
-        <div>
-          <p className="text-sm font-medium">Mean:</p>
-          <p className="text-lg font-semibold">{mean}</p>
-        </div>
-        <div>
-          <p className="text-sm font-medium">Median:</p>
-          <p className="text-lg font-semibold">{median}</p>
-        </div>
-        <div>
-          <p className="text-sm font-medium">Mode:</p>
-          <p className="text-lg font-semibold">{mode}</p>
-        </div>
+    <div>
+      <Navbar />
+      <div className="mt-4 h-screen flex items-center place-content-center">
+        <Card className="w-96">
+          <CardHeader
+            variant="gradient"
+            color="gray"
+            className="flex-1 mb-4 grid h-28 place-items-center"
+          >
+            <Typography variant="h3" color="white">
+              Student Marks
+            </Typography>
+          </CardHeader>
+          <CardBody className="flex flex-col gap-4">
+            <table className="w-full mb-8">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Marks
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((student) => (
+                  <tr key={student.id}>
+                    <td className="border px-6 py-4">{student.name}</td>
+                    <td className="border px-6 py-4">{student.marks}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="flex justify-between mb-4">
+              <div>
+                <p className="text-sm font-medium">Mean:</p>
+                <p className="text-lg font-semibold">{mean}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">Median:</p>
+                <p className="text-lg font-semibold">{median}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">Mode:</p>
+                <p className="text-lg font-semibold">{mode}</p>
+              </div>
+            </div>
+            <div className="mb-4">
+              <p className="text-sm font-medium">Highest Scorer:</p>
+              <p className="text-lg font-semibold">{highestScorer.name} - {highestScorer.marks}</p>
+            </div>
+            <div className="mb-4">
+              <p className="text-sm font-medium">Students above Average:</p>
+              <p className="text-lg font-semibold">{aboveAverageCount}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Students below Average:</p>
+              <p className="text-lg font-semibold">{belowAverageCount}</p>
+            </div>
+          </CardBody>
+          <CardFooter className="pt-0">
+            {/* Footer content here */}
+          </CardFooter>
+        </Card>
       </div>
-      <div className="mb-4">
-        <p className="text-sm font-medium">Highest Scorer:</p>
-        <p className="text-lg font-semibold">{highestScorer.name} - {highestScorer.marks}</p>
-      </div>
-      <div className="mb-4">
-        <p className="text-sm font-medium">Students above Average:</p>
-        <p className="text-lg font-semibold">{aboveAverageCount}</p>
-      </div>
-      <div>
-        <p className="text-sm font-medium">Students below Average:</p>
-        <p className="text-lg font-semibold">{belowAverageCount}</p>
-      </div>
+      <Footer />
     </div>
   );
 };
 
-export default InstituteTestResult
+export default InstituteTestResult;

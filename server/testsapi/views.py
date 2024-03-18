@@ -14,6 +14,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from api.models import Test, UserProfile, Question, Result, Response as ResponseModel
 from django.contrib.auth.models import User
+import json
 
 # Create your views here.
 
@@ -74,8 +75,10 @@ class SubmitTestView(APIView):
 
     def post(self, request):
         try:
-            test_id = request.data["test_id"]
-            user_response = request.data["user_response"]
+            data = request.data["data"]
+            data = json.loads(data)
+            test_id = data["test_id"]
+            user_response = data["user_response"]
         except:
             # If test_id or answers are not provided
             jsonresponse = {
@@ -146,6 +149,41 @@ class SubmitTestView(APIView):
                 "ok": True,
                 "message": "Test submitted successfully",
                 "score": score,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class clocksyncView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            test_id = request.data["test_id"]
+        except:
+            # If test_id or answers are not provided
+            jsonresponse = {
+                "ok": False,
+                "error": "test_id or time not provided",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        # If test_id is not valid
+        if not Test.objects.filter(id=test_id).exists():
+            return Response(
+                {
+                    "ok": False,
+                    "error": "No test with the given id found",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        test = Test.objects.get(id=test_id)
+        startTime = test.start
+        duration = test.duration
+        return Response(
+            {
+                "ok": True,
+                "start_time": startTime,
+                "duration": duration,
             },
             status=status.HTTP_200_OK,
         )

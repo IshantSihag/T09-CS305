@@ -13,4 +13,9 @@ urlpatterns = [
         views.GetResultForStudent.as_view(),
         name="GetResultForStudent",
     ),
+    path(
+        "getTestID/",
+        views.GetTestID.as_view(),
+        name="GetTestID",
+    ),
 ]
