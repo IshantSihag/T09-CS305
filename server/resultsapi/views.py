@@ -69,7 +69,7 @@ class RegisterStudentForTestView(APIView):
             test.save()
 
             # adding test_id to registrations for the student
-            # I have used str convertion otherwise it would show error
+            # I have used str convertion otherwise it would throw error
             if len(userProfile.tests):
                 userProfile.tests += "," + str(test.id)
             else:
