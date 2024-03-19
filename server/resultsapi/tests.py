@@ -84,3 +84,19 @@ class RegisterStudentForTestViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["ok"], False)
         self.assertIn("Test not found", response.data["error"])
+    
+    def test_test_ended(self):
+        mytest= Test.objects.create(
+            id=uuid.uuid4(),
+            title="past@test",
+            start=timezone.now()-timedelta(seconds=4000),
+            duration=3600,
+            author="institute@example.com",
+            testCode="UUYREQ",
+        )
+        data = {"test_id": mytest.id}
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["ok"], False)
+        self.assertEqual(response.data["error"], "Test already ended")
