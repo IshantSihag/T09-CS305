@@ -42,6 +42,9 @@ const StartTest = () => {
 
     // Continue with test initiation or redirection logic
     alert("Test initiated successfully!");
+
+    // Redirect to test page
+    navigate("/attemptest");
   };
 
 
