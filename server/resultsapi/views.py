@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 import traceback
 
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 
 from django.utils import timezone
 
@@ -54,14 +54,14 @@ class RegisterStudentForTestView(APIView):
             if str(user.email) in registrations:
                 jsonresponse["error"] = "You are already registered for the Test"
                 return Response(jsonresponse, status=status.HTTP_409_CONFLICT)
-            
-            start=test.start
-            end=start+timedelta(seconds=test.duration) #end time of the test
 
-            if(end<=timezone.now()): 
-                #when the request is recieved at the server. All calcutaion are timezone sensitive
-                #it is ok, even if the timezone of the tiem stored in the start is different 
-                #form the current timezone.
+            start = test.start
+            end = start + timedelta(seconds=test.duration)  # end time of the test
+
+            if end <= timezone.now():
+                # when the request is recieved at the server. All calcutaion are timezone sensitive
+                # it is ok, even if the timezone of the tiem stored in the start is different
+                # form the current timezone.
                 jsonresponse["error"] = "Test already ended"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
