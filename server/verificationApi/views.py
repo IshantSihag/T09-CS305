@@ -19,6 +19,7 @@ import cv2
 import face_recognition
 import numpy as np
 import base64
+from .models import UserImage
 
 
 # Face verification utility methods
@@ -67,6 +68,24 @@ class VerifyUserView(APIView):
             else:
                 jsonresponse = {"ok": False, "error": "User verification failed"}
                 return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+
+        except:
+            jsonresponse = {"ok": False, "error": "Invalid request"}
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SubmitInitalImage(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            user_pic_base64 = request.data["user_image_base64"]
+            user_email = request.user.email
+            user = User.objects.get(email=user_email)
+            user_image = UserImage.objects.get(user_id=user.id)
+            user_image.image_base64 = user_pic_base64
+            jsonresponse = {"ok": True, "message": "User profile picture saved"}
+            return Response(jsonresponse, status=status.HTTP_200_OK)
 
         except:
             jsonresponse = {"ok": False, "error": "Invalid request"}
