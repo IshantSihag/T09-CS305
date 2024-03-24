@@ -53,9 +53,9 @@ class VerifyUserView(APIView):
             user_pic_base64 = request.data["user_pic_base64"]
             user_email = request.user.email
             user = User.objects.get(email=user_email)
-            user_profile = UserProfile.objects.get(user_id=user.id)
-            user_profile_pic = user_profile.profile_url
-            known_face_enc = find_face_encodings(user_profile_pic)
+            user_image = UserImage.objects.get(user_id=user.id)
+            user_initial_image = user_image.image_base64
+            known_face_enc = find_face_encodings(user_initial_image)
             unknown_face_enc = find_face_encodings(user_pic_base64)
             if known_face_enc is None or unknown_face_enc is None:
                 jsonresponse = {"ok": False, "error": "Invalid image"}
