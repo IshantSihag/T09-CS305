@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+
 class UserImage(models.Model):
     user_id = models.OneToOneField(
         User, related_name="userdetails", default=1, on_delete=models.CASCADE
