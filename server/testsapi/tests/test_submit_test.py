@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 import json
 
+
 class TestCreateTest(TestCase):
     def setUp(self):
         # setting up and creation of a test student
@@ -47,7 +48,6 @@ class TestCreateTest(TestCase):
             "duration": "3600",
             "questions": json.dumps(
                 [
-
                     {
                         "statement": "1+1 is what",
                         "type": "single",
@@ -78,7 +78,7 @@ class TestCreateTest(TestCase):
         self.assertTrue(self.response.data["ok"])
         self.assertTrue(self.response.data["test_id"])
         self.assertTrue(self.response.data["testCode"])
-    
+
     def test_submit_test(self):
         submit_test_data = {
             "data": json.dumps(
@@ -101,3 +101,125 @@ class TestCreateTest(TestCase):
         self.assertTrue(self.response.data["ok"])
         self.assertTrue(self.response.data["message"])
         self.assertTrue(self.response.data["score"])
+
+    def test_submit_test_invalid_test_id(self):
+        submit_test_data = {
+            "data": json.dumps(
+                {
+                    "test_id": str(self.test_id),
+                    "user_response": [
+                        {
+                            "id": 2,
+                            "answerList": [0],
+                        }
+                    ],
+                }
+            ),
+        }
+        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
+        self.response = self.client.post(
+            reverse("submitTest"), submit_test_data, **headers
+        )
+        self.assertEqual(self.response.status_code, 400)
+        self.assertFalse(self.response.data["ok"])
+        self.assertTrue(self.response.data["error"])
+
+    def test_submit_test_invalid_answerList(self):
+        submit_test_data = {
+            "data": json.dumps(
+                {
+                    "test_id": str(self.test_id),
+                    "user_response": [
+                        {
+                            "id": 1,
+                            "answerList": [4],
+                        }
+                    ],
+                }
+            ),
+        }
+        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
+        self.response = self.client.post(
+            reverse("submitTest"), submit_test_data, **headers
+        )
+        self.assertEqual(self.response.status_code, 400)
+        self.assertFalse(self.response.data["ok"])
+        self.assertTrue(self.response.data["error"])
+
+    def test_submit_test_invalid_question_id(self):
+        submit_test_data = {
+            "data": json.dumps(
+                {
+                    "test_id": str(self.test_id),
+                    "user_response": [
+                        {
+                            "id": 2,
+                            "answerList": [0],
+                        }
+                    ],
+                }
+            ),
+        }
+        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
+        self.response = self.client.post(
+            reverse("submitTest"), submit_test_data, **headers
+        )
+        self.assertEqual(self.response.status_code, 400)
+        self.assertFalse(self.response.data["ok"])
+        self.assertTrue(self.response.data["error"])
+
+    def test_submit_test_invalid_question_not_part_of_test(self):
+        submit_test_data = {
+            "data": json.dumps(
+                {
+                    "test_id": str(self.test_id),
+                    "user_response": [
+                        {
+                            "id": 2,
+                            "answerList": [0],
+                        }
+                    ],
+                }
+            ),
+        }
+        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
+        self.response = self.client.post(
+            reverse("submitTest"), submit_test_data, **headers
+        )
+        self.assertEqual(self.response.status_code, 400)
+        self.assertFalse(self.response.data["ok"])
+        self.assertTrue(self.response.data["error"])
+
+    def test_submit_test_no_test_id_or_user_response(self):
+        submit_test_data = {
+            "test_id": self.test_id,
+        }
+        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
+        self.response = self.client.post(
+            reverse("submitTest"), submit_test_data, **headers
+        )
+        self.assertEqual(self.response.status_code, 400)
+        self.assertFalse(self.response.data["ok"])
+        self.assertTrue(self.response.data["error"])
+
+    def test_submit_test_garbage_data(self):
+        submit_test_data = {
+            "test_id": "garbage",
+            "data": json.dumps(
+                {
+                    "test_id": str(self.test_id),
+                    "user_response": [
+                        {
+                            "id": 1,
+                            "answerList": [0],
+                        }
+                    ],
+                }
+            ),
+        }
+        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
+        self.response = self.client.post(
+            reverse("submitTest"), submit_test_data, **headers
+        )
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTrue(self.response.data["ok"])
