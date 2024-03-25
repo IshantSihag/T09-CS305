@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import PhotoCaptureWindow from "./PhotoCaptureWindow";
+import Cookies from "js-cookie";
 
 const StartTest = () => {
   const navigate = useNavigate();
