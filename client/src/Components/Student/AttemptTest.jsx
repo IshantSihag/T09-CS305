@@ -38,10 +38,21 @@ const AttemptTest=()=>
     //TODO: fetch correct test id
     const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
 
-    const storeListToCookies = async(usrQ, usrT) => {
+    const storeListToCookies = async(usrQ) => {
         // console.log("COOKIES");
         Cookies.set(`ques/${testId}`, JSON.stringify({ usrQ }), { expires: 1 });
-        Cookies.set(`time/${testId}`, JSON.stringify({ usrT }), { expires: 1 });
+    };
+
+    //to calculate time left 
+    const timeLeftCalc = (startTimeForTest, duration) => {
+        const now = new Date();
+        const startTime = new Date(startTimeForTest);
+
+        const diffInMs = now.getTime() - startTime.getTime();
+        const diffInSec = Math.floor(diffInMs / 1000);
+        
+        const left = Math.max(duration-diffInSec, 0);
+        return left;
     };
 
     useEffect(() => {
@@ -49,20 +60,17 @@ const AttemptTest=()=>
             try {
                 //fetching the questions list, if it is available in cookies
                 const cookiesQuesData = Cookies.get(`ques/${testId}`);  
-                const cookiesTimeData = Cookies.get(`time/${testId}`); 
 
                 // console.log("cookiesQuesData : ", cookiesQuesData, " cookiesTimeData : ", cookiesTimeData);
                 
                 // filling values with the cookies data
-                if (cookiesQuesData && cookiesTimeData) {
+                if (cookiesQuesData) {
                     console.log("Data found in cookies");
                     const parsedQ = await JSON.parse(cookiesQuesData);
-                    const parsedT = await JSON.parse(cookiesTimeData);
                     
                     // console.log("Parsed Data from cookies : Q = ", parsedQ, " T = ", parsedT);
                     
                     setTotalQuestions(parsedQ.usrQ.length);
-                    setTimeLeft(parsedT.usrT);
                     setUserQuestions(parsedQ.usrQ);
 
                     return ;
@@ -112,7 +120,7 @@ const AttemptTest=()=>
                     alert("Data fetched successfully");
                     
                     //setting cookies data
-                    await storeListToCookies(questionsList, data.duration); 
+                    await storeListToCookies(questionsList); 
 
                     // console.log("stored cookies questionList : ", questionsList);
                 } else {
@@ -126,12 +134,69 @@ const AttemptTest=()=>
                     console.log(`Fetch Error : ${res.status}`);
                 }
             } catch (err) {
-                console.log("Fetch Error : ", err.message);
                 console.log(`Error while fetching test: ${err.message}`); 
             }
         };
         
         fetchQuestions();
+    }, []);
+
+    //to synchronize the clock on refresh 
+    useEffect(() => {
+        const fetchTime = async() => {
+            try {
+                //accessing access token from cookies 
+                const accessToken = Cookies.get('access');
+
+                if (!accessToken) {
+                    console.log("Access token not found, User not authorized");
+                    alert("User not authorized, Please Login");
+                    navigate('/student/login');
+                    
+                    return ;
+                }               
+
+                const formData = new FormData();
+                formData.append('test_id', testId);
+
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/clocksync/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}` 
+                    },
+                    body: formData
+                }) 
+
+                if (res.ok) {
+                    const data = await res.json();
+
+                    if (data.ok) {
+                        const logMsg = "Time fetched successfully";
+                        console.log(logMsg);
+
+                        const left = timeLeftCalc(data.start_time, data.duration);
+                        setTimeLeft(left);
+                    } else {
+                        console.log(`Error in fetching test timings: ${data.error}`);
+                    }
+                } else {
+                    //CHECK: for unauthorized request, user redirected to login
+                    if (res.status === 401) {
+                        console.log("Unauthorized : Please login");
+                        alert("Unauthorized : Please login");
+                        navigate('/student/login');
+
+                        return ;
+                    }
+                    console.log(`Error in fetching test timings`);
+                }
+            } catch (err) {
+                console.log(`Error in fetching test timings : ${err.message}`);
+                alert('Error in fetching test timings'); 
+            }
+        };
+
+        fetchTime();
     }, []);
 
     useEffect(() => {
