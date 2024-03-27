@@ -5,6 +5,7 @@ import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import PhotoCaptureWindow from "./PhotoCaptureWindow";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import Cookies from "js-cookie";
 
 const StartTest = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const StartTest = () => {
 
   const handle = useFullScreenHandle();
   const handleBackToDashboard = () => {
-    navigate("/dashboard");
+    navigate("/student/");
   };
 
   const handleStartTest = () => {
@@ -45,8 +46,18 @@ const StartTest = () => {
     // Redirect to test page
     // Continue with test initiation or redirection logic
     alert("Test initiated successfully!");
-  };
+    Cookies.set("testDetails", {
+      studentDetails: {
+        studentName: document.getElementById("studentName").value,
+        dob: document.getElementById("dob").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+      },
+    });
 
+    // Redirect to test page
+    navigate("/student/attemptest");
+  };
 
   const handleCheckboxChange = () => {
     setAgreeTerms(!agreeTerms);
@@ -72,74 +83,74 @@ const StartTest = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="flex flex-col">
       <Navbar />
 
-      <div className="flex-grow p-10  flex  " handle={handle}>
+      <div className="flex-1 flex p-10   "handle={handle}>
         {/* User Information */}
-        <div className="ml-20 p-20 mb--10 mr-20" >
+        <div className="flex-1  p-20 pt-3 pb-5 ">
           <div className="text-3xl font-bold mb-5">User Information</div>
 
-{/* Student Information Form */}
-<div className="mb-4 w-full max-w-md">
-        <label
-          htmlFor="studentName"
-          className="block text-gray-700 font-bold mb-2 text-xl"
-        >
-          Student Name
-        </label>
-        <input
-          id="studentName"
-          type="text"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
+          {/* Student Information Form */}
+          <div className="mb-4 w-full max-w-md">
+            <label
+              htmlFor="studentName"
+              className="block text-gray-700 font-bold mb-2 text-xl"
+            >
+              Student Name
+            </label>
+            <input
+              id="studentName"
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
 
-      <div className="mb-4 w-full max-w-md">
-        <label
-          htmlFor="dob"
-          className="block text-gray-700 text-sm font-bold mb-2 text-xl"
-        >
-          Date of Birth
-        </label>
-        <input
-          id="dob"
-          type="date"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
+          <div className="mb-4 w-full max-w-md">
+            <label
+              htmlFor="dob"
+              className="block text-gray-700 text-sm font-bold mb-2 text-xl"
+            >
+              Date of Birth
+            </label>
+            <input
+              id="dob"
+              type="date"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
 
-      <div className="mb-4 w-full max-w-md">
-        <label
-          htmlFor="email"
-          className="block text-gray-700 text-sm font-bold mb-2 text-xl"
-        >
-          Email ID
-        </label>
-        <input
-          id="email"
-          type="email"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
+          <div className="mb-4 w-full max-w-md">
+            <label
+              htmlFor="email"
+              className="block text-gray-700 text-sm font-bold mb-2 text-xl"
+            >
+              Email ID
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
 
-      <div className="mb-4 w-full max-w-md">
-        <label
-          htmlFor="phone"
-          className="block text-gray-700 text-sm font-bold mb-2 text-xl"
-        >
-          Phone No
-        </label>
-        <input
-          id="phone"
-          type="tel"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
-      </div>
+          <div className="mb-4 w-full max-w-md">
+            <label
+              htmlFor="phone"
+              className="block text-gray-700 text-sm font-bold  text-xl"
+            >
+              Phone No
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+        </div>
 
         {/* Camera Feed and Photo Capture */}
-        <div className="flex p-20 flex-col items-center ">
+        <div className="flex-1 p-20 pt-3 flex-col items-center ">
           <div className="mb-4  items-center ">
             {!photoCaptured ? (
               <>
@@ -177,10 +188,11 @@ const StartTest = () => {
             <img
               src={capturedPhoto}
               alt="Captured Photo"
-              className="rounded-lg mb-4 "
+              className="rounded-lg -mb-64"
               style={{ maxWidth: "100%", maxHeight: "300px" }}
             />
           )}
+
           {/* Camera Feed */}
           <video
             ref={videoRef}
@@ -199,7 +211,7 @@ const StartTest = () => {
         />
       )}
       {/* Terms and Conditions */}
-      <div className="flex items-center justify-center flex-grow" >
+      <div className="flex-1 p-20 pt-0 items-center justify-center ">
         <div className="mb-4">
           <p className="text-xl mb-2">
             Please read and agree to the following terms and conditions before
@@ -225,13 +237,15 @@ const StartTest = () => {
             </li>
             {/* Add more terms and conditions as needed */}
           </ul>
-          <div className="mb-2">
+
+          <div className="flex items-center">
             <Checkbox
               color="lightBlue"
               checked={agreeTerms}
               onChange={handleCheckboxChange}
+              className="m--2 "
             />
-            <label className="text-lg ml-2">
+            <label className="text-lg ">
               I agree to the terms and conditions
             </label>
           </div>
@@ -239,7 +253,7 @@ const StartTest = () => {
       </div>
 
       {/* Start Test and Back to Dashboard Buttons */}
-      <div className="flex items-center justify-center">
+      <div className="flex flex-row items-center justify-center">
         {/* Start Test Button */}
         <Button
           color="black"
