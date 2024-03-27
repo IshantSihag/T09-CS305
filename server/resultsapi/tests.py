@@ -187,14 +187,10 @@ class TestGetResultForStudentAPI(APITestCase):
     def test_test_not_found(self):
         self.client.force_authenticate(user=self.user)
 
-        response = self.client.get(self.url, {"test_id":uuid.uuid4()})
+        response = self.client.get(self.url, {"test_id": uuid.uuid4()})
         print(response.json())
 
         self.assertEqual(response.status_code, 404)
         result = response.json()
         self.assertFalse(result["ok"])
         self.assertIn("Test not found", result["error"])
-
-
-
-
