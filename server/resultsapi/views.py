@@ -46,7 +46,7 @@ class RegisterStudentForTestView(APIView):
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
             registrations = test.registrations.split(",")
             registrations = [registration.strip() for registration in registrations]
-            if str(user.id) in registrations:
+            if str(user.email) in registrations:
                 jsonresponse["error"] = "You are already registered for the Test"
                 return Response(jsonresponse, status=status.HTTP_409_CONFLICT)
 
@@ -243,7 +243,7 @@ class GetTestID(APIView):
                 print(traceback.format_exc())
                 jsonresponse = {
                     "ok": False,
-                    "error": "Invlaid Input format or user not logged in. Required test_code",
+                    "error": "Invlaid Input format. Required test_code",
                 }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             try:
@@ -252,7 +252,7 @@ class GetTestID(APIView):
                     "ok": True,
                     "test_id": test.id,
                 }
-                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+                return Response(jsonresponse, status=status.HTTP_200_OK)
             except Test.DoesNotExist:
                 print(traceback.format_exc())
                 jsonresponse = {
