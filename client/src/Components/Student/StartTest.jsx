@@ -1,9 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { Button, Checkbox } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import PhotoCaptureWindow from "./PhotoCaptureWindow";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 const StartTest = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const StartTest = () => {
   const [isCaptureWindowOpen, setCaptureWindowOpen] = useState(false);
   const videoRef = useRef(null); // Initialize with null
 
+  const handle = useFullScreenHandle();
   const handleBackToDashboard = () => {
     navigate("/dashboard");
   };
@@ -40,11 +42,9 @@ const StartTest = () => {
       return;
     }
 
+    // Redirect to test page
     // Continue with test initiation or redirection logic
     alert("Test initiated successfully!");
-
-    // Redirect to test page
-    navigate("/attemptest");
   };
 
 
@@ -75,7 +75,7 @@ const StartTest = () => {
     <div className="h-screen flex flex-col">
       <Navbar />
 
-      <div className="flex-grow p-10  flex  " >
+      <div className="flex-grow p-10  flex  " handle={handle}>
         {/* User Information */}
         <div className="ml-20 p-20 mb--10 mr-20" >
           <div className="text-3xl font-bold mb-5">User Information</div>

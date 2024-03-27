@@ -26,6 +26,9 @@ const AttemptTest=()=>
 {
     //for quicks links
     const [open, setOpen] = useState(false);
+
+    const [fullscreen, setFullscreen] = useState(false);
+    const [testStarted, setTestStarted] = useState(false);
     
     //dynamically fetched data 
     const [totalQuestions, setTotalQuestions] = useState(0);
@@ -36,7 +39,7 @@ const AttemptTest=()=>
     const navigate = useNavigate();
 
     //TODO: fetch correct test id
-    const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
+    const testId = "ee2806d7-7583-4eec-966a-33ac27eb58da";
 
     const storeListToCookies = async(usrQ, usrT) => {
         // console.log("COOKIES");
@@ -84,7 +87,7 @@ const AttemptTest=()=>
                 const formData = new FormData();
                 formData.append('test_id', testId);
 
-                const res = await fetch(`${process.env.REACT_APP_API_URL}/startTest/`, {
+                const res = await fetch(`http://127.0.0.1:8000/startTest/`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${accessToken}` 
@@ -133,6 +136,31 @@ const AttemptTest=()=>
         
         fetchQuestions();
     }, []);
+
+    const toggleFullscreen = () => {
+        if (!fullscreen) {
+          document.documentElement.requestFullscreen().catch((err) => {
+            console.log(`Error attempting to enable full-screen mode: ${err.message}`);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+        setFullscreen(!fullscreen);
+      };
+    
+      const startTest = () => {
+        setTestStarted(true);
+        toggleFullscreen();
+      };
+    
+      const exitFullscreen = () => {
+        if (window.confirm('Exiting fullscreen mode will close the test. Are you sure you want to exit fullscreen?')) {
+          document.exitFullscreen();
+          setFullscreen(false);
+          setTestStarted(false); // Close the test when exiting fullscreen
+        }
+      };
+  
 
     useEffect(() => {
         const interval = setInterval(() => {
