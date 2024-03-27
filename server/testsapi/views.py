@@ -235,3 +235,62 @@ class DashboardView(APIView):
                     )
 
         return Response(jsonresponse, status=status.HTTP_200_OK)
+
+
+class getTestDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        email = request.user.email
+        try:
+            test_id = request.data["test_id"]
+        except:
+            # If test_id is not provided
+            return Response(
+                {
+                    "ok": False,
+                    "error": "test_id not provided",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        # If test_id is not valid
+        if not Test.objects.filter(id=test_id).exists():
+            return Response(
+                {
+                    "ok": False,
+                    "error": "No test with the given id found",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        test = Test.objects.get(id=test_id)
+        if email not in test.registrations.split(","):
+            return Response(
+                {
+                    "ok": False,
+                    "error": "You are not registered for the test",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        numofquestions = 0
+        marks = 0
+        date = test.start.date()
+        time = test.start.time()
+        questions = test.questions.split(",")
+        for questionid in questions:
+            question = Question.objects.get(id=questionid)
+            marks += question.marks
+            numofquestions += 1
+
+        jsonresponse = {
+            "ok": True,
+            "title": test.title,
+            "duration": test.duration,
+            "date": date,
+            "time": time,
+            "marks": marks,
+            "questions": numofquestions,
+        }
+
+        return Response(jsonresponse, status=status.HTTP_200_OK)
