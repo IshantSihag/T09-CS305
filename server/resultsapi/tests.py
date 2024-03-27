@@ -164,3 +164,37 @@ class TestGetResultForStudentAPI(APITestCase):
         result = response.json()
         self.assertFalse(result["ok"])
         self.assertIn("The test is still ongoing", result["error"])
+
+    def test_student_not_registered(self):
+        myuser = User.objects.create_user(
+            username="myuser@example.com",
+            email="myuser@example.com",
+            password="mypassword",
+        )
+        myuserprofile = UserProfile.objects.create(
+            user_id=myuser, name="Test User", type="student"
+        )
+        self.client.force_authenticate(user=myuser)
+
+        response = self.client.get(self.url, {"test_id": self.test.id})
+        print(response.json())
+
+        self.assertEqual(response.status_code, 409)
+        result = response.json()
+        self.assertFalse(result["ok"])
+        self.assertIn("You were not registered for the Test", result["error"])
+
+    def test_test_not_found(self):
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(self.url, {"test_id":uuid.uuid4()})
+        print(response.json())
+
+        self.assertEqual(response.status_code, 404)
+        result = response.json()
+        self.assertFalse(result["ok"])
+        self.assertIn("Test not found", result["error"])
+
+
+
+
