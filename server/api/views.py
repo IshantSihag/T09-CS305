@@ -16,6 +16,7 @@ from .models import Test, UserProfile, Question
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from django.utils.crypto import get_random_string
+import json
 
 
 class LoginView(TokenObtainPairView):
@@ -252,6 +253,7 @@ class createTest(APIView):
             start = request.data["start"]
             duration = request.data["duration"]
             questions = request.data["questions"]
+            questions = json.loads(questions)
             user_email = request.user.email
             test = Test.objects.create(
                 title=title,
@@ -264,12 +266,25 @@ class createTest(APIView):
             )
             question_ids = ""
             for question in questions:
+                answer = ""
+                options = ""
+                for choice in question["choices"]:
+                    if options == "":
+                        options += choice["value"]
+                    else:
+                        options += "," + choice["value"]
+                    if choice["isCorrect"] == True:
+                        if answer == "":
+                            answer += choice["value"]
+                        else:
+                            answer += "," + choice["value"]
+
                 question = Question.objects.create(
                     statement=question["statement"],
-                    type=question["type"],
+                    type=question["type"].split("_")[0],
                     marks=question["marks"],
-                    options=question["options"],
-                    answer=question["answer"],
+                    options=options,
+                    answer=answer,
                     test_id=test,
                 )
                 question_ids += str(question.id) + ","
@@ -287,6 +302,14 @@ class createTest(APIView):
                 "test_id": test.id,
                 "testCode": testCode,
             }
+
+            profile = UserProfile.objects.get(user_id=request.user)
+            if profile.tests == "":
+                profile.tests = str(test.id)
+            else:
+                profile.tests += "," + str(test.id)
+
+            profile.save()
             return Response(jsonresponse, status=status.HTTP_201_CREATED)
         except Exception as e:
             jsonresponse = {

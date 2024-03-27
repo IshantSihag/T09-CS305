@@ -15,6 +15,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from api.models import Test, UserProfile, Question, Result, Response as ResponseModel
 from django.contrib.auth.models import User
 import json
+import datetime
+from datetime import timedelta
+import pytz
+
+utc = pytz.UTC
 
 # Create your views here.
 
@@ -187,3 +192,46 @@ class clocksyncView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        email = request.user.email
+        user = User.objects.get(email=email)
+        profile = UserProfile.objects.get(user_id=user)
+        jsonresponse = {
+            "ok": True,
+            "name": profile.name,
+            "bio": profile.bio,
+            "profile_url": profile.profile_url,
+            "upcomingtests": [],
+            "pasttests": [],
+        }
+        tests = profile.tests.split(",")
+        for test_id in tests:
+            if test_id != "":
+                test = Test.objects.get(id=test_id)
+                if test.start.replace(tzinfo=utc) + timedelta(
+                    seconds=test.duration
+                ) > datetime.datetime.now().replace(tzinfo=utc):
+                    jsonresponse["upcomingtests"].append(
+                        {
+                            "id": test.id,
+                            "title": test.title,
+                            "start": test.start,
+                            "duration": test.duration,
+                        }
+                    )
+                else:
+                    jsonresponse["pasttests"].append(
+                        {
+                            "id": test.id,
+                            "title": test.title,
+                            "start": test.start,
+                            "duration": test.duration,
+                        }
+                    )
+
+        return Response(jsonresponse, status=status.HTTP_200_OK)
