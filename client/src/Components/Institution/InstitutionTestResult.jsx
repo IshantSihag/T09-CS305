@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Footer from '../Common/Footer';
 import Navbar from '../Common/Navbar';
 import { Card, CardHeader, CardBody, CardFooter, Typography, Button } from '@material-tailwind/react'; // Import your component library
+import fetchAPI from '../Tools/FetchAPI';
 
 const InstituteTestResult = () => {
   const [students, setStudents] = useState([
@@ -11,6 +12,7 @@ const InstituteTestResult = () => {
     { id: 4, name: 'Eve', marks: 88 },
     { id: 5, name: 'Charlie', marks: 92 },
   ]);
+  const [testid, setTestId] = useState('')
   const [mean, setMean] = useState(0);
   const [median, setMedian] = useState(0);
   const [mode, setMode] = useState(0);
@@ -18,6 +20,26 @@ const InstituteTestResult = () => {
   const [aboveAverageCount, setAboveAverageCount] = useState(0);
   const [belowAverageCount, setBelowAverageCount] = useState(0);
 
+  let api = `http://localhost:5000/api`
+  useEffect(() => {
+    const fetchResult = async () => {
+      let response = await fetchAPI(`${port}/testresult?test_id=${testid}`, {}, "GET", false)
+      if (response.ok) {
+        let students = response.result
+        for(let i=0;i<students.length;i++){
+          students[i] ={
+            id:i+1,
+            name:students[i].name,
+            marks:parseInt(students[i].score)
+          }
+        }
+        setStudents(students)
+      }
+      else {
+        // error statement
+      }
+    }
+  }, [])
   useEffect(() => {
     calculateMean(students);
     calculateMedian(students);
