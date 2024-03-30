@@ -5,30 +5,29 @@ import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import profileImage from "../../Assets/profile_image.jpg"; // Import the image
 import Cookies from "js-cookie"; // Import Cookies
+import DialogBox from "../Common/DialogBox";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  const [studentDetails, setStudentDetails] = useState({
-    name: "Sumit Patil",
-    bio: " Lorem ipsum dolor sit, amet consectetur adipisicing elit. Adipisci laudantium, ullam illum nemo qui explicabo non sit eligendi, doloribus, molestiae quaerat beatae impedit praesentium perferendis commodi cum nulla. Totam tempora, at voluptates illum ipsa ea dolore, aperiam veritatis dolores consectetur dolorem? Fugit temporibus totam, quasi aliquid id quidem magni omnis!",
-  });
+  const [studentDetails, setStudentDetails] = useState({});
 
   const [image, setImage] = useState(null);
-  // Dummy data for upcoming tests
+
   const [upcomingTests, setUpcomingTests] = useState([]);
 
-  // Dummy data for past tests
+ 
   const [pastTests, setPastTests] = useState([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(true);
 
   useEffect(() => {
     // Fetch student profile and tests data on component mount
     fetchData();
   }, []);
 
-  // Fetch student profile and tests data
+
   const fetchData = async () => {
     try {
-      // Fetch student data and tests data from API
+     
       const accessToken = Cookies.get("access");
 
       if (!accessToken) {
@@ -52,8 +51,8 @@ const StudentDashboard = () => {
           bio: data.bio,
         });
 
-        // Assuming the tests data is returned as part of the response
-        console.log(data.upcomingtests)
+       
+        console.log(data.upcomingtests);
         console.log(data.pasttests);
         setUpcomingTests(data.upcomingtests);
         setPastTests(data.pasttests);
@@ -71,8 +70,16 @@ const StudentDashboard = () => {
     setImage(URL.createObjectURL(file));
   };
 
-  const handleEnterTestCode = () => {
-    // Handle attempt test logic here
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false); // Close the dialog
+  };
+  const handleAttemptTest = () => {
+  
+    navigate("/student/starttest");
+  };
+
+  const handleViewAnalysis = () => {
+    navigate("/student/result");
   };
 
   return (
@@ -104,14 +111,10 @@ const StudentDashboard = () => {
             </div>
             <div className="text-2xl text-center m-4">{studentDetails.bio}</div>
             <div className="w-25 items-center">
-              <Button
-                color="black"
-                onClick={handleEnterTestCode}
-                className="mt-4 px-6 py-3 w-full"
-                ripple="light"
-              >
-                Enter Test Code
-              </Button>
+              <div className="mt-4 px-3 w-full">
+             
+                {isDialogOpen && <DialogBox onClose={handleCloseDialog} />}
+              </div>
             </div>
           </div>
         </div>
@@ -119,77 +122,109 @@ const StudentDashboard = () => {
         {/* Tables */}
         <div className="flex-1 mt-8">
           <div className="mt-8 mb-8">
-            <h2 className="text-xl font-bold mb-2">Upcoming Tests</h2>
-            <table className="border-collapse border border-black w-full">
-              <thead>
-                <tr>
-                  <th className="border border-black px-4 py-2">Sr No.</th>
-                  <th className="border border-black px-4 py-2">Test Title</th>
-                  <th className="border border-black px-4 py-2">Start Time</th>
-                  <th className="border border-black px-4 py-2">Duration</th>
-                  <th className="border border-black px-4 py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {upcomingTests.map((test, index) => (
-                  <tr key={test.id}>
-                    <td className="border border-black px-4 py-2">
-                      {index + 1}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.title}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.start}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.duration}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      <Button color="blue" ripple="light">
-                        View Analysis
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {upcomingTests.length > 0 ? (
+              <>
+                <h2 className="text-xl font-bold mb-2">Upcoming Tests</h2>
+                <table className="border-collapse border border-black w-full">
+                  <thead>
+                    <tr>
+                      <th className="border border-black px-4 py-2">Sr No.</th>
+                      <th className="border border-black px-4 py-2">
+                        Test Title
+                      </th>
+                      <th className="border border-black px-4 py-2">
+                        Start Time
+                      </th>
+                      <th className="border border-black px-4 py-2">
+                        Duration
+                      </th>
+                      <th className="border border-black px-4 py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {upcomingTests.map((test, index) => (
+                      <tr key={test.id}>
+                        <td className="border border-black px-4 py-2">
+                          {index + 1}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.title}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.start}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.duration}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          <Button
+                            color="blue"
+                            ripple="light"
+                            onClick={handleAttemptTest}
+                          >
+                            Attempt Test
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <p className="text-xl font-bold mb-2">No upcoming tests.</p>
+            )}
 
-            <h2 className="text-xl font-bold mt-8 mb-2">Past Tests</h2>
-            <table className="border-collapse border border-black w-full">
-              <thead>
-                <tr>
-                  <th className="border border-black px-4 py-2">Sr No.</th>
-                  <th className="border border-black px-4 py-2">Test Title</th>
-                  <th className="border border-black px-4 py-2">Start Time</th>
-                  <th className="border border-black px-4 py-2">Duration</th>
-                  <th className="border border-black px-4 py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pastTests.map((test, index) => (
-                  <tr key={test.id}>
-                    <td className="border border-black px-4 py-2">
-                      {index + 1}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.title}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.startTime}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.duration}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      <Button color="blue" ripple="light">
-                        View Analysis
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {pastTests.length > 0 ? (
+              <>
+                <h2 className="text-xl font-bold mt-8 mb-2">Past Tests</h2>
+                <table className="border-collapse border border-black w-full">
+                  <thead>
+                    <tr>
+                      <th className="border border-black px-4 py-2">Sr No.</th>
+                      <th className="border border-black px-4 py-2">
+                        Test Title
+                      </th>
+                      <th className="border border-black px-4 py-2">
+                        Start Time
+                      </th>
+                      <th className="border border-black px-4 py-2">
+                        Duration
+                      </th>
+                      <th className="border border-black px-4 py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pastTests.map((test, index) => (
+                      <tr key={test.id}>
+                        <td className="border border-black px-4 py-2">
+                          {index + 1}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.title}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.startTime}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.duration}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          <Button
+                            color="blue"
+                            ripple="light"
+                            onClick={handleViewAnalysis}
+                          >
+                            View Analysis
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <p className=" text-xl font-bold mt-8 mb-2">No Past tests.</p>
+            )}
           </div>
         </div>
       </div>

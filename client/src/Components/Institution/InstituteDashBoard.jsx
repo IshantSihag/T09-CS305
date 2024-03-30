@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@material-tailwind/react";
+import { Button, Input } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
@@ -8,60 +8,79 @@ import Cookies from "js-cookie"; // Import Cookies
 
 const InstituteDashboard = () => {
   const navigate = useNavigate();
-  const [instituteDetails, setInstituteDetails] = useState({
-    name: "Sumit Patil",
-    bio: " Lorem ipsum dolor sit, amet consectetur adipisicing elit. Adipisci laudantium, ullam illum nemo qui explicabo non sit eligendi, doloribus, molestiae quaerat beatae impedit praesentium perferendis commodi cum nulla. Totam tempora, at voluptates illum ipsa ea dolore, aperiam veritatis dolores consectetur dolorem? Fugit temporibus totam, quasi aliquid id quidem magni omnis!",
-  });
+  const [instituteDetails, setInstituteDetails] = useState({});
 
   const [image, setImage] = useState(null);
-  const [hostedTests, setHostedTests] = useState([]);
-  const [toHostTests, setToHostTests] = useState([]);
+  // Dummy data for upcoming tests
+  const [upcomingTests, setUpcomingTests] = useState([]);
+
+  // Dummy data for past tests
+  const [pastTests, setPastTests] = useState([]);
 
   useEffect(() => {
-    fetchDummyData();
+    // Fetch student profile and tests data on component mount
+    fetchData();
   }, []);
 
-  const fetchDummyData = async () => {
-    // Fetching dummy data for hosted tests
-    const dummyHostedTests = [
-      {
-        id: 1,
-        title: "Dummy Hosted Test 1",
-        startDate: "2024-04-01",
-        duration: "2 hours",
-      },
-      {
-        id: 2,
-        title: "Dummy Hosted Test 2",
-        startDate: "2024-04-05",
-        duration: "1.5 hours",
-      },
-    ];
+  // Fetch student profile and tests data
+  const fetchData = async () => {
+    try {
+      // Fetch student data and tests data from API
+      const accessToken = Cookies.get("access");
 
-    // Fetching dummy data for to host tests
-    const dummyToHostTests = [
-      {
-        id: 3,
-        title: "Dummy To Host Test 1",
-        startDate: "2024-04-10",
-        duration: "1 hour",
-      },
-      {
-        id: 4,
-        title: "Dummy To Host Test 2",
-        startDate: "2024-04-15",
-        duration: "2.5 hours",
-      },
-    ];
+      if (!accessToken) {
+        console.log("Access token not found, User not authorized");
+        navigate("/student/login");
+        return;
+      }
 
-    setHostedTests(dummyHostedTests);
-    setToHostTests(dummyToHostTests);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/dashboard`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+        setInstituteDetails({
+          name: data.name,
+          bio: data.bio,
+        });
+
+        // Assuming the tests data is returned as part of the response
+        console.log(data.upcomingtests);
+        console.log(data.pasttests);
+        setUpcomingTests(data.upcomingtests);
+        setPastTests(data.pasttests);
+      } else {
+        console.error("Failed to fetch student profile data");
+      }
+    } catch (error) {
+      console.error("Error while fetching data:", error);
+    }
   };
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
+    // Handle image upload logic here
     setImage(URL.createObjectURL(file));
   };
+
+  const handleCreateTest = () => {
+    navigate("/institution/createtest");
+  };
+
+  const handleUpdateTest = () => {
+    navigate("/institution/updatetest");
+  }
+
+  const handleViewAnalysis = () => {
+   
+    navigate("/institution/testresult");
+  }
+
 
   return (
     <div className="h-screen ">
@@ -93,25 +112,38 @@ const InstituteDashboard = () => {
             <div className="text-2xl text-center m-4">
               {instituteDetails.bio}
             </div>
+            <div className="w-25 items-center">
+              <Button
+                color="black"
+                onClick={handleCreateTest}
+                className="mt-4 px-6 py-3 w-full"
+                ripple="light"
+              >
+                Create Test
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Hosted Tests Table */}
+        {/* Tables */}
         <div className="flex-1 mt-8">
           <div className="mt-8 mb-8">
-            <h2 className="text-xl font-bold mb-2">Hosted Tests</h2>
+
+          {upcomingTests.length > 0 ? (
+         <>
+            <h2 className="text-xl font-bold mb-2">Upcoming Tests</h2>
             <table className="border-collapse border border-black w-full">
               <thead>
                 <tr>
                   <th className="border border-black px-4 py-2">Sr No.</th>
                   <th className="border border-black px-4 py-2">Test Title</th>
-                  <th className="border border-black px-4 py-2">Start Date</th>
+                  <th className="border border-black px-4 py-2">Start Time</th>
                   <th className="border border-black px-4 py-2">Duration</th>
                   <th className="border border-black px-4 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {hostedTests.map((test, index) => (
+                {upcomingTests.map((test, index) => (
                   <tr key={test.id}>
                     <td className="border border-black px-4 py-2">
                       {index + 1}
@@ -120,61 +152,75 @@ const InstituteDashboard = () => {
                       {test.title}
                     </td>
                     <td className="border border-black px-4 py-2">
-                      {test.startDate}
+                      {test.start}
                     </td>
                     <td className="border border-black px-4 py-2">
                       {test.duration}
                     </td>
                     <td className="border border-black px-4 py-2">
-                      <Button color="blue" ripple="light">
-                        View Test
+                      <Button color="blue" ripple="light" onClick={handleUpdateTest}>
+                        Update Test
                       </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
 
-        {/* To Host Tests Table */}
-        <div className="flex-1 mt-8">
-          <div className="mt-8 mb-8">
-            <h2 className="text-xl font-bold mb-2">To Host Tests</h2>
-            <table className="border-collapse border border-black w-full">
-              <thead>
-                <tr>
-                  <th className="border border-black px-4 py-2">Sr No.</th>
-                  <th className="border border-black px-4 py-2">Test Title</th>
-                  <th className="border border-black px-4 py-2">Start Date</th>
-                  <th className="border border-black px-4 py-2">Duration</th>
-                  <th className="border border-black px-4 py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {toHostTests.map((test, index) => (
-                  <tr key={test.id}>
-                    <td className="border border-black px-4 py-2">
-                      {index + 1}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.title}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.startDate}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.duration}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      <Button color="blue" ripple="light">
-                        View Test
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            </>
+    ) : (
+      <p className="text-xl font-bold mb-2">No upcoming tests.</p>
+    )}
+
+
+
+            {pastTests.length > 0 ? (
+              <>
+                <h2 className="text-xl font-bold mt-8 mb-2">Hosted Tests</h2>
+                <table className="border-collapse border border-black w-full">
+                  <thead>
+                    <tr>
+                      <th className="border border-black px-4 py-2">Sr No.</th>
+                      <th className="border border-black px-4 py-2">
+                        Test Title
+                      </th>
+                      <th className="border border-black px-4 py-2">
+                        Start Time
+                      </th>
+                      <th className="border border-black px-4 py-2">
+                        Duration
+                      </th>
+                      <th className="border border-black px-4 py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pastTests.map((test, index) => (
+                      <tr key={test.id}>
+                        <td className="border border-black px-4 py-2">
+                          {index + 1}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.title}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.startTime}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.duration}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          <Button color="blue" ripple="light" onClick={handleViewAnalysis}>
+                            View Analysis
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <p className=" text-xl font-bold mt-8 mb-2">No hosted tests.</p>
+            )}
           </div>
         </div>
       </div>
