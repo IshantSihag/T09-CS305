@@ -3,7 +3,7 @@ import {
     Button
 } from "@material-tailwind/react";
 import Cookies from 'js-cookie';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 //css 
 import "../../styles/AttemptTest.css";
@@ -19,6 +19,7 @@ import secondsToHMS from "../../Utils/secondsToHMS";
 
 //icons 
 import { ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import Watermark from "../Common/Watermark";
 
 //TODO: REPLACE ALL ALERTS TO REACT TOAST
 
@@ -36,7 +37,8 @@ const AttemptTest=()=>
     const navigate = useNavigate();
 
     //TODO: fetch correct test id
-    const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
+    // const { id:testId } = useParams();
+    const testId = "693e6fa1-5613-4f78-9484-6dc38b95f646";
 
     const storeListToCookies = async(usrQ) => {
         // console.log("COOKIES");
@@ -265,7 +267,7 @@ const AttemptTest=()=>
                 if (resData.ok) {
                     //removing cookies data after successfully submitting the test
                     Cookies.remove(`ques/${testId}`);
-                    Cookies.remove(`time/${testId}`);
+                    // Cookies.remove(`time/${testId}`);
                     
                     console.log(receievedMsg);
                     alert(receievedMsg);
@@ -328,6 +330,8 @@ const AttemptTest=()=>
     };
 
     return (
+        <>
+        <Watermark text="Confidential"/>
         <div>
             <div className="test-container">
                 <div className="test-header">
@@ -379,6 +383,7 @@ const AttemptTest=()=>
                 </div>
             </div>
         </div>
+        </>
     )
 }
 
