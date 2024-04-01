@@ -1,12 +1,13 @@
 import React, { useState, useRef } from "react";
 import { Button, Checkbox } from "@material-tailwind/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import PhotoCaptureWindow from "./PhotoCaptureWindow";
 import Cookies from "js-cookie";
 
 const StartTest = () => {
+    const {id} = useParams();
   const navigate = useNavigate();
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [photoCaptured, setPhotoCaptured] = useState(false);
@@ -53,7 +54,7 @@ const StartTest = () => {
     });
 
     // Redirect to test page
-    navigate("/student/attemptest");
+    navigate(`/student/attemptest/${id}`);
   };
 
   const handleCheckboxChange = () => {

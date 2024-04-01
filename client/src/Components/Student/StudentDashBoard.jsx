@@ -36,7 +36,7 @@ const StudentDashboard = () => {
         return;
       }
 
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/dashboard`, {
+      const res = await fetch(`http://127.0.0.1:8000/dashboard`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -70,6 +70,7 @@ const StudentDashboard = () => {
     setImage(URL.createObjectURL(file));
   };
 
+
   const handleCloseDialog = () => {
     setIsDialogOpen(false); // Close the dialog
   };
@@ -80,7 +81,8 @@ const StudentDashboard = () => {
 
   const handleViewAnalysis = () => {
     navigate("/student/result");
-  };
+
+ 
 
   return (
     <div className="h-screen ">
@@ -111,10 +113,12 @@ const StudentDashboard = () => {
             </div>
             <div className="text-2xl text-center m-4">{studentDetails.bio}</div>
             <div className="w-25 items-center">
+
               <div className="mt-4 px-3 w-full">
              
                 {isDialogOpen && <DialogBox onClose={handleCloseDialog} />}
               </div>
+
             </div>
           </div>
         </div>
@@ -122,6 +126,7 @@ const StudentDashboard = () => {
         {/* Tables */}
         <div className="flex-1 mt-8">
           <div className="mt-8 mb-8">
+
             {upcomingTests.length > 0 ? (
               <>
                 <h2 className="text-xl font-bold mb-2">Upcoming Tests</h2>
@@ -225,6 +230,7 @@ const StudentDashboard = () => {
             ) : (
               <p className=" text-xl font-bold mt-8 mb-2">No Past tests.</p>
             )}
+
           </div>
         </div>
       </div>
