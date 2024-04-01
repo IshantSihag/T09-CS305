@@ -3,7 +3,7 @@ import {
     Button
 } from "@material-tailwind/react";
 import Cookies from 'js-cookie';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 //css 
 import "../../styles/AttemptTest.css";
@@ -36,8 +36,8 @@ const AttemptTest=()=>
     const navigate = useNavigate();
 
     //TODO: fetch correct test id
-    const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
-
+    // const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
+    const {id: testId} = useParams();
     const storeListToCookies = async(usrQ) => {
         // console.log("COOKIES");
         Cookies.set(`ques/${testId}`, JSON.stringify({ usrQ }), { expires: 1 });
@@ -92,7 +92,7 @@ const AttemptTest=()=>
                 const formData = new FormData();
                 formData.append('test_id', testId);
 
-                const res = await fetch(`${process.env.REACT_APP_API_URL}/startTest/`, {
+                const res = await fetch(`http://127.0.0.1:8000/startTest/`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${accessToken}` 
@@ -159,14 +159,13 @@ const AttemptTest=()=>
                 const formData = new FormData();
                 formData.append('test_id', testId);
 
-                const res = await fetch(`${process.env.REACT_APP_API_URL}/clocksync/`, {
+                const res = await fetch(`http://127.0.0.1:8000/clocksync/`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${accessToken}` 
                     },
                     body: formData
-                }) 
-
+                })
                 if (res.ok) {
                     const data = await res.json();
 
@@ -246,7 +245,7 @@ const AttemptTest=()=>
             const sendFormData = new FormData();
             sendFormData.append("data", sendData);
 
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/submitTest/`, {
+            const res = await fetch(`http://127.0.0.1:8000/submitTest/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
@@ -271,7 +270,7 @@ const AttemptTest=()=>
                     alert(receievedMsg);
 
                     //navigating to student dashboard
-                    navigate("/student");
+                    navigate("/student/review");
                 } else {
                     // Handle the error response
                     let errMsg = `Test submission failed: ${resData.error}` || "Error (submit-test)" ;
