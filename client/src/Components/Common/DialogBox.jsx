@@ -40,14 +40,16 @@ const DialogBox = ({
                 return ;
             }
 
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/getTestID/?test_code=${testCode}`, {
+            const res = await fetch(`http://127.0.0.1:8000/getTestID/?test_code=${testCode}`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${access}`
                 }
             });
-
+            console.log(res);
+            
             const resData = await res.json();
+            console.log(resData);
             if (res.ok) {
                 if (resData.ok) {
                     const resMsg = "Test Id fetched successfully";
@@ -58,7 +60,7 @@ const DialogBox = ({
                     alert(resMsg);
                     
                     //TODO: navigate to the startTest page along with testId
-                    navigate(`/student/registertest`); 
+                    navigate(`/student/registertest/${testId}`); 
                 } else {
                     console.log(`Failed to fetch Test Id : ${resData.error}`);
                     alert("Error in fetching data from server. Please try again later.");
