@@ -19,6 +19,7 @@ import secondsToHMS from "../../Utils/secondsToHMS";
 
 //icons 
 import { ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import WebcamCapture from "../Common/WebcamCatpure";
 
 //TODO: REPLACE ALL ALERTS TO REACT TOAST
 
@@ -36,7 +37,7 @@ const AttemptTest=()=>
     const navigate = useNavigate();
 
     //TODO: fetch correct test id
-    const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
+    const testId = "693e6fa1-5613-4f78-9484-6dc38b95f646";
 
     const storeListToCookies = async(usrQ) => {
         // console.log("COOKIES");
@@ -167,6 +168,8 @@ const AttemptTest=()=>
                     body: formData
                 }) 
 
+                console.log("res : ", res);
+
                 if (res.ok) {
                     const data = await res.json();
 
@@ -265,7 +268,7 @@ const AttemptTest=()=>
                 if (resData.ok) {
                     //removing cookies data after successfully submitting the test
                     Cookies.remove(`ques/${testId}`);
-                    Cookies.remove(`time/${testId}`);
+                    // Cookies.remove(`time/${testId}`);
                     
                     console.log(receievedMsg);
                     alert(receievedMsg);
@@ -329,6 +332,8 @@ const AttemptTest=()=>
 
     return (
         <div>
+            {/* TODO: Take appropriate action if the user does allow webcam capture  */}
+            <WebcamCapture />
             <div className="test-container">
                 <div className="test-header">
                     <div className="test-header-heading">ProctorX Test</div>
