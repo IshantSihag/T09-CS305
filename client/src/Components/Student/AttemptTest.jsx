@@ -39,6 +39,9 @@ const AttemptTest=()=>
     //TODO: fetch correct test id
     // const { id:testId } = useParams();
     const testId = "693e6fa1-5613-4f78-9484-6dc38b95f646";
+    
+    //TODO: fetch the correct user email 
+    const email = "2021csb0000@iitrpr.ac.in"
 
     const storeListToCookies = async(usrQ) => {
         // console.log("COOKIES");
@@ -331,7 +334,7 @@ const AttemptTest=()=>
 
     return (
         <>
-        <Watermark text="Confidential"/>
+        <Watermark text={email}/>
         <div>
             <div className="test-container">
                 <div className="test-header">
