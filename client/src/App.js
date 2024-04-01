@@ -25,7 +25,7 @@ const App = () => {
           <Route exact path="/student/" element={<StudentDashBoard />} />
           <Route exact path="/student/registertest/:id" element={<RegisterTest />} />
           <Route exact path="/student/attemptest/:id" element={<AttemptTest />} />
-          <Route exact path="/student/starttest" element={<StartTest />} />
+          <Route exact path="/student/starttest/:id" element={<StartTest />} />
           <Route exact path="/student/login" element={<StudentLogin />} />
           <Route exact path="/student/signup" element={<StudentSignUp />} />
           <Route exact path="/student/profile" element={<StudentProfilePage />} />

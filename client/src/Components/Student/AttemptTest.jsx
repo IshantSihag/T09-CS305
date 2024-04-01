@@ -36,10 +36,9 @@ const AttemptTest = () => {
     const navigate = useNavigate();
 
     //TODO: fetch correct test id
+    // const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
     const {id: testId} = useParams();
-    // const testId = "693e6fa1-5613-4f78-9484-6dc38b95f646";
-
-    const storeListToCookies = async (usrQ) => {
+    const storeListToCookies = async(usrQ) => {
         // console.log("COOKIES");
         Cookies.set(`ques/${testId}`, JSON.stringify({ usrQ }), { expires: 1 });
     };
@@ -167,9 +166,6 @@ const AttemptTest = () => {
                     },
                     body: formData
                 })
-
-                console.log("res : ", res);
-
                 if (res.ok) {
                     const data = await res.json();
 
