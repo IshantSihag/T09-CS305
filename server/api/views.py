@@ -64,22 +64,7 @@ class HomeView(APIView):
         return Response(content)
 
 
-class LogoutView(APIView):
-    permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
-        try:
-            refresh_token = request.data["refresh_token"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            jsonresponse = {"ok": True, "message": "Successfully logged out"}
-            return Response(jsonresponse, status=status.HTTP_205_RESET_CONTENT)
-        except Exception as e:
-            jsonresponse = {
-                "ok": False,
-                "error": "Invalid refresh token",
-            }
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class SignUpView(APIView):
