@@ -74,7 +74,7 @@ class VerifyUserView(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SubmitInitalImage(APIView):
+class SubmitInitialImage(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
