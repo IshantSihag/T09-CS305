@@ -264,15 +264,6 @@ class getTestDetailsView(APIView):
             )
 
         test = Test.objects.get(id=test_id)
-        if email not in test.registrations.split(","):
-            return Response(
-                {
-                    "ok": False,
-                    "error": "You are not registered for the test",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         numofquestions = 0
         marks = 0
         date = test.start.date()

@@ -22,35 +22,36 @@ const Navbar = () => {
     },[])
     const navigate=useNavigate()
 
-    const handleLogout = async() => {
-      const data = {'refresh': Cookies.get('refresh')};
-      const response = await fetch('http://127.0.0.1:8000/logout/', {
-        headers: {
-          'Authourization': 'Bearer '+Cookies.get('access')
-        },
-        method: "POST",
-        body: data
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        Cookies.delete('access');
-        Cookies.delete('refresh');
-        Cookies.delete('type');
-        Cookies.delete('name');
-        if (data.ok) {
-          console.log("Login Successfully");   
-
-          navigate("/");  
-        } else {
-          const errMsg = data?.error || "Error in Logout, Please try again";
-          alert(errMsg);
-          console.log(errMsg);
+    const handleLogout = async () => {
+        try {
+          const refresh = Cookies.get('refresh');
+          const access = Cookies.get('access');
+    
+          const sendFormData = new FormData();
+          sendFormData.append('refresh', refresh);
+    
+          const response = await fetch('http://127.0.0.1:8000/logout/', {
+            method: "POST",
+            headers: {
+              'Authorization': `Bearer ${access}`
+            },
+            body: sendFormData
+          });
+    
+    
+          if (response.ok) {
+            Cookies.remove('access');
+            Cookies.remove('refresh');
+            Cookies.remove('type');
+            Cookies.remove('name');
+            navigate('/');
+          } else {
+            console.log("Logout Failed Please try again");
+          }
+        } catch (err) {
+          console.log("Error in Logout, Please try again");
         }
-      } else {
-        console.log("Logout Failed Please try again");
       }
-    }
 
     return (
         <div>
@@ -65,20 +66,15 @@ const Navbar = () => {
                     <a href="http://localhost:3000/institute" class="navbar-brand">
                       Institute
                     </a>
-                    <a href="http://localhost:3000/institute/verify" class="navbar-brand">
-                      Verify
-                    </a>
                     <button onClick={handleLogout} class="navbar-brand">LOGOUT</button>
                   </div>
                 ):
                 type==='student'?(
-                  <div>
+                    <div>
                     <a href="http://localhost:3000/student" class="navbar-brand">
                       Student
                     </a>
-                    <a href="http://localhost:3000/student/verify" class="navbar-brand">
-                      Verify
-                    </a>
+                      <button onClick={handleLogout} class="navbar-brand">LOGOUT</button>
                   </div>
                 ):(
                   <div className="d-flex">
