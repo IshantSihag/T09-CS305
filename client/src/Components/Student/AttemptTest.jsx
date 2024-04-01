@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { 
+import {
     Button
 } from "@material-tailwind/react";
 import Cookies from 'js-cookie';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 //css 
 import "../../styles/AttemptTest.css";
@@ -23,11 +23,10 @@ import WebcamCapture from "../Common/WebcamCatpure";
 
 //TODO: REPLACE ALL ALERTS TO REACT TOAST
 
-const AttemptTest=()=>
-{
+const AttemptTest = () => {
     //for quicks links
     const [open, setOpen] = useState(false);
-    
+
     //dynamically fetched data 
     const [totalQuestions, setTotalQuestions] = useState(0);
     const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -37,9 +36,10 @@ const AttemptTest=()=>
     const navigate = useNavigate();
 
     //TODO: fetch correct test id
-    const testId = "693e6fa1-5613-4f78-9484-6dc38b95f646";
+    const {id: testId} = useParams();
+    // const testId = "693e6fa1-5613-4f78-9484-6dc38b95f646";
 
-    const storeListToCookies = async(usrQ) => {
+    const storeListToCookies = async (usrQ) => {
         // console.log("COOKIES");
         Cookies.set(`ques/${testId}`, JSON.stringify({ usrQ }), { expires: 1 });
     };
@@ -51,34 +51,34 @@ const AttemptTest=()=>
 
         const diffInMs = now.getTime() - startTime.getTime();
         const diffInSec = Math.floor(diffInMs / 1000);
-        
-        const left = Math.max(duration-diffInSec, 0);
+
+        const left = Math.max(duration - diffInSec, 0);
         return left;
     };
 
     useEffect(() => {
-        const fetchQuestions = async() => {
+        const fetchQuestions = async () => {
             try {
                 //fetching the questions list, if it is available in cookies
-                const cookiesQuesData = Cookies.get(`ques/${testId}`);  
+                const cookiesQuesData = Cookies.get(`ques/${testId}`);
 
                 // console.log("cookiesQuesData : ", cookiesQuesData, " cookiesTimeData : ", cookiesTimeData);
-                
+
                 // filling values with the cookies data
                 if (cookiesQuesData) {
                     console.log("Data found in cookies");
                     const parsedQ = await JSON.parse(cookiesQuesData);
-                    
+
                     // console.log("Parsed Data from cookies : Q = ", parsedQ, " T = ", parsedT);
-                    
+
                     setTotalQuestions(parsedQ.usrQ.length);
                     setUserQuestions(parsedQ.usrQ);
 
-                    return ;
+                    return;
                 }
 
                 console.log("No data found in cookies, fetching the questions list from API...");
-                
+
                 //accessing access token from cookies 
                 const accessToken = Cookies.get('access');
 
@@ -86,8 +86,8 @@ const AttemptTest=()=>
                     console.log("Access token not found, User not authorized");
                     alert("User not authorized, Please Login");
                     navigate('/student/login');
-                    return ;
-                }  
+                    return;
+                }
 
                 //calling API (cookies does not exist)
                 const formData = new FormData();
@@ -96,14 +96,14 @@ const AttemptTest=()=>
                 const res = await fetch(`${process.env.REACT_APP_API_URL}/startTest/`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${accessToken}` 
+                        'Authorization': `Bearer ${accessToken}`
                     },
                     body: formData
                 });
 
                 if (res.ok) {
                     const data = await res.json();
-                    
+
                     //setting up variables 
                     setTotalQuestions(data.questions.length);
                     setTimeLeft(data.duration);
@@ -112,16 +112,16 @@ const AttemptTest=()=>
                     const questionsList = [];
                     for (const ques of data.questions) {
                         questionsList.push({ ...ques, answerList: [] });
-                    } 
+                    }
 
                     setUserQuestions(questionsList);
 
                     const logMsg = "Data fetched, setting up cookies with fetched data...";
-                    console.log(logMsg); 
+                    console.log(logMsg);
                     alert("Data fetched successfully");
-                    
+
                     //setting cookies data
-                    await storeListToCookies(questionsList); 
+                    await storeListToCookies(questionsList);
 
                     // console.log("stored cookies questionList : ", questionsList);
                 } else {
@@ -130,21 +130,21 @@ const AttemptTest=()=>
                         console.log("Unauthorized : Please login");
                         navigate('/student/login');
 
-                        return ;
+                        return;
                     }
                     console.log(`Fetch Error : ${res.status}`);
                 }
             } catch (err) {
-                console.log(`Error while fetching test: ${err.message}`); 
+                console.log(`Error while fetching test: ${err.message}`);
             }
         };
-        
+
         fetchQuestions();
     }, []);
 
     //to synchronize the clock on refresh 
     useEffect(() => {
-        const fetchTime = async() => {
+        const fetchTime = async () => {
             try {
                 //accessing access token from cookies 
                 const accessToken = Cookies.get('access');
@@ -153,9 +153,9 @@ const AttemptTest=()=>
                     console.log("Access token not found, User not authorized");
                     alert("User not authorized, Please Login");
                     navigate('/student/login');
-                    
-                    return ;
-                }               
+
+                    return;
+                }
 
                 const formData = new FormData();
                 formData.append('test_id', testId);
@@ -163,10 +163,10 @@ const AttemptTest=()=>
                 const res = await fetch(`${process.env.REACT_APP_API_URL}/clocksync/`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${accessToken}` 
+                        'Authorization': `Bearer ${accessToken}`
                     },
                     body: formData
-                }) 
+                })
 
                 console.log("res : ", res);
 
@@ -189,13 +189,13 @@ const AttemptTest=()=>
                         alert("Unauthorized : Please login");
                         navigate('/student/login');
 
-                        return ;
+                        return;
                     }
                     console.log(`Error in fetching test timings`);
                 }
             } catch (err) {
                 console.log(`Error in fetching test timings : ${err.message}`);
-                alert('Error in fetching test timings'); 
+                alert('Error in fetching test timings');
             }
         };
 
@@ -206,8 +206,8 @@ const AttemptTest=()=>
         const interval = setInterval(() => {
             setTimeLeft(prevTimeLeft => {
                 if (prevTimeLeft <= 0) {
-                    clearInterval(interval); 
-                    return 0; 
+                    clearInterval(interval);
+                    return 0;
                 }
                 return prevTimeLeft - 1;
             });
@@ -221,17 +221,17 @@ const AttemptTest=()=>
 
     const handleButtonClick = (e, act) => {
         if (act === "next") {
-            if (currentQuestion < totalQuestions) setCurrentQuestion(currentQuestion+1);
+            if (currentQuestion < totalQuestions) setCurrentQuestion(currentQuestion + 1);
         } else if (act === "prev") {
-            if (currentQuestion > 1) setCurrentQuestion(currentQuestion-1);
+            if (currentQuestion > 1) setCurrentQuestion(currentQuestion - 1);
         }
     };
 
-    const handleTestSubmit = async(e) => {
+    const handleTestSubmit = async (e) => {
         e.preventDefault();
         try {
             const accessToken = Cookies.get('access');
-            
+
             if (!accessToken) {
                 console.log("Access token not found, User not authorized");
                 alert("User not authorized, Please Login");
@@ -245,7 +245,7 @@ const AttemptTest=()=>
             };
 
             const sendData = JSON.stringify(data);
-            
+
             const sendFormData = new FormData();
             sendFormData.append("data", sendData);
 
@@ -256,7 +256,7 @@ const AttemptTest=()=>
                 },
                 body: sendFormData
             });
-            
+
             const resData = await res.json();
 
             // console.log("res = ", res);
@@ -264,12 +264,12 @@ const AttemptTest=()=>
 
             if (res.ok) {
                 const receievedMsg = resData.message;
-                
+
                 if (resData.ok) {
                     //removing cookies data after successfully submitting the test
                     Cookies.remove(`ques/${testId}`);
                     // Cookies.remove(`time/${testId}`);
-                    
+
                     console.log(receievedMsg);
                     alert(receievedMsg);
 
@@ -277,68 +277,66 @@ const AttemptTest=()=>
                     navigate("/student");
                 } else {
                     // Handle the error response
-                    let errMsg = `Test submission failed: ${resData.error}` || "Error (submit-test)" ;
+                    let errMsg = `Test submission failed: ${resData.error}` || "Error (submit-test)";
                     console.log(`Error (submit-test) : ${errMsg}`);
                     alert("Submit test failed");
                 }
             } else {
                 // Handle the error response
-                let errMsg = `Error while submitting test`;   
+                let errMsg = `Error while submitting test`;
                 console.log(errMsg);
                 alert("Submit test failed");
             };
         } catch (err) {
-            let errMsg = `Error while submitting test: ${err.message}`;   
+            let errMsg = `Error while submitting test: ${err.message}`;
             console.log(`Error (submit-test) : ${err}`);
             alert(errMsg);
         }
-    }; 
+    };
 
-    const handleOptionClick = async(e, index) => {
+    const handleOptionClick = async (e, index) => {
         // console.log("userQuestion before option clicked : ", userQuestions);    
         const newAnswerList = [...userQuestions];
         // console.log("currentQuestion : ", currentQuestion);
-        
-        const question = userQuestions[currentQuestion-1];
-        
+
+        const question = userQuestions[currentQuestion - 1];
+
         // console.log("question : ", question);
         // console.log("index : ", index);
 
         if (question.type === 'single') {
             //user wants to remove a already selected option
             if (question.answerList.includes(index)) {
-                newAnswerList[currentQuestion-1].answerList = []; 
-            } 
+                newAnswerList[currentQuestion - 1].answerList = [];
+            }
             //user wants to select a new option
             else {
-                newAnswerList[currentQuestion-1].answerList = [index];
-            } 
+                newAnswerList[currentQuestion - 1].answerList = [index];
+            }
         } else if (question.type === 'multiple') {
             //user wants to remove a already selected option
             if (question.answerList.includes(index)) {
-                newAnswerList[currentQuestion-1].answerList = question.answerList.filter(opt => opt !== index); 
-            } 
+                newAnswerList[currentQuestion - 1].answerList = question.answerList.filter(opt => opt !== index);
+            }
             //user wants to select a new option
             else {
-                newAnswerList[currentQuestion-1].answerList.push(index);
-            } 
+                newAnswerList[currentQuestion - 1].answerList.push(index);
+            }
         }
         // console.log("new answerList : ", newAnswerList);
-        setUserQuestions(newAnswerList);  
+        setUserQuestions(newAnswerList);
 
         //setting cookies data
-        await storeListToCookies(newAnswerList, timeLeft); 
+        await storeListToCookies(newAnswerList, timeLeft);
     };
 
     return (
         <div>
-            {/* TODO: Take appropriate action if the user does allow webcam capture  */}
-            <WebcamCapture />
             <div className="test-container">
                 <div className="test-header">
                     <div className="test-header-heading">ProctorX Test</div>
                     <div className="test-header-content">
-                        <Pagination 
+                        <Pagination
                             total={totalQuestions}
                             currentIndex={currentQuestion}
                             setCurrentIndex={setCurrentQuestion}
@@ -346,7 +344,7 @@ const AttemptTest=()=>
                         <div className="quick-links-container">
                             <Squares2X2Icon className="ml-2 h-6 w-6 text-gray-500 cursor-pointer quick-links-icon" onClick={() => setOpen(!open)} />
                             {open && <QuickLink
-                                className="quick-links" 
+                                className="quick-links"
                                 total={totalQuestions}
                                 currentIndex={currentQuestion}
                                 setCurrentIndex={setCurrentQuestion}
@@ -354,20 +352,23 @@ const AttemptTest=()=>
                             />}
                         </div>
                     </div>
-                    <div className="test-header-timer"><ClockIcon />Time Left<span style={{ color: timeLeft >= 5*60 ? "green" : "red" }}>{secondsToHMS(timeLeft)}</span></div>
-                </div>   
+                    <div className="test-header-timer"><ClockIcon />Time Left<span style={{ color: timeLeft >= 5 * 60 ? "green" : "red" }}>{secondsToHMS(timeLeft)}</span></div>
+                    <div className="test-header-webcam">
+                        <WebcamCapture />
+                    </div>
+                </div>
                 <div className="test-body">
                     <div className="question-container">
                         <div className="question-meta-data">
                             <div className="question-number">Question No. {currentQuestion}</div>
-                            <div className="question-points">Points: {userQuestions[currentQuestion-1].marks}</div>
+                            <div className="question-points">Points: {userQuestions[currentQuestion - 1].marks}</div>
                         </div>
-                        <div className="question-statement">{userQuestions[currentQuestion-1].statement}</div>
+                        <div className="question-statement">{userQuestions[currentQuestion - 1].statement}</div>
                     </div>
                     <div className="answer-container">
-                        <div className="answer-statement">Answer Statement</div>
+                        <div className="answer-statement">{userQuestions[currentQuestion - 1].type} choice</div>
                         <div className="answer-option">
-                            <CheckList 
+                            <CheckList
                                 userQuestions={userQuestions}
                                 currentQuestion={currentQuestion}
                                 handleOptionClick={handleOptionClick}

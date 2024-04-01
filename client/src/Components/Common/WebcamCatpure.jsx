@@ -18,7 +18,7 @@ const WebcamCapture = () => {
 
         intervalRef.current = setInterval(() => {
             captureImage();
-        }, 7000);
+        }, 15000);
 
         return () => {
             clearInterval(intervalRef.current);
@@ -51,12 +51,11 @@ const WebcamCapture = () => {
     const sendImageToBackend = async (imageStr) => {
         const formData = new FormData();
         formData.append('image', imageStr);
-        console.log("image : ", imageStr.slice(0,10));
 
         try {
             const access = Cookies.get("access");
 
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/verifyUser`, {
                 method: 'POST',
                 headers: {
                     "Authorization": `Bearer ${access}`
@@ -68,7 +67,7 @@ const WebcamCapture = () => {
                 if (data.ok) {
                     console.log('Image sent successfully');
                 } else {
-                    console.log(`Error(sending-image) : ${data.error}`); 
+                    console.log(`Error(sending-image) : ${data.error}`);
                 }
             } else {
                 console.error('Error(sending-image) : Failed to send image');
@@ -78,7 +77,10 @@ const WebcamCapture = () => {
         }
     };
 
-    return <video ref={videoRef} autoPlay playsInline style={{ display: "none" }}/>;
+    return <video ref={videoRef} autoPlay playsInline
+        // style={{ display: "none" }}
+    />
+
 };
 
 export default WebcamCapture;
