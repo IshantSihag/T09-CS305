@@ -64,9 +64,6 @@ class HomeView(APIView):
         return Response(content)
 
 
-
-
-
 class SignUpView(APIView):
     def post(self, request):
         try:

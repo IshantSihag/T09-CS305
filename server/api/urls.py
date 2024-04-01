@@ -5,7 +5,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path("home/", views.HomeView.as_view(), name="home"),
-    path('logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path("logout/", TokenBlacklistView.as_view(), name="token_blacklist"),
     path("signup/", views.SignUpView.as_view(), name="signup"),
     path("login/", views.LoginView.as_view(), name="login"),
     path("startTest/", views.startTest.as_view(), name="startTest"),
