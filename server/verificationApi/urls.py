@@ -8,4 +8,5 @@ urlpatterns = [
         views.SubmitInitialImage.as_view(),
         name="submitInitialImage",
     ),
+    path("submitTestRating/", views.TestRatingView.as_view(), name="submitTestRating"),
 ]
