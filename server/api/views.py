@@ -12,7 +12,7 @@ from .serializers import (
 )
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Test, UserProfile, Question
+from .models import Test, UserProfile, Question,Student
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from django.utils.crypto import get_random_string
@@ -97,6 +97,15 @@ class SignUpView(APIView):
                     "bio": "",
                     "profile_url": "",
                 }
+                if(request.data['type']=="student"):
+                    Student.objects.create(
+                        email=request.data["username"],
+                        phone_number = '',
+                        cgpa = 0.0,
+                        batch = 0,
+                        course = '',
+                    )
+                    
                 return Response(response, status=status.HTTP_201_CREATED)
             else:
                 response = {"ok": False, "error": "Invalid user type"}
