@@ -21,6 +21,27 @@ const StartTest = () => {
     navigate("/student/");
   };
 
+  const handleFullscreen = () => {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      element.requestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    }
+  };
+
   const handleStartTest = () => {
     const isDetailsFilled =
       // Check if all details are filled
@@ -57,6 +78,7 @@ const StartTest = () => {
     });
 
     // Redirect to test page
+    handleFullscreen();
     navigate(`/student/attemptest/${id}`);
   };
 

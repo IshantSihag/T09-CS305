@@ -23,7 +23,7 @@ const InstituteTestResult = () => {
   let api = `http://localhost:5000/api`
   useEffect(() => {
     const fetchResult = async () => {
-      let response = await fetchAPI(`${port}/testresult?test_id=${testid}`, {}, "GET", false)
+      let response = await fetchAPI(`${process.env.REACT_APP_API_URL}/testresult?test_id=${testid}`, {}, "GET", false)
       if (response.ok) {
         let students = response.result
         for(let i=0;i<students.length;i++){

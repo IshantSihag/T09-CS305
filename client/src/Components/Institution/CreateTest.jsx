@@ -212,7 +212,7 @@ export default function CreattTest() {
     sendData.append("questions", JSON.stringify(questions));
 
     // console.log(sendData);
-    try{
+    // try{
       const res = await fetch("http://localhost:8000/createTest/", {
         method: "POST",
         headers: {
@@ -222,9 +222,11 @@ export default function CreattTest() {
       })
 
       console.log("RES : ", res);
-    } catch (err) {
-      console.log("Failed to create test. error:", err);
-    }
+      const data = await res.json();
+      console.log("data : ", data);
+    // } catch (err) {
+      // console.log("Failed to create test. error:", err);
+    // }
 
   };
 

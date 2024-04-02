@@ -26,7 +26,7 @@ import WebcamCapture from "../Common/WebcamCatpure";
 const AttemptTest = () => {
     //for quicks links
     const [open, setOpen] = useState(false);
-
+    
     //dynamically fetched data 
     const [totalQuestions, setTotalQuestions] = useState(0);
     const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -36,8 +36,8 @@ const AttemptTest = () => {
     const navigate = useNavigate();
 
     //TODO: fetch correct test id
-    // const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
-    const {id: testId} = useParams();
+    const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
+
     const storeListToCookies = async(usrQ) => {
         // console.log("COOKIES");
         Cookies.set(`ques/${testId}`, JSON.stringify({ usrQ }), { expires: 1 });
