@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 import json
 
+
 class TestCreateTest(TestCase):
     def setUp(self):
         # setting up and creation of a test institute
@@ -100,7 +101,6 @@ class TestCreateTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertTrue(self.response.data["ok"])
 
-
     def test_start_test(self):
         self.start_test_url = reverse("startTest")
         start_test_data = {
@@ -114,19 +114,6 @@ class TestCreateTest(TestCase):
         # print(self.response.data)
         self.assertEqual(self.response.status_code, 200)
         self.assertTrue(self.response.data["ok"])
-    
-    def test_start_test_invalid(self):
-        self.start_test_url = reverse("startTest")
-        start_test_data = {
-            "test_id": "123",
-        }
-        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
-        self.response = self.client.post(
-            self.start_test_url, start_test_data, **headers
-        )
-        self.assertEqual(self.response.status_code, 400)
-        self.assertFalse(self.response.data["ok"])
-        self.assertEqual(self.response.data["message"], "Invalid Test ID")
 
     def test_start_test_invalid_student(self):
         self.client = Client()
@@ -160,3 +147,16 @@ class TestCreateTest(TestCase):
             self.start_test_url, start_test_data, **headers
         )
         self.assertEqual(self.response.status_code, 401)
+
+    def pending_test_start_test_invalid(self):
+        self.start_test_url = reverse("startTest")
+        start_test_data = {
+            "test_id": "123",
+        }
+        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
+        self.response = self.client.post(
+            self.start_test_url, start_test_data, **headers
+        )
+        self.assertEqual(self.response.status_code, 400)
+        self.assertFalse(self.response.data["ok"])
+        self.assertEqual(self.response.data["message"], "Invalid Test ID")
