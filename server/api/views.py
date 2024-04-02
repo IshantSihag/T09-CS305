@@ -319,8 +319,6 @@ class createTest(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class UpdateTest(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -391,15 +389,15 @@ class UpdateTest(APIView):
 
                 # check if question already exsists
                 if Question.objects.filter(id=question["id"]).exists():
-                    question = Question.objects.get(id=question["id"])
-                    question.statement = question["statement"]
-                    question.type = question["type"]
-                    question.marks = question["marks"]
-                    question.options = question["options"]
-                    question.answer = question["answer"]
-                    question.save()
+                    question_inst = Question.objects.get(id=question["id"])
+                    question_inst.statement = question["statement"]
+                    question_inst.type = question["type"]
+                    question_inst.marks = question["marks"]
+                    question_inst.options = options
+                    question_inst.answer = answer
+                    question_inst.save()
                 else:
-                    question = Question.objects.create(
+                    question_inst = Question.objects.create(
                         statement=question["statement"],
                         type=question["type"].split("_")[0],
                         marks=question["marks"],
@@ -408,7 +406,7 @@ class UpdateTest(APIView):
                         test_id=test,
                     )
 
-                question_ids += str(question.id) + ","
+                question_ids += str(question_inst.id) + ","
 
             question_ids = question_ids[:-1]
             test.questions = question_ids
