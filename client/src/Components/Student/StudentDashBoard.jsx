@@ -5,6 +5,7 @@ import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import profileImage from "../../Assets/profile_image.jpg"; // Import the image
 import Cookies from "js-cookie"; // Import Cookies
+import DialogBox from "../Common/DialogBox";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const StudentDashboard = () => {
         return;
       }
 
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/dashboard`, {
+      const res = await fetch(`http://127.0.0.1:8000/dashboard`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -72,7 +73,7 @@ const StudentDashboard = () => {
   };
 
   const handleEnterTestCode = () => {
-    // Handle attempt test logic here
+
   };
 
   return (
@@ -104,14 +105,15 @@ const StudentDashboard = () => {
             </div>
             <div className="text-2xl text-center m-4">{studentDetails.bio}</div>
             <div className="w-25 items-center">
-              <Button
+              {/* <Button
                 color="black"
                 onClick={handleEnterTestCode}
                 className="mt-4 px-6 py-3 w-full"
                 ripple="light"
               >
                 Enter Test Code
-              </Button>
+              </Button> */}
+              <DialogBox/>
             </div>
           </div>
         </div>
@@ -146,8 +148,8 @@ const StudentDashboard = () => {
                       {test.duration}
                     </td>
                     <td className="border border-black px-4 py-2">
-                      <Button color="blue" ripple="light">
-                        View Analysis
+                      <Button color="blue" ripple="light" onClick={() => navigate(`/student/starttest/${test.id}`)}>
+                        Start Test 
                       </Button>
                     </td>
                   </tr>
