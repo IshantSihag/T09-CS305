@@ -12,7 +12,14 @@ from api.serializers import (
 )
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from api.models import Test, UserProfile, Question, Result, Response as ResponseModel,Student
+from api.models import (
+    Test,
+    UserProfile,
+    Question,
+    Result,
+    Response as ResponseModel,
+    Student,
+)
 from django.contrib.auth.models import User
 import json
 import datetime
@@ -66,18 +73,18 @@ class TestResultView(APIView):
             student_id = res.student_id
 
             userProfile = UserProfile.objects.get(user_id=student_id)
-            name=userProfile.name
+            name = userProfile.name
             try:
-                student=Student.objects.get(student_id=student_id)
+                student = Student.objects.get(student_id=student_id)
             except Student.DoesNotExist:
                 pass
             jsonresponse["result"].append(
                 {
                     "name": name,
-                    "cgpa":student.cgpa,
-                    "phoneNo":student.phone_number,
-                    "batch":student.batch,
-                    "course":student.course,
+                    "cgpa": student.cgpa,
+                    "phoneNo": student.phone_number,
+                    "batch": student.batch,
+                    "course": student.course,
                     "score": res.score,
                 }
             )

@@ -46,7 +46,6 @@ class UserProfile(models.Model):
         default="student",
         choices=(("student", "Student"), ("institute", "Institute")),
     )
-    
 
 
 class Response(models.Model):
@@ -62,9 +61,12 @@ class Result(models.Model):
     test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
     score = models.IntegerField()
 
+
 class Student(models.Model):
     student_id = models.IntegerField()
     phone_number = models.CharField(max_length=15)
-    cgpa = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    cgpa = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)]
+    )
     batch = models.IntegerField()
     course = models.CharField(max_length=100)

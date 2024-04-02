@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Test, Question, UserProfile, Response, Result,Student
+from .models import Test, Question, UserProfile, Response, Result, Student
 
 # Register your models here.
 admin.site.register(Test)
