@@ -99,7 +99,7 @@ class SignUpView(APIView):
                 }
                 if request.data["type"] == "student":
                     Student.objects.create(
-                        email=request.data["username"],
+                        student_id=user.id,
                         phone_number="",
                         cgpa=0.0,
                         batch=0,
@@ -111,7 +111,7 @@ class SignUpView(APIView):
                 response = {"ok": False, "error": "Invalid user type"}
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            # print(str(e))
+            print(str(e))
             response = {"ok": False, "error": "Invalid input"}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
