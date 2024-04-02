@@ -492,7 +492,7 @@ Content-Type: application/json
             "phoneNo": "Student's Phone number",
             "batch": "Student's Batch eg. 2021",
             "course": "Student's Course eg. BTech",
-            "score": "total score achieved by the student",
+            "score": "total score achieved by the student"
         },
         ...
     ]
