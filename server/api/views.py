@@ -389,7 +389,8 @@ class UpdateTest(APIView):
             questions = request.data["questions"]
             questions = json.loads(questions)
             id=request.data['id']
-        except:
+        except Exception as e:
+            print(str(e))
             jsonresponse={
                 'ok':False,
                 'error':'body of the requet not as intended',
@@ -404,8 +405,9 @@ class UpdateTest(APIView):
             }
             return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
         try:
-            userprofile=UserProfile.objects.get(user=request.user)
-        except UserProfile.DoesNotExist:
+            userprofile=UserProfile.objects.get(user_id=request.user)
+        except Exception as e:
+            print(str(e))
             jsonresponse={
                 'ok':False,
                 'error':'You are not a valid User',
@@ -428,6 +430,7 @@ class UpdateTest(APIView):
             test.title=title
             test.start=start
             test.duration=duration
+            question_ids=""
             for question in questions:
                 answer = ""
                 options = ""
@@ -443,17 +446,35 @@ class UpdateTest(APIView):
                             answer += "," + choice["value"]
                 
                 #check if question already exsists
-                            
-                # question = Question.objects.create(
-                #     statement=question["statement"],
-                #     type=question["type"].split("_")[0],
-                #     marks=question["marks"],
-                #     options=options,
-                #     answer=answer,
-                #     test_id=test,
-                # )
+                if Question.objects.filter(id=question["id"]).exists():  
+                    question = Question.objects.get(id=question["id"])
+                    question.statement = question["statement"]
+                    question.type = question["type"]
+                    question.marks = question["marks"]
+                    question.options = question["options"]
+                    question.answer = question["answer"]
+                    question.save()
+                else:             
+                    question = Question.objects.create(
+                        statement=question["statement"],
+                        type=question["type"].split("_")[0],
+                        marks=question["marks"],
+                        options=options,
+                        answer=answer,
+                        test_id=test,
+                    )
                             
                 question_ids += str(question.id) + ","
+
+            question_ids = question_ids[:-1]
+            test.questions = question_ids
+            test.save()
+            jsonresponse = {
+                "ok": True,
+                "message": "Test updated successfully",
+                "test_id": test.id,
+            }
+            return Response(jsonresponse,status=status.HTTP_200_OK)
         except Exception as e:
             jsonresponse={
                 "ok":False,
