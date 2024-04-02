@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../Common/Footer";
 import ScorePage from "./ScorePage";
 import DetailedAnalysisPage from "./DetailedAnalysisPage";
 import "./StudentResultPage.css";
+import fetchAPI from '../Tools/FetchAPI'
 import {
   Tabs,
   TabsHeader,
@@ -11,9 +12,22 @@ import {
   TabPanel,
 } from "@material-tailwind/react";
 
+let api = `http://localhost:5000/api`
 const StudentResultPage = () => {
   const [selectedTab, setSelectedTab] = useState("score");
-
+  const [testid, setTestId] = useState('')
+  useEffect(() => {
+    const fetchResult = async () => {
+      let response = await fetchAPI(`${api}/student/getResultForTest?test_id=${testid}`, {}, "GET", false)
+      if (response.ok) {
+        // use response according to the data
+        console.log(response)
+      }
+      else {
+        // throw error accordingly
+      }
+    }
+  }, [])
   return (
     <div>
       <h2 className="result-title">Result for TEST NAME</h2>
