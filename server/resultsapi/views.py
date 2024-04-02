@@ -7,6 +7,8 @@ from api.models import Test, UserProfile, Question, Response as ResponseModel
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 import traceback
+from datetime import timedelta
+from django.utils import timezone
 
 
 # Create your views here.
@@ -82,12 +84,14 @@ class GetResultForStudent(APIView):
     def get(self, request):
         try:
             student_email = request.user.email
-            test_id = request.data["test_id"]
+            test_id = request.GET.get("test_id")
+            if not test_id:
+                raise Exception
         except:
             print(traceback.format_exc())
             jsonresponse = {
                 "ok": False,
-                "error": "Invalid Input format. required username , test_id, test_code",
+                "error": "Invalid Input format.",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -116,9 +120,16 @@ class GetResultForStudent(APIView):
             # if student registered for the test
             registrations = test.registrations.split(",")
             registrations = [registration.strip() for registration in registrations]
-            if str(user.id) not in registrations:
+            if str(user.email) not in registrations:
                 jsonresponse["error"] = "You were not registered for the Test"
                 return Response(jsonresponse, status=status.HTTP_409_CONFLICT)
+
+            # ongoing test
+            start = test.start
+            end = start + timedelta(seconds=test.duration)
+            if end >= timezone.now():
+                jsonresponse["error"] = "The test is still ongoing"
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
             # if student attempted the test
             # doubtful about my method to check if student attempted the test,
@@ -137,8 +148,19 @@ class GetResultForStudent(APIView):
                 pass
             # print(studentResponse)
 
-            questions = test.questions.split(",")
-            questions = [int(question.strip()) for question in questions]
+            test_questions = (
+                test.questions.strip()
+            )  # Remove leading and trailing whitespace
+            test_questions = (
+                test.questions.strip()
+            )  # Remove leading and trailing whitespace
+
+            if test_questions:  # Check if the string is not empty
+                questions = [
+                    int(question.strip()) for question in test_questions.split(",")
+                ]
+            else:
+                questions = []  # Assign an empty list or any other default value
 
             resultResponse = {
                 "ok": True,
@@ -239,6 +261,8 @@ class GetTestID(APIView):
         try:
             try:
                 test_code = request.GET.get("test_code")
+                if not test_code:
+                    raise Exception
             except:
                 print(traceback.format_exc())
                 jsonresponse = {
