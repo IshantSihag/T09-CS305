@@ -471,7 +471,7 @@ Content-Type: application/json
 
 ### Test Result
 
-This endpoint retrieves the test result for a student.
+This endpoint retrieves the test result for an Institute.
 
 Test Result Request:
 ```http
@@ -488,8 +488,12 @@ Content-Type: application/json
     "ok": true,
     "result": [
         {
-            "name": "Student Name",
-            "score": "Score obtained by the student"
+            "name": "Name of Student",
+            "cgpa": "Student's CGPA",
+            "phoneNo": "Student's Phone number",
+            "batch": "Student's Batch eg. 2021",
+            "course": "Student's Course eg. BTech",
+            "score": "total score achieved by the student"
         },
         ...
     ]
