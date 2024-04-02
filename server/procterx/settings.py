@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "api",
+    "verificationApi",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
