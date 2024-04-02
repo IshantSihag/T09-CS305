@@ -378,59 +378,61 @@ class createTest(APIView):
 #         jsonresponse = {"ok": True, "message": "Test updated successfully"}
 #         return Response(jsonresponse, status=status.HTTP_200_OK)
 
+
 class UpdateTest(APIView):
-    permission_classes=(IsAuthenticated,)
-    def post(self,request):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
         try:
-            email=request.user.email
+            email = request.user.email
             title = request.data["title"]
             start = request.data["start"]
             duration = request.data["duration"]
             questions = request.data["questions"]
             questions = json.loads(questions)
-            id=request.data['id']
+            id = request.data["id"]
         except Exception as e:
             print(str(e))
-            jsonresponse={
-                'ok':False,
-                'error':'body of the requet not as intended',
+            jsonresponse = {
+                "ok": False,
+                "error": "body of the requet not as intended",
             }
-            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
-            test=Test.objects.get(id=id)
+            test = Test.objects.get(id=id)
         except Test.DoesNotExist:
-            jsonresponse={
-                'ok':False,
-                'error':'Test not found',
+            jsonresponse = {
+                "ok": False,
+                "error": "Test not found",
             }
-            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
-            userprofile=UserProfile.objects.get(user_id=request.user)
+            userprofile = UserProfile.objects.get(user_id=request.user)
         except Exception as e:
             print(str(e))
-            jsonresponse={
-                'ok':False,
-                'error':'You are not a valid User',
+            jsonresponse = {
+                "ok": False,
+                "error": "You are not a valid User",
             }
-            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
-        if(userprofile.type!='institute'):
-            jsonresponse={
-                'ok':False,
-                'error':'Only insitute profile allowed access this resource',
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        if userprofile.type != "institute":
+            jsonresponse = {
+                "ok": False,
+                "error": "Only insitute profile allowed access this resource",
             }
-            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
-        if(test.author!=request.user.email):
-            jsonresponse={
-                'ok':False,
-                'error':'You do not have access to update',
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        if test.author != request.user.email:
+            jsonresponse = {
+                "ok": False,
+                "error": "You do not have access to update",
             }
-            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            test.title=title
-            test.start=start
-            test.duration=duration
-            question_ids=""
+            test.title = title
+            test.start = start
+            test.duration = duration
+            question_ids = ""
             for question in questions:
                 answer = ""
                 options = ""
@@ -444,9 +446,9 @@ class UpdateTest(APIView):
                             answer += choice["value"]
                         else:
                             answer += "," + choice["value"]
-                
-                #check if question already exsists
-                if Question.objects.filter(id=question["id"]).exists():  
+
+                # check if question already exsists
+                if Question.objects.filter(id=question["id"]).exists():
                     question = Question.objects.get(id=question["id"])
                     question.statement = question["statement"]
                     question.type = question["type"]
@@ -454,7 +456,7 @@ class UpdateTest(APIView):
                     question.options = question["options"]
                     question.answer = question["answer"]
                     question.save()
-                else:             
+                else:
                     question = Question.objects.create(
                         statement=question["statement"],
                         type=question["type"].split("_")[0],
@@ -463,7 +465,7 @@ class UpdateTest(APIView):
                         answer=answer,
                         test_id=test,
                     )
-                            
+
                 question_ids += str(question.id) + ","
 
             question_ids = question_ids[:-1]
@@ -474,13 +476,13 @@ class UpdateTest(APIView):
                 "message": "Test updated successfully",
                 "test_id": test.id,
             }
-            return Response(jsonresponse,status=status.HTTP_200_OK)
+            return Response(jsonresponse, status=status.HTTP_200_OK)
         except Exception as e:
-            jsonresponse={
-                "ok":False,
+            jsonresponse = {
+                "ok": False,
                 "error": str(e),
             }
-            return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetAllTestStudentView(APIView):

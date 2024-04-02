@@ -11,7 +11,7 @@ urlpatterns = [
     path("home/profile", views.ProfileView.as_view(), name="profile"),
     path("deleteTest/", views.deleteTest.as_view(), name="deleteTest"),
     path("createTest/", views.createTest.as_view(), name="createTest"),
-    path("updateTest/",views.UpdateTest.as_view(),name='updateTest'),
+    path("updateTest/", views.UpdateTest.as_view(), name="updateTest"),
     path(
         "student/getAllTests/",
         views.GetAllTestStudentView.as_view(),
