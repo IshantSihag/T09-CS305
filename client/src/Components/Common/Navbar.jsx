@@ -63,7 +63,7 @@ const Navbar = () => {
               {
                 type==='institute'?(
                   <div>
-                    <a href="http://localhost:3000/institute" class="navbar-brand">
+                    <a href="http://localhost:3000/institution" class="navbar-brand">
                       Institute
                     </a>
                     <button onClick={handleLogout} class="navbar-brand">LOGOUT</button>
