@@ -310,64 +310,110 @@ class createTest(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
-class updateTest(APIView):
+class UpdateTest(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         try:
-            test_id = request.data["test_id"]
-
-        except:
-            jsonresponse = {"ok": False, "error": "Invalid input. test_id required"}
-            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        user_email = request.user.email
-        if not Test.objects.filter(id=test_id).exists():
-            jsonresponse = {"ok": False, "error": "Test not found"}
-            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        test = Test.objects.get(id=test_id)
-        if test.author != user_email:
+            email = request.user.email
+            title = request.data["title"]
+            start = request.data["start"]
+            duration = request.data["duration"]
+            questions = request.data["questions"]
+            questions = json.loads(questions)
+            id = request.data["id"]
+        except Exception as e:
+            print(str(e))
             jsonresponse = {
                 "ok": False,
-                "error": "You are not authorized to update this test",
+                "error": "body of the requet not as intended",
             }
-            return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            test = Test.objects.get(id=id)
+        except Test.DoesNotExist:
+            jsonresponse = {
+                "ok": False,
+                "error": "Test not found",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            userprofile = UserProfile.objects.get(user_id=request.user)
+        except Exception as e:
+            print(str(e))
+            jsonresponse = {
+                "ok": False,
+                "error": "You are not a valid User",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        if userprofile.type != "institute":
+            jsonresponse = {
+                "ok": False,
+                "error": "Only insitute profile allowed access this resource",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        if test.author != request.user.email:
+            jsonresponse = {
+                "ok": False,
+                "error": "You do not have access to update",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
-        test.title = request.data["title"]
-        test.start = request.data["start"]
-        test.duration = request.data["duration"]
+        try:
+            test.title = title
+            test.start = start
+            test.duration = duration
+            question_ids = ""
+            for question in questions:
+                answer = ""
+                options = ""
+                for choice in question["choices"]:
+                    if options == "":
+                        options += choice["value"]
+                    else:
+                        options += "," + choice["value"]
+                    if choice["isCorrect"] == True:
+                        if answer == "":
+                            answer += choice["value"]
+                        else:
+                            answer += "," + choice["value"]
 
-        question_array = request.data["questions"]
+                # check if question already exsists
+                if Question.objects.filter(id=question["id"]).exists():
+                    question_inst = Question.objects.get(id=question["id"])
+                    question_inst.statement = question["statement"]
+                    question_inst.type = question["type"]
+                    question_inst.marks = question["marks"]
+                    question_inst.options = options
+                    question_inst.answer = answer
+                    question_inst.save()
+                else:
+                    question_inst = Question.objects.create(
+                        statement=question["statement"],
+                        type=question["type"].split("_")[0],
+                        marks=question["marks"],
+                        options=options,
+                        answer=answer,
+                        test_id=test,
+                    )
 
-        test = Test.objects.get(id=test_id)
-        for question in question_array:
-            if not Question.objects.filter(id=question["id"]).exists():
-                question = Question.objects.create(
-                    statement=question["statement"],
-                    type=question["type"],
-                    marks=question["marks"],
-                    options=question["options"],
-                    answer=question["answer"],
-                    test_id=test,
-                )
-            else:
-                question = Question.objects.get(id=question["id"])
-                question.statement = question["statement"]
-                question.type = question["type"]
-                question.marks = question["marks"]
-                question.options = question["options"]
-                question.answer = question["answer"]
-                question.save()
+                question_ids += str(question_inst.id) + ","
 
-        question_ids = ""
-        for question in question_array:
-            question_ids += str(question["id"]) + ","
-        question_ids = question_ids[:-1]
-        test.questions = question_ids
-
-        test.save()
-
-        jsonresponse = {"ok": True, "message": "Test updated successfully"}
-        return Response(jsonresponse, status=status.HTTP_200_OK)
+            question_ids = question_ids[:-1]
+            test.questions = question_ids
+            test.save()
+            jsonresponse = {
+                "ok": True,
+                "message": "Test updated successfully",
+                "test_id": test.id,
+            }
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+        except Exception as e:
+            jsonresponse = {
+                "ok": False,
+                "error": str(e),
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetAllTestStudentView(APIView):
