@@ -78,6 +78,19 @@ class TestResultInstitute(TestCase):
         self.assertTrue(self.response.data["ok"])
         self.assertTrue(self.response.data["test_id"])
         self.assertTrue(self.response.data["testCode"])
+
+        # student loggin in 
+        self.login_url = reverse("login")
+        login_data = {
+            "username": "teststudent@example.com",
+            "password": "testpassword",
+            "type": "student",
+        }
+        self.response = self.client.post(self.login_url, login_data)
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTrue(self.response.data["ok"])
+        self.jwt_token_student = self.response.data["access"]
+
         submit_test_data = {
             "data": json.dumps(
                 {
@@ -91,7 +104,7 @@ class TestResultInstitute(TestCase):
                 }
             ),
         }
-        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
+        headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token_student}
         self.response = self.client.post(
             reverse("submitTest"), submit_test_data, **headers
         )
