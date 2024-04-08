@@ -74,13 +74,11 @@ const InstituteDashboard = () => {
 
   const handleUpdateTest = () => {
     navigate("/institution/updatetest");
-  }
+  };
 
   const handleViewAnalysis = () => {
-   
     navigate("/institution/testresult");
-  }
-
+  };
 
   return (
     <div className="h-screen ">
@@ -100,7 +98,7 @@ const InstituteDashboard = () => {
               <input
                 type="file"
                 accept="image/*"
-                className="m-10"
+                className="-m-5"
                 onChange={handleImageUpload}
               />
             </div>
@@ -128,55 +126,66 @@ const InstituteDashboard = () => {
         {/* Tables */}
         <div className="flex-1 mt-8">
           <div className="mt-8 mb-8">
+            {upcomingTests.length > 0 ? (
+              <>
+                <h2 className="text-xl font-bold mb-4 text-left">Upcoming Tests</h2>
+                <table className="border-collapse border border-black w-full">
+                  <thead>
+                    <tr>
+                      <th className="border border-black px-4 py-2">Sr No.</th>
+                      <th className="border border-black px-4 py-2">
+                        Test Title
+                      </th>
+                      <th className="border border-black px-4 py-2">Test ID</th>
+                      <th className="border border-black px-4 py-2">
+                        Start Time
+                      </th>
+                      <th className="border border-black px-4 py-2">
+                        Duration
+                      </th>
+                      <th className="border border-black px-4 py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {upcomingTests.map((test, index) => (
+                      <tr key={test.id}>
+                        <td className="border border-black px-4 py-2">
+                          {index + 1}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.title}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {test.id}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {new Date(test.start).toLocaleString()}
+                        </td>
+                        <td className="border border-black px-4 py-2">
+                          {(test.duration)} minutes
+                        </td>
 
-          {upcomingTests.length > 0 ? (
-         <>
-            <h2 className="text-xl font-bold mb-2">Upcoming Tests</h2>
-            <table className="border-collapse border border-black w-full">
-              <thead>
-                <tr>
-                  <th className="border border-black px-4 py-2">Sr No.</th>
-                  <th className="border border-black px-4 py-2">Test Title</th>
-                  <th className="border border-black px-4 py-2">Start Time</th>
-                  <th className="border border-black px-4 py-2">Duration</th>
-                  <th className="border border-black px-4 py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {upcomingTests.map((test, index) => (
-                  <tr key={test.id}>
-                    <td className="border border-black px-4 py-2">
-                      {index + 1}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.title}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.start}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {test.duration}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      <Button color="blue" ripple="light" onClick={handleUpdateTest}>
-                        Update Test
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            </>
-    ) : (
-      <p className="text-xl font-bold mb-2">No upcoming tests.</p>
-    )}
-
-
+                        <td className="border border-black px-4 py-2">
+                          <Button
+                            color="blue"
+                            ripple="light"
+                            onClick={handleUpdateTest}
+                          >
+                            Update Test
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <p className="text-xl font-bold mb-2">No upcoming tests.</p>
+            )}
 
             {pastTests.length > 0 ? (
               <>
-                <h2 className="text-xl font-bold mt-8 mb-2">Hosted Tests</h2>
+                <h2 className="text-xl font-bold mt-8 mb-2 text-left">Hosted Tests</h2>
                 <table className="border-collapse border border-black w-full">
                   <thead>
                     <tr>
@@ -203,13 +212,17 @@ const InstituteDashboard = () => {
                           {test.title}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.startTime}
+                          {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.duration}
-                        </td>
+                          {(test.duration)} minutes
+                        </td> 
                         <td className="border border-black px-4 py-2">
-                          <Button color="blue" ripple="light" onClick={handleViewAnalysis}>
+                          <Button
+                            color="blue"
+                            ripple="light"
+                            onClick={handleViewAnalysis}
+                          >
                             View Analysis
                           </Button>
                         </td>

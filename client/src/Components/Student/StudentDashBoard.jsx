@@ -10,12 +10,8 @@ import DialogBox from "../Common/DialogBox";
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [studentDetails, setStudentDetails] = useState({});
-
   const [image, setImage] = useState(null);
-
   const [upcomingTests, setUpcomingTests] = useState([]);
-
- 
   const [pastTests, setPastTests] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(true);
 
@@ -24,10 +20,8 @@ const StudentDashboard = () => {
     fetchData();
   }, []);
 
-
   const fetchData = async () => {
     try {
-     
       const accessToken = Cookies.get("access");
 
       if (!accessToken) {
@@ -51,7 +45,6 @@ const StudentDashboard = () => {
           bio: data.bio,
         });
 
-       
         console.log(data.upcomingtests);
         console.log(data.pasttests);
         setUpcomingTests(data.upcomingtests);
@@ -66,26 +59,23 @@ const StudentDashboard = () => {
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-    // Handle image upload logic here
     setImage(URL.createObjectURL(file));
   };
 
-
   const handleCloseDialog = () => {
-    setIsDialogOpen(false); // Close the dialog
+    setIsDialogOpen(false);
   };
+
   const handleAttemptTest = () => {
-  
     navigate("/student/starttest");
   };
 
   const handleViewAnalysis = () => {
     navigate("/student/result");
-
- 
+  };
 
   return (
-    <div className="h-screen ">
+    <div className="h-screen">
       <Navbar />
       <div className="flex flex-col flex-grow p-4">
         <div className="text-2xl font-bold mb-4 text-center">
@@ -102,7 +92,7 @@ const StudentDashboard = () => {
               <input
                 type="file"
                 accept="image/*"
-                className="m-10"
+                className="-m-5 "
                 onChange={handleImageUpload}
               />
             </div>
@@ -113,20 +103,15 @@ const StudentDashboard = () => {
             </div>
             <div className="text-2xl text-center m-4">{studentDetails.bio}</div>
             <div className="w-25 items-center">
-
               <div className="mt-4 px-3 w-full">
-             
                 {isDialogOpen && <DialogBox onClose={handleCloseDialog} />}
               </div>
-
             </div>
           </div>
         </div>
 
-        {/* Tables */}
         <div className="flex-1 mt-8">
           <div className="mt-8 mb-8">
-
             {upcomingTests.length > 0 ? (
               <>
                 <h2 className="text-xl font-bold mb-2">Upcoming Tests</h2>
@@ -156,10 +141,10 @@ const StudentDashboard = () => {
                           {test.title}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.start}
+                          {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.duration}
+                          {test.duration} minutes
                         </td>
                         <td className="border border-black px-4 py-2">
                           <Button
@@ -208,10 +193,10 @@ const StudentDashboard = () => {
                           {test.title}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.startTime}
+                          {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.duration}
+                          {(test.duration)} minutes
                         </td>
                         <td className="border border-black px-4 py-2">
                           <Button
@@ -230,7 +215,6 @@ const StudentDashboard = () => {
             ) : (
               <p className=" text-xl font-bold mt-8 mb-2">No Past tests.</p>
             )}
-
           </div>
         </div>
       </div>
