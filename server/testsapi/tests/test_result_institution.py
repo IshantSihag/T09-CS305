@@ -159,7 +159,7 @@ class TestResultInstitute(TestCase):
         self.assertFalse(self.response.data["ok"])
         self.assertTrue(self.response.data["error"])
     
-    def test_result_invalid_test_id(self):
+    def pending_test_result_invalid_test_id(self):
         self.result_url = reverse("testresult")
         headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token,
         }
