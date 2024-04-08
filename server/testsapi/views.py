@@ -25,6 +25,7 @@ import json
 import datetime
 from datetime import timedelta
 import pytz
+import uuid
 
 utc = pytz.UTC
 
@@ -39,13 +40,14 @@ class TestResultView(APIView):
         email = request.user.email
         try:
             # to get the test_id from the request url
+            uuid.UUID(request.GET.get("test_id"))
             test_id = request.GET.get("test_id")
         except:
             # If test_id is not provided
             return Response(
                 {
                     "ok": False,
-                    "error": "test_id not provided",
+                    "error": "test_id not provided or invalid",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -101,6 +103,7 @@ class SubmitTestView(APIView):
         try:
             data = request.data["data"]
             data = json.loads(data)
+            uuid.UUID(data["test_id"])
             test_id = data["test_id"]
             user_response = data["user_response"]
         except:
@@ -183,6 +186,7 @@ class clocksyncView(APIView):
 
     def post(self, request):
         try:
+            uuid.UUID(request.data["test_id"])
             test_id = request.data["test_id"]
         except:
             # If test_id or answers are not provided
@@ -241,6 +245,7 @@ class DashboardView(APIView):
                             "title": test.title,
                             "start": test.start,
                             "duration": test.duration,
+                            "testCode": test.testCode,
                         }
                     )
                 else:
@@ -250,6 +255,7 @@ class DashboardView(APIView):
                             "title": test.title,
                             "start": test.start,
                             "duration": test.duration,
+                            "testCode": test.testCode,
                         }
                     )
 

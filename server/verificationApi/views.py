@@ -20,6 +20,7 @@ import face_recognition
 import numpy as np
 import base64
 from .models import UserImage, TestRating
+import uuid
 
 
 # Face verification utility methods
@@ -98,6 +99,7 @@ class TestRatingView(APIView):
     def post(self, request):
         try:
             test_id = request.data["test_id"]
+            uuid.UUID(request.data["test_id"])
             rating = request.data["rating"]
             suggestion = request.data["suggestion"]
             user_email = request.user.email

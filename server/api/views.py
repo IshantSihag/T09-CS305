@@ -17,6 +17,7 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from django.utils.crypto import get_random_string
 import json
+import uuid
 
 
 class LoginView(TokenObtainPairView):
@@ -171,6 +172,7 @@ class startTest(APIView):
 
     def post(self, request):
         try:
+            uuid.UUID(request.data["test_id"])
             test_id = request.data["test_id"]
         except:
             jsonresponse = {"ok": False, "error": "test_id required"}
@@ -215,6 +217,7 @@ class deleteTest(APIView):
 
     def post(self, request):
         try:
+            uuid.UUID(request.data["test_id"])
             test_id = request.data["test_id"]
         except:
             jsonresponse = {"ok": False, "error": "Invalid input. test_id required"}
@@ -337,12 +340,13 @@ class UpdateTest(APIView):
             duration = request.data["duration"]
             questions = request.data["questions"]
             questions = json.loads(questions)
-            id = request.data["id"]
+            uuid.UUID(request.data["test_id"])
+            id = request.data["test_id"]
         except Exception as e:
             print(str(e))
             jsonresponse = {
                 "ok": False,
-                "error": "body of the requet not as intended",
+                "error": "body of the request not as intended",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
