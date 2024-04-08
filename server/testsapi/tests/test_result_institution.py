@@ -79,7 +79,7 @@ class TestResultInstitute(TestCase):
         self.assertTrue(self.response.data["test_id"])
         self.assertTrue(self.response.data["testCode"])
 
-        # student loggin in 
+        # student loggin in
         self.login_url = reverse("login")
         login_data = {
             "username": "teststudent@example.com",
