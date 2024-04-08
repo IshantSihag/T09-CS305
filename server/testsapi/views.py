@@ -31,13 +31,15 @@ utc = pytz.UTC
 # Create your views here.
 
 
+# Gives the Result view for Institution
 class TestResultView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         email = request.user.email
         try:
-            test_id = request.data["test_id"]
+            # to get the test_id from the request url
+            test_id = request.GET.get("test_id")
         except:
             # If test_id is not provided
             return Response(
