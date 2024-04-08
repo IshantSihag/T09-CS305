@@ -242,10 +242,26 @@ class createTest(APIView):
         try:
             title = request.data["title"]
             start = request.data["start"]
-            duration = request.data["duration"]
+            duration = int(request.data["duration"])
+            if duration < 0:
+                jsonresponse = {"ok": False, "error": "Invalid duration"}
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             questions = request.data["questions"]
             questions = json.loads(questions)
+            for question in questions:
+                if question["type"].split("_")[0] not in (
+                    "single",
+                    "multiple",
+                ):
+                    jsonresponse = {"ok": False, "error": "Invalid question type"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+                if int(question["marks"]) < 0:
+                    jsonresponse = {"ok": False, "error": "Invalid marks"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             user_email = request.user.email
+        except:
+            jsonresponse = {"ok": False, "error": "Invalid input"}
+        try:
             test = Test.objects.create(
                 title=title,
                 start=start,
@@ -278,7 +294,7 @@ class createTest(APIView):
                     answer=answer,
                     test_id=test,
                 )
-                question_ids += str(question.id) + ","
+            question_ids += str(question.id) + ","
             question_ids = question_ids[:-1]
             test.questions = question_ids
             test.save()
