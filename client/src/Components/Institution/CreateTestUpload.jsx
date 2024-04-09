@@ -28,6 +28,12 @@ const CreateTestUpload = () => {
     ]);
     let date = new Date();
 
+    const handlePreview = () => {
+        localStorage.setItem('testData', JSON.stringify(testData));
+        localStorage.setItem('testQuestion', JSON.stringify(questions));
+        window.open('/institution/createtest/preview', '_blank');
+    };
+
     const readCSVFile = (event) => {
         const file = event.target.files[0];
         Papa.parse(file, {
@@ -95,6 +101,8 @@ const CreateTestUpload = () => {
                     notifyError("An error occurred. Please try again later", 5000);
                 });
         }
+        localStorage.removeItem('testData');
+        localStorage.removeItem('testQuestion');
         setLoading(false);
         return;
     };
@@ -171,9 +179,7 @@ const CreateTestUpload = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <button
-                        onClick={() => {
-                            console.log(testData);
-                        }}
+                        onClick={handlePreview}
                         className={`flex font-bold py-2 px-4 rounded mt-4 mx-2 ${upstate ? 'bg-green-500 hover:bg-blue-700 text-white' : 'bg-gray-500 text-gray-300 cursor-not-allowed'}`}
                         disabled={!upstate}
                     >
