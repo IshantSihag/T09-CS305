@@ -489,8 +489,8 @@ class FetchStudentDetails(APIView):
                 "cgpa": student.cgpa,
                 "batch": student.batch,
                 "course": student.course,
-                "bio":userprofile.bio,
-                "profile_url":userprofile.profile_url
+                "bio": userprofile.bio,
+                "profile_url": userprofile.profile_url,
             }
             return Response(jsonresponse, status=status.HTTP_200_OK)
 
