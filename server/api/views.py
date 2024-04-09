@@ -479,7 +479,7 @@ class FetchStudentDetails(APIView):
             user = request.user
             userprofile = UserProfile.objects.get(user_id=user.id)
             if userprofile.type != "student":
-                jsonresponse["error"] = "Need to login through a student credentials"
+                jsonresponse["error"] = "Need to login through student credentials"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             student = Student.objects.get(student_id=user.id)
 
