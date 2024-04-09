@@ -19,7 +19,8 @@ import cv2
 import face_recognition
 import numpy as np
 import base64
-from .models import UserImage
+from .models import UserImage, TestRating
+import uuid
 
 
 # Face verification utility methods
@@ -74,7 +75,7 @@ class VerifyUserView(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SubmitInitalImage(APIView):
+class SubmitInitialImage(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -85,6 +86,29 @@ class SubmitInitalImage(APIView):
             user_image = UserImage.objects.get(user_id=user.id)
             user_image.image_base64 = user_pic_base64
             jsonresponse = {"ok": True, "message": "User profile picture saved"}
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+
+        except:
+            jsonresponse = {"ok": False, "error": "Invalid request"}
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TestRatingView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            test_id = request.data["test_id"]
+            uuid.UUID(request.data["test_id"])
+            rating = request.data["rating"]
+            suggestion = request.data["suggestion"]
+            user_email = request.user.email
+            user = User.objects.get(email=user_email)
+            test = Test.objects.get(id=test_id)
+            test_rating = TestRating.objects.create(
+                test_id=test, rating=rating, suggestion=suggestion
+            )
+            jsonresponse = {"ok": True, "message": "Rating saved successfully"}
             return Response(jsonresponse, status=status.HTTP_200_OK)
 
         except:
