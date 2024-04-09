@@ -619,6 +619,8 @@ Content-Type: application/json
     "cgpa": 8.7,
     "batch": "2021",
     "course": "Computer Science"
+    "bio": "An aspiring Computer Scientist in the field of Cybersecurity and zero knowledge proofs"
+    "profile_url":"https://drive/sdasa.png"
 }
 ```
 
