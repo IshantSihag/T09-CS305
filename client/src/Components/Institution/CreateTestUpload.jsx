@@ -1,11 +1,36 @@
 import { useState } from "react";
+import Papa from "papaparse";
 
 import { Typography } from "@material-tailwind/react";
+import { CheckIcon, LockClosedIcon } from "@heroicons/react/16/solid";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 
+const readCSVFile = (event) => {
+    const file = event.target.files[0];
+    Papa.parse(file, {
+        header: true,
+        complete: function(results) {
+            const testData = results.data.map((item, index) => ({
+                id: index + 1,
+                title: item.Question_Title,
+                statement: item.Statement,
+                type: item.Type.toLowerCase().replace(' ', '_'),
+                choices: item.Options.split(', ').map(option => ({
+                    value: option,
+                    isCorrect: item.Answer.split(', ').includes(option)
+                })),
+                answer: "",
+                marks: parseInt(item.Marks)
+            }));
+            console.log({ questions: testData });
+        }
+    });
+}
+
 const CreateTestUpload = () => {
     const [testData, setTestData] = useState({ title: '', start: '', duration: 0 });
+    const [upstate, setUpstate] = useState(false);
     let date = new Date();
     return (
         <div>
@@ -67,19 +92,10 @@ const CreateTestUpload = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <input
-                        accept=""
+                        accept=".csv"
                         id="csvInput"
                         style={{ width: '50%' }}
-                        onChange={() => {
-                            const reader = new FileReader();
-                            reader.onload = () => {
-                                // @ts-ignore
-                                document.getElementById('out').innerHTML = reader.result;
-                            };
-                            // start reading the file. When it is done, calls the onload event defined above.
-                            // @ts-ignore
-                            reader.readAsBinaryString(document.getElementById('csvInput').files[0]);
-                        }}
+                        onChange={readCSVFile}
                         type="file"
                     />
                 </div>
@@ -92,9 +108,11 @@ const CreateTestUpload = () => {
                             console.log(testData);
                             console.log(document.getElementById('out').innerHTML);
                         }}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 mx-2"
+                        className={`flex font-bold py-2 px-4 rounded mt-4 mx-2 ${upstate ? 'bg-blue-500 hover:bg-blue-700 text-white' : 'bg-gray-500 text-gray-300 cursor-not-allowed'}`}
+                        disabled={!upstate}
                     >
-                        Upload
+                        {!upstate ? <LockClosedIcon className="w-6" /> : <CheckIcon className="w-6"/>}
+                        Preview
                     </button>
                     <button
                         onClick={() => {
@@ -103,7 +121,7 @@ const CreateTestUpload = () => {
                         }}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 mx-2"
                     >
-                        Upload
+                        Create
                     </button>
                 </div>
                 <div className="bg-gray-50 px-6 py-2">
@@ -113,6 +131,7 @@ const CreateTestUpload = () => {
                         </Typography>
                         <ul className="list-disc">
                             <li className="ml-8">Make sure your file is according to format specified in the demo file</li>
+                            <li className="ml-8">Make sure that options in answer field are present in option fields and vice versa</li>
                             <li className="ml-8">Make sure your file is in CSV format</li>
                             <li className="ml-8">ProctorX does not store any of your files</li>
                         </ul>
