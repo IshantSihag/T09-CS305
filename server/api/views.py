@@ -465,3 +465,35 @@ class GetAllTestStudentView(APIView):
                 "error": str(e),
             }
             return (jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class FetchStudentDetails(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self,request):
+        jsonresponse = {
+            "ok": False,
+            "error": "backend error",
+        }
+        try:
+            user=request.user
+            userprofile=UserProfile.objects.get(user_id=user.id)
+            if userprofile.type!='student':
+                jsonresponse['error']="Need to login through a student credentials"
+                return Response(jsonresponse,status=status.HTTP_400_BAD_REQUEST)
+            student=Student.objects.get(student_id=user.id)
+            
+            jsonresponse={
+                "ok":True,
+                "phone_number":student.phone_number,
+                "cgpa":student.cgpa,
+                "batch":student.batch,
+                "course":student.course,
+            }
+            return Response(jsonresponse,status=status.HTTP_200_OK)       
+
+        except Exception as e:
+            jsonresponse = {
+                "ok": False,
+                "error": str(e),
+            }
+            return Response(jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)
