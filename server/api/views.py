@@ -136,7 +136,7 @@ class getTest(APIView):
                         "start": test.start,
                         "duration": test.duration,
                         "author": test.author,
-                        "code": test.testCode
+                        "code": test.testCode,
                     }
                 )
             return Response(jsonresponse, status=status.HTTP_200_OK)
