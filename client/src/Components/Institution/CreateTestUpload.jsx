@@ -1,40 +1,107 @@
 import { useState } from "react";
 import Papa from "papaparse";
+import { ToastContainer, notifySuccess, notifyError } from "../../Components/UI/ToastNotification";
+import Cookies from "js-cookie";
 
 import { Typography } from "@material-tailwind/react";
 import { CheckIcon, LockClosedIcon } from "@heroicons/react/16/solid";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 
-const readCSVFile = (event) => {
-    const file = event.target.files[0];
-    Papa.parse(file, {
-        header: true,
-        complete: function(results) {
-            const testData = results.data.map((item, index) => ({
-                id: index + 1,
-                title: item.Question_Title,
-                statement: item.Statement,
-                type: item.Type.toLowerCase().replace(' ', '_'),
-                choices: item.Options.split(', ').map(option => ({
-                    value: option,
-                    isCorrect: item.Answer.split(', ').includes(option)
-                })),
-                answer: "",
-                marks: parseInt(item.Marks)
-            }));
-            console.log({ questions: testData });
-        }
-    });
-}
-
 const CreateTestUpload = () => {
     const [testData, setTestData] = useState({ title: '', start: '', duration: 0 });
     const [upstate, setUpstate] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [questions, setQuestions] = useState([
+        {
+            id: 1,
+            title: "",
+            statement: "",
+            type: "single_correct",
+            choices: [
+                { value: "", isCorrect: false },
+                { value: "", isCorrect: false },
+            ],
+            answer: "",
+            marks: "",
+        },
+    ]);
     let date = new Date();
+
+    const readCSVFile = (event) => {
+        const file = event.target.files[0];
+        Papa.parse(file, {
+            header: true,
+            complete: function (results) {
+                const tempData = results.data.map((item, index) => ({
+                    id: index + 1,
+                    title: item.Question_Title,
+                    statement: item.Statement,
+                    type: item.Type.toLowerCase().replace(' ', '_'),
+                    choices: item.Options.split(', ').map(option => ({
+                        value: option,
+                        isCorrect: item.Answer.split(', ').includes(option)
+                    })),
+                    answer: "",
+                    marks: parseInt(item.Marks)
+                }));
+                setQuestions(tempData);
+            }
+        });
+        setUpstate(true);
+    };
+
+    const handleSubmit = () => {
+        setLoading(true);
+        const data = new FormData();
+        if (testData.title === "" || testData.start === "" || testData.duration === 0) {
+            setLoading(false);
+            return notifyError("Please fill all the fields", 5000);
+        }
+        if (!upstate) {
+            setLoading(false);
+            return notifyError("Please upload a file first", 5000);
+        }
+        let access = Cookies.get("access");
+        if(!access) {
+            setLoading(false);
+            navigator.push('/institution/login');
+            return notifyError("Please login first", 5000);
+        }
+        data.append('title', testData.title);
+        data.append('start', testData.start);
+        data.append('duration', testData.duration);
+        data.append('questions', JSON.stringify(questions));
+        alert('Are you absolutely sure you want to create this test? Please preview once before creating!')
+        if (window.confirm('Are you absolutely sure you want to create this test? Please preview once before creating!')) {
+            fetch("http://localhost:8000/createTest/", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${access}`,
+                },
+                body: data,
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        console.log(data.error);
+                        notifyError(data.error, 5000);
+                    } else {
+                        notifySuccess(data.message, 5000);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    notifyError("An error occurred. Please try again later", 5000);
+                });
+        }
+        setLoading(false);
+        return;
+    };
     return (
         <div>
             <Navbar />
+            <ToastContainer />
             <div style={{ display: 'flex', flexDirection: 'column', height: '60vh' }}>
                 <div className="bg-gray-50 flex px-6 py-2 mt-10">
                     <Typography variant="h3" color="blue-gray" className="my-auto">
@@ -106,20 +173,17 @@ const CreateTestUpload = () => {
                     <button
                         onClick={() => {
                             console.log(testData);
-                            console.log(document.getElementById('out').innerHTML);
                         }}
-                        className={`flex font-bold py-2 px-4 rounded mt-4 mx-2 ${upstate ? 'bg-blue-500 hover:bg-blue-700 text-white' : 'bg-gray-500 text-gray-300 cursor-not-allowed'}`}
+                        className={`flex font-bold py-2 px-4 rounded mt-4 mx-2 ${upstate ? 'bg-green-500 hover:bg-blue-700 text-white' : 'bg-gray-500 text-gray-300 cursor-not-allowed'}`}
                         disabled={!upstate}
                     >
-                        {!upstate ? <LockClosedIcon className="w-6" /> : <CheckIcon className="w-6"/>}
+                        {!upstate ? <LockClosedIcon className="w-6" /> : <CheckIcon className="w-6" />}
                         Preview
                     </button>
                     <button
-                        onClick={() => {
-                            console.log(testData);
-                            console.log(document.getElementById('out').innerHTML);
-                        }}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 mx-2"
+                        onClick={handleSubmit}
+                        className={`${!loading ? 'bg-blue-500 hover:bg-blue-700 text-white' : 'bg-gray-500 text-gray-300 cursor-not-allowed'} font-bold py-2 px-4 rounded mt-4 mx-2`}
+                        disabled={loading}
                     >
                         Create
                     </button>

@@ -262,10 +262,10 @@ class createTest(APIView):
                 if int(question["marks"]) < 0:
                     jsonresponse = {"ok": False, "error": "Invalid marks"}
                     return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-            user_email = request.user.email
         except:
             jsonresponse = {"ok": False, "error": "Invalid input"}
         try:
+            user_email = request.user.email
             test = Test.objects.create(
                 title=title,
                 start=start,
