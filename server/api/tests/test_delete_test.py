@@ -3,6 +3,7 @@ from django.urls import reverse
 import json
 import uuid
 
+
 class TestCreateTest(TestCase):
     def setUp(self):
         # setting up and creation of a test student
@@ -89,7 +90,6 @@ class TestCreateTest(TestCase):
         self.assertTrue(self.response.data["ok"])
         self.assertEqual(self.response.data["message"], "Test deleted successfully")
 
-
     def test_delete_test_unauthorized_access(self):
         headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
         delete_test_data = {"test_id": self.test_id}
@@ -136,7 +136,7 @@ class TestCreateTest(TestCase):
         )
         self.assertEqual(self.response.status_code, 401)
         self.assertFalse(self.response.data["ok"])
-        
+
     def test_bad_data(self):
         headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
         delete_test_data = {"invalid": "invalid"}
@@ -145,7 +145,7 @@ class TestCreateTest(TestCase):
         )
         self.assertEqual(self.response.status_code, 400)
         self.assertFalse(self.response.data["ok"])
-    
+
     def test_bad_test_id(self):
         headers = {"HTTP_AUTHORIZATION": "Bearer " + self.jwt_token}
         delete_test_data = {"test_id": uuid.uuid4()}
@@ -164,4 +164,3 @@ class TestCreateTest(TestCase):
         self.assertEqual(self.response.status_code, 400)
         self.assertFalse(self.response.data["ok"])
         self.assertEqual(self.response.data["message"], "Invalid test_id")
-
