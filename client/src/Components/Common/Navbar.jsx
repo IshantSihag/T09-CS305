@@ -59,6 +59,20 @@ const Navbar = () => {
             <nav className="navbar navbar-dark bg-dark border-bottom border-body">
                 <div className="container-fluid">
                     <a href="http://localhost:3000/" className="navbar-brand">
+              </a>
+              {
+                type==='institute'?(
+                  <div>
+                    <a href="http://localhost:3000/institution" class="navbar-brand">
+                      Institute
+                    </a>
+                    <button onClick={handleLogout} class="navbar-brand">LOGOUT</button>
+                  </div>
+                ):
+                type==='student'?(
+                    <div>
+                    <a href="http://localhost:3000/student" class="navbar-brand">
+                      Student
                     </a>
                     {
                         type === 'institute' ? (

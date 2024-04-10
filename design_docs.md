@@ -17,6 +17,9 @@
     - [Get Result for Student](#get-result-for-student)
     - [Test Result](#test-result)
     - [Submit Test](#submit-test)
+    - [Test Rating](#test-rating)
+4. [Student](#student)
+    - [Fetch Student Details](#fetch-student-details)
     
 
 ## Introduction
@@ -470,7 +473,7 @@ Content-Type: application/json
 
 ### Test Result
 
-This endpoint retrieves the test result for a student.
+This endpoint retrieves the test result for an Institute.
 
 Test Result Request:
 ```http
@@ -487,8 +490,12 @@ Content-Type: application/json
     "ok": true,
     "result": [
         {
-            "name": "Student Name",
-            "score": "Score obtained by the student"
+            "name": "Name of Student",
+            "cgpa": "Student's CGPA",
+            "phoneNo": "Student's Phone number",
+            "batch": "Student's Batch eg. 2021",
+            "course": "Student's Course eg. BTech",
+            "score": "total score achieved by the student"
         },
         ...
     ]
@@ -549,3 +556,91 @@ Content-Type: application/json
 }
 ```
 
+### Test Rating
+
+This endpoint rates a test for the authenticated student.
+
+Test Rating Request:
+```http
+POST /submitTestRating
+Content-Type: application/json
+{
+    "test_id": "ID of the test to rate",
+    "rating": "Rating for the test",
+    "suggestion": "Suggestion for the test"
+}
+```
+
+Test Rating Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "message": "Rating saved successfully"
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Invalid request"
+}
+```
+
+## Student
+
+
+### Fetch Student Details
+
+This API endpoint retrieves details of the authenticated student.
+
+The Fetch Student Detail request:
+```http
+
+GET /student/fetchStudentDetails
+```
+
+Fetch Student Response
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "phone_number": "123-456-7890",
+    "cgpa": 8.7,
+    "batch": "2021",
+    "course": "Computer Science"
+    "bio": "An aspiring Computer Scientist in the field of Cybersecurity and zero knowledge proofs"
+    "profile_url":"https://drive/sdasa.png"
+}
+```
+
+2. If the login credentials are not that of a student, the server responds with a 400 Bad Request and a JSON object containing an error message.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Need to login through a student credentials"
+}
+```
+3. Any other error apart from the one mentioned above, the server response with 500 Internal Server Error
+
+```http
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message specific to the error"
+}
+```

@@ -1,0 +1,13 @@
+.watermark {
+    position: fixed;
+    bottom: 50%;
+    right: 15%;
+    color: rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    font-size: 100px;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: rotate(-20deg); 
+}
