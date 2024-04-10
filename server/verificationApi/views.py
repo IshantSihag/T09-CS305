@@ -53,6 +53,7 @@ def get_face_count(base64_image):
     face_enc = face_recognition.face_encodings(image)
     return len(face_enc)
 
+
 class VerifyUserView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -67,19 +68,35 @@ class VerifyUserView(APIView):
             # assert known_face_enc is not None # initial image not found
             unknown_face_enc, cnt = find_face_encodings(user_pic_base64)
             if cnt == 0:
-                jsonresponse = {"ok": True, "verified": False, "message": "No Face Found in the image"}
+                jsonresponse = {
+                    "ok": True,
+                    "verified": False,
+                    "message": "No Face Found in the image",
+                }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
             elif cnt > 1:
-                jsonresponse = {"ok": True, "verified": False, "message": "Multiple Faces Found in the image"}
+                jsonresponse = {
+                    "ok": True,
+                    "verified": False,
+                    "message": "Multiple Faces Found in the image",
+                }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
             result = compare_face_encodings(known_face_enc, unknown_face_enc)
             print("FACE VERIFICATION RESULT:", result)
 
             if result:
-                jsonresponse = {"ok": True, "verified": True, "message": "Face Verified"}
+                jsonresponse = {
+                    "ok": True,
+                    "verified": True,
+                    "message": "Face Verified",
+                }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
             else:
-                jsonresponse = {"ok": True, "verified": False, "message": "Face didn't match"}
+                jsonresponse = {
+                    "ok": True,
+                    "verified": False,
+                    "message": "Face didn't match",
+                }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
 
         except:
@@ -100,7 +117,10 @@ class SubmitInitialImage(APIView):
                 jsonresponse = {"ok": False, "error": "No Face Found in the image"}
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             elif cnt > 1:
-                jsonresponse = {"ok": False, "error": "Multiple Faces Found in the image"}
+                jsonresponse = {
+                    "ok": False,
+                    "error": "Multiple Faces Found in the image",
+                }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             try:
                 user_image = UserImage.objects.get(user_id=user)
