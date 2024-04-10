@@ -114,8 +114,7 @@ class SubmitTestView(APIView):
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         # If test_id is not valid
-        
-            
+
         if not Test.objects.filter(id=test_id).exists():
             return Response(
                 {
@@ -133,11 +132,11 @@ class SubmitTestView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         startTime = test.start
         duration = test.duration
         endTime = startTime + timedelta(seconds=duration + 5)
-        
+
         if datetime.datetime.now().replace(tzinfo=utc) < startTime:
             return Response(
                 {
@@ -146,7 +145,7 @@ class SubmitTestView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         if datetime.datetime.now().replace(tzinfo=utc) > endTime:
             return Response(
                 {
@@ -155,7 +154,7 @@ class SubmitTestView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         if Result.objects.filter(student_id=request.user.id, test_id=test).exists():
             return Response(
                 {
@@ -164,7 +163,7 @@ class SubmitTestView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-            
+
         for question in user_response:
             if not Question.objects.filter(id=question["id"]).exists():
                 return Response(
