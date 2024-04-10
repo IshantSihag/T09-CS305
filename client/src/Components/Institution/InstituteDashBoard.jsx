@@ -34,7 +34,7 @@ const InstituteDashboard = () => {
         return;
       }
 
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/dashboard`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/dashboard/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -70,11 +70,51 @@ const InstituteDashboard = () => {
 
   const handleCreateTest = () => {
     navigate("/institution/createtest");
+     fetchData(); 
   };
 
   const handleUpdateTest = () => {
     navigate("/institution/updatetest");
   };
+  
+  const formData = new FormData();
+  const handleDeleteTest = async (id) => {
+    formData.append('test_id', id);
+    try {
+      const accessToken = Cookies.get("access");
+
+      if(!accessToken) {
+        console.log("Access token not found, User not authorized");
+        navigate("/institution");
+        return;
+      }
+
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/deleteTest/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+       
+        },
+
+        body: formData,
+
+      });
+  
+      if (res.ok) {
+        // Handle successful deletion
+        console.log("Test deleted successfully");
+        fetchData();
+      } else {
+        // Handle errors
+        console.log(res);
+        console.error("Failed to delete test:", res.statusText);
+      }
+    } catch (error) {
+      // Handle network errors or exceptions
+      console.error("An error occurred while deleting the test:", error);
+    }
+  };
+  
 
   const handleViewAnalysis = () => {
     navigate("/institution/testresult");
@@ -136,7 +176,7 @@ const InstituteDashboard = () => {
                       <th className="border border-black px-4 py-2">
                         Test Title
                       </th>
-                      <th className="border border-black px-4 py-2">Test ID</th>
+                      <th className="border border-black px-4 py-2">Test Code</th>
                       <th className="border border-black px-4 py-2">
                         Start Time
                       </th>
@@ -156,7 +196,7 @@ const InstituteDashboard = () => {
                           {test.title}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.id}
+                          {test.testCode}
                         </td>
                         <td className="border border-black px-4 py-2">
                           {new Date(test.start).toLocaleString()}
@@ -165,13 +205,22 @@ const InstituteDashboard = () => {
                           {(test.duration)} minutes
                         </td>
 
-                        <td className="border border-black px-4 py-2">
+                        <td className="border border-black px-2 py-2">
                           <Button
                             color="blue"
                             ripple="light"
                             onClick={handleUpdateTest}
+                            className="ml-2"
                           >
                             Update Test
+                          </Button>
+                          <Button
+                            color="red"
+                            ripple="light"
+                            onClick={()=>handleDeleteTest(test.id)}
+                            className="ml-2 -mr-28"
+                          >
+                            Delete Test
                           </Button>
                         </td>
                       </tr>
