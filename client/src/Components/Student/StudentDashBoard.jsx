@@ -64,10 +64,11 @@ const StudentDashboard = () => {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+    fetchData();
   };
 
-  const handleAttemptTest = () => {
-    navigate("/student/starttest");
+  const handleAttemptTest = (id) => {
+    navigate(`/student/starttest/${id}`);
   };
 
   const handleViewAnalysis = () => {
@@ -114,7 +115,7 @@ const StudentDashboard = () => {
           <div className="mt-8 mb-8">
             {upcomingTests.length > 0 ? (
               <>
-                <h2 className="text-xl font-bold mb-2">Upcoming Tests</h2>
+                <h2 className="text-xl font-bold mb-4 text-left">Upcoming Tests</h2>
                 <table className="border-collapse border border-black w-full">
                   <thead>
                     <tr>
@@ -150,7 +151,7 @@ const StudentDashboard = () => {
                           <Button
                             color="blue"
                             ripple="light"
-                            onClick={handleAttemptTest}
+                            onClick={()=>handleAttemptTest(test.id)}
                           >
                             Attempt Test
                           </Button>
@@ -166,7 +167,7 @@ const StudentDashboard = () => {
 
             {pastTests.length > 0 ? (
               <>
-                <h2 className="text-xl font-bold mt-8 mb-2">Past Tests</h2>
+                <h2 className="text-xl font-bold mt-8 mb-2 text-left">Past Tests</h2>
                 <table className="border-collapse border border-black w-full">
                   <thead>
                     <tr>
