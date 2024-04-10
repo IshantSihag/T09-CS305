@@ -20,7 +20,7 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Ques_Types = ["single_correct", "multi_correct", "long_answer"];
 
@@ -155,9 +155,11 @@ const LongAnswer = ({ currentQuestion_, handleQuestionAnswerChange_ }) => {
   );
 };
 
-export default function CreattTest() {
+export default function CreattTest({type}) {
+  const { id: testId } = useParams();
   const navigate = useNavigate();
   let date = new Date();
+  const [loading, setLoading] = useState(false);
   const [testData, setTestData] = useState({ title: "", start: "", duration: "" });
 
   const [questions, setQuestions] = useState([
@@ -182,7 +184,7 @@ export default function CreattTest() {
   useEffect(() => {
     let access = Cookies.get("access");
     if (!access) {
-      window.location.href = "/institution/login";
+      navigate("/institution/login");
     }
     const questions_ = Cookies.get("questions");
     const currentQuestionIndex_ = Cookies.get("currentQuestionIndex");
@@ -196,9 +198,74 @@ export default function CreattTest() {
     }
   }, []);
 
+  useEffect(() => {
+    setLoading(false);
+    const access = Cookies.get("access");
+    if (!access) {
+      navigate("/institution/login");
+    }
+    
+    if(type == "edit"){
+      const fetchData = async () => {
+        try{
+          const formData = new FormData();
+          formData.append("test_id", testId);
+
+          const res = await fetch(`http://127.0.0.1:8000/startTest/`, {
+            method: "POST", 
+            headers: {
+              'Authorization': `Bearer ${access}`
+            },
+            body: formData
+          });
+          console.log(res)
+
+          if (res.ok){
+            const data = await res.json();
+
+            setTestData({
+              title: data.title,
+              start: data.start,
+              duration: data.duration
+            });
+
+            let questions = data.questions;
+            for(let i=0; i<questions.length; i++){
+              questions[i].id = i+1;
+              questions[i].title = '';
+              questions[i].answer = '';
+              questions[i].choices = questions[i].options;
+              delete questions[i].options;
+            }
+
+            setQuestions(questions);
+
+            const logMsg = "Data fetched, setting up cookies with fetched data...";
+            console.log(logMsg);
+            alert("Data fetched successfully");
+
+          } else {
+            //CHECK: for unauthorized request, user redirected to login
+            if (res.status === 401) {
+                console.log("Unauthorized : Please login");
+                // navigate('/institution/login');
+
+                return;
+            }
+            console.log(`Fetch Error : ${res.status}`);
+          }
+        } catch (err) {
+            console.log(`Error while fetching test: ${err.message}`);
+        }
+      };
+      fetchData();
+    }
+  }, []);
+
+
   setInterval(() => {
     setCookies();
-  }, 10000);
+  }, 60000);
 
   const handleSave = async() => {
     // console.log(questions);
