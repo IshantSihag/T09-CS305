@@ -18,6 +18,8 @@
     - [Test Result](#test-result)
     - [Submit Test](#submit-test)
     - [Test Rating](#test-rating)
+4. [Student](#student)
+    - [Fetch Student Details](#fetch-student-details)
     
 
 ## Introduction
@@ -588,5 +590,57 @@ Content-Type: application/json
 {
     "ok": false,
     "error": "Invalid request"
+}
+```
+
+## Student
+
+
+### Fetch Student Details
+
+This API endpoint retrieves details of the authenticated student.
+
+The Fetch Student Detail request:
+```http
+
+GET /student/fetchStudentDetails
+```
+
+Fetch Student Response
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "phone_number": "123-456-7890",
+    "cgpa": 8.7,
+    "batch": "2021",
+    "course": "Computer Science"
+    "bio": "An aspiring Computer Scientist in the field of Cybersecurity and zero knowledge proofs"
+    "profile_url":"https://drive/sdasa.png"
+}
+```
+
+2. If the login credentials are not that of a student, the server responds with a 400 Bad Request and a JSON object containing an error message.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Need to login through a student credentials"
+}
+```
+3. Any other error apart from the one mentioned above, the server response with 500 Internal Server Error
+
+```http
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message specific to the error"
 }
 ```
