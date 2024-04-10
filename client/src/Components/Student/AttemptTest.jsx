@@ -37,7 +37,7 @@ const AttemptTest = () => {
     const navigate = useNavigate();
 
     //TODO: fetch the correct user email 
-    const email = "2021csb1100@iitrpr.ac.in"
+    const email = Cookies.get('email') || "";
 
     //TODO: fetch correct test id
     // const testId = "98897fbc-55c2-456d-94f2-b14759a57381";

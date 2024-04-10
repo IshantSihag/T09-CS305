@@ -44,6 +44,7 @@ const Navbar = () => {
             Cookies.remove('refresh');
             Cookies.remove('type');
             Cookies.remove('name');
+            Cookies.remove('email');
             navigate('/');
           } else {
             console.log("Logout Failed Please try again");
