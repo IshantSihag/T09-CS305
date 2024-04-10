@@ -275,7 +275,6 @@ class createTest(APIView):
                 registrations="",
             )
             question_ids = ""
-            print(questions)
             for question in questions:
                 answer = ""
                 options = ""
