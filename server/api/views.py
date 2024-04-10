@@ -275,6 +275,7 @@ class createTest(APIView):
                 registrations="",
             )
             question_ids = ""
+            print(questions)
             for question in questions:
                 answer = ""
                 options = ""
@@ -297,7 +298,7 @@ class createTest(APIView):
                     answer=answer,
                     test_id=test,
                 )
-            question_ids += str(question.id) + ","
+                question_ids += str(question.id) + ","
             question_ids = question_ids[:-1]
             test.questions = question_ids
             test.save()
@@ -378,6 +379,22 @@ class UpdateTest(APIView):
                 "error": "You do not have access to update",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if duration < 0:
+                jsonresponse = {"ok": False, "error": "Invalid duration"}
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            for question in questions:
+                if question["type"].split("_")[0] not in (
+                    "single",
+                    "multiple",
+                ):
+                    jsonresponse = {"ok": False, "error": "Invalid question type"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+                if int(question["marks"]) < 0:
+                    jsonresponse = {"ok": False, "error": "Invalid marks"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            jsonresponse = {"ok": False, "error": "Invalid input"}
 
         try:
             test.title = title
@@ -402,7 +419,7 @@ class UpdateTest(APIView):
                 if Question.objects.filter(id=question["id"]).exists():
                     question_inst = Question.objects.get(id=question["id"])
                     question_inst.statement = question["statement"]
-                    question_inst.type = question["type"]
+                    question_inst.type = question["type"].split("_")[0]
                     question_inst.marks = question["marks"]
                     question_inst.options = options
                     question_inst.answer = answer
