@@ -10,11 +10,12 @@ import traceback
 from datetime import timedelta
 from django.utils import timezone
 import uuid
-
+from ..api.permissions import IsStudent
+from datetime import datetime
 
 # Create your views here.
 class RegisterStudentForTestView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsStudent)
 
     def post(self, request):
         try:
@@ -38,8 +39,15 @@ class RegisterStudentForTestView(APIView):
                 jsonresponse["error"] = "No user with the given email or username"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
             userProfile = UserProfile.objects.get(user_id=user.id)
-            if userProfile.type not in ("Student", "student"):
-                jsonresponse["error"] = "user must be student"
+            # if userProfile.type not in ("Student", "student"):
+            #     jsonresponse["error"] = "user must be student"
+            #     return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            current_time = datetime.now()
+            if current_time >= test.start:
+                jsonresponse = {
+                    "ok": False,
+                    "error": "Registration is closed. The test has already started.",
+                }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
             try:
@@ -136,7 +144,7 @@ class GetResultForStudent(APIView):
             # ongoing test
             start = test.start
             end = start + timedelta(seconds=test.duration)
-            if end >= timezone.now():
+            if end >= datetime.now():
                 jsonresponse["error"] = "The test is still ongoing"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 

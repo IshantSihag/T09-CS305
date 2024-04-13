@@ -18,6 +18,8 @@ from rest_framework.decorators import api_view
 from django.utils.crypto import get_random_string
 import json
 import uuid
+from .permissions import IsStudent,IsInstitute
+from datetime import datetime,timedelta
 
 
 class LoginView(TokenObtainPairView):
@@ -169,7 +171,7 @@ class ProfileView(APIView):
 
 
 class startTest(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsStudent)
 
     def post(self, request):
         try:
@@ -185,6 +187,19 @@ class startTest(APIView):
         test = Test.objects.get(id=test_id)
         registrations = test.registrations.split(",")
         if user_email in registrations:
+            current_time = datetime.now()
+            if current_time >= test.start:
+                jsonresponse={
+                    'ok':False,
+                    'error':'test has not started yet',
+                }
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            elif current_time>=test.start+timedelta(seconds=test.duration):
+                jsonresponse={
+                    'ok':False,
+                    'error':'test has already finished',
+                }
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             questions = []
             listquestions = Question.objects.filter(test_id=test_id)
             for question in listquestions:
@@ -240,7 +255,7 @@ class deleteTest(APIView):
 
 
 class createTest(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,IsInstitute)
 
     def post(self, request):
         try:
