@@ -5,6 +5,11 @@ import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import profileImage from "../../Assets/profile_image.jpg"; // Import the image
 import Cookies from "js-cookie"; // Import Cookies
+import {
+  ToastContainer,
+  notifyError,
+  notifySuccess,
+} from "../UI/ToastNotification";
 
 const InstituteDashboard = () => {
   const navigate = useNavigate();
@@ -70,20 +75,20 @@ const InstituteDashboard = () => {
 
   const handleCreateTest = () => {
     navigate("/institution/createtest");
-     fetchData(); 
+    fetchData();
   };
 
   const handleUpdateTest = () => {
     navigate("/institution/updatetest");
   };
-  
+
   const formData = new FormData();
   const handleDeleteTest = async (id) => {
-    formData.append('test_id', id);
+    formData.append("test_id", id);
     try {
       const accessToken = Cookies.get("access");
 
-      if(!accessToken) {
+      if (!accessToken) {
         console.log("Access token not found, User not authorized");
         navigate("/institution");
         return;
@@ -93,28 +98,27 @@ const InstituteDashboard = () => {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-       
         },
 
         body: formData,
-
       });
-  
+
       if (res.ok) {
         // Handle successful deletion
         console.log("Test deleted successfully");
-        fetchData();
+        await fetchData();
+        notifySuccess("Test Deleted successfully!");
       } else {
         // Handle errors
         console.log(res);
         console.error("Failed to delete test:", res.statusText);
+        notifyError("Failed to delete test");
       }
     } catch (error) {
       // Handle network errors or exceptions
       console.error("An error occurred while deleting the test:", error);
     }
   };
-  
 
   const handleViewAnalysis = () => {
     navigate("/institution/testresult");
@@ -122,6 +126,7 @@ const InstituteDashboard = () => {
 
   return (
     <div className="h-screen ">
+      <ToastContainer />
       <Navbar />
       <div className="flex flex-col flex-grow p-4">
         <div className="text-2xl font-bold mb-4 text-center">
@@ -168,7 +173,9 @@ const InstituteDashboard = () => {
           <div className="mt-8 mb-8">
             {upcomingTests.length > 0 ? (
               <>
-                <h2 className="text-xl font-bold mb-4 text-left">Upcoming Tests</h2>
+                <h2 className="text-xl font-bold mb-4 text-left">
+                  Upcoming Tests
+                </h2>
                 <table className="border-collapse border border-black w-full">
                   <thead>
                     <tr>
@@ -176,7 +183,9 @@ const InstituteDashboard = () => {
                       <th className="border border-black px-4 py-2">
                         Test Title
                       </th>
-                      <th className="border border-black px-4 py-2">Test Code</th>
+                      <th className="border border-black px-4 py-2">
+                        Test Code
+                      </th>
                       <th className="border border-black px-4 py-2">
                         Start Time
                       </th>
@@ -202,7 +211,7 @@ const InstituteDashboard = () => {
                           {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {(test.duration)} minutes
+                          {test.duration} minutes
                         </td>
 
                         <td className="border border-black px-2 py-2">
@@ -217,7 +226,7 @@ const InstituteDashboard = () => {
                           <Button
                             color="red"
                             ripple="light"
-                            onClick={()=>handleDeleteTest(test.id)}
+                            onClick={() => handleDeleteTest(test.id)}
                             className="ml-2 -mr-28"
                           >
                             Delete Test
@@ -234,7 +243,9 @@ const InstituteDashboard = () => {
 
             {pastTests.length > 0 ? (
               <>
-                <h2 className="text-xl font-bold mt-8 mb-2 text-left">Hosted Tests</h2>
+                <h2 className="text-xl font-bold mt-8 mb-2 text-left">
+                  Hosted Tests
+                </h2>
                 <table className="border-collapse border border-black w-full">
                   <thead>
                     <tr>
@@ -264,8 +275,8 @@ const InstituteDashboard = () => {
                           {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {(test.duration)} minutes
-                        </td> 
+                          {test.duration} minutes
+                        </td>
                         <td className="border border-black px-4 py-2">
                           <Button
                             color="blue"
