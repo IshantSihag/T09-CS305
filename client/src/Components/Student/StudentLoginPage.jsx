@@ -61,6 +61,7 @@ const StudentLogin = () => {
           Cookies.set('refresh', data.refresh, { expires: 1, path: '/' });          
           Cookies.set('type', data.type, { expires: 1, path: '/' });     
           Cookies.set('name', data.name, { expires: 1, path: '/' })     
+          Cookies.set('email', data.email, { expires: 1, path: '/' })     
 
           navigate("/");  
         } else {

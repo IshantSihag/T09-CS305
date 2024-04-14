@@ -20,6 +20,7 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
+import { ToastContainer, notifyError, notifySuccess } from "../UI/ToastNotification";
 import { useNavigate } from "react-router-dom";
 
 const Ques_Types = ["single_correct", "multi_correct", "long_answer"];
@@ -182,7 +183,7 @@ export default function CreattTest() {
   useEffect(() => {
     let access = Cookies.get("access");
     if (!access) {
-      window.location.href = "/institution/login";
+      navigate("/institution/login");
     }
     const questions_ = Cookies.get("questions");
     const currentQuestionIndex_ = Cookies.get("currentQuestionIndex");
@@ -201,9 +202,41 @@ export default function CreattTest() {
   }, 10000);
 
   const handleSave = async() => {
-    // console.log(questions);
     let access = Cookies.get("access");
-    // console.log("access", access);
+    if (!access) {
+      navigate("/institution/login");
+    }
+    for (let i = 0; i < questions.length; i++) {
+      if (questions[i].title === "" || questions[i].statement === "" || questions[i].marks === "") {
+        notifyError("Please fill all the fields in question " + (i + 1));
+        return;
+      }
+      if (questions[i].type === "single_correct" || questions[i].type === "multi_correct") {
+        let flag = false;
+        let flag1 = false;
+        for (let j = 0; j < questions[i].choices.length; j++) {
+          if (questions[i].choices[j].value === "") {
+            flag = true;
+            break;
+          }
+          if (questions[i].choices[j].isCorrect) {
+            flag1 = true;
+          }
+        }
+        if (flag) {
+          notifyError("Please fill all the fields in question " + (i + 1));
+          return;
+        }
+        if (!flag1) {
+          notifyError("Please select the correct answer in question " + (i + 1));
+          return;
+        }
+      }
+    }
+    if (testData.title === "" || testData.start === "" || testData.duration === "") {
+      notifyError("Please fill all the fields");
+      return;
+    }
     
     const sendData = new FormData();
     sendData.append("title", testData.title);
@@ -222,8 +255,18 @@ export default function CreattTest() {
       })
 
       console.log("RES : ", res);
+      if (!res.ok) {
+        notifyError("Failed to create test, Please try again");
+        return;
+      }
+      const data = await res.json();
+      if (data.ok) {
+        notifySuccess("Test created successfully");
+        navigate("/institution/");
+      }      
     } catch (err) {
       console.log("Failed to create test. error:", err);
+      notifyError("Failed to create test. Please try again");
     }
 
   };
@@ -374,7 +417,7 @@ export default function CreattTest() {
           <input
             type="text"
             placeholder="Test Title"
-            className="w-1/4 p-1.5 border-1 border-blue-gray-100 rounded-md"
+            className="w-1/4 p-1.5 mr-4 border-1 border-blue-gray-100 rounded-md"
             value={testData.title}
             onChange={(e) => setTestData({ ...testData, title: e.target.value })}
           />
@@ -589,7 +632,6 @@ export default function CreattTest() {
                 size="sm"
                 onClick={() => {
                   handleSave();
-                  navigate("/institution/");
                 }}
               >
                 Save
@@ -599,6 +641,7 @@ export default function CreattTest() {
         </Card>
       </div>
       <Footer />
+      <ToastContainer />
     </div>
   );
 }

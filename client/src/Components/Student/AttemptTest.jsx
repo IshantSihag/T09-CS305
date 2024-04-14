@@ -19,6 +19,7 @@ import secondsToHMS from "../../Utils/secondsToHMS";
 
 //icons 
 import { ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import Watermark from "../Common/Watermark";
 import WebcamCapture from "../Common/WebcamCatpure";
 
 //TODO: REPLACE ALL ALERTS TO REACT TOAST
@@ -34,6 +35,9 @@ const AttemptTest = () => {
     const [userQuestions, setUserQuestions] = useState([]);
 
     const navigate = useNavigate();
+
+    //TODO: fetch the correct user email 
+    const email = Cookies.get('email') || "";
 
     //TODO: fetch correct test id
     // const testId = "98897fbc-55c2-456d-94f2-b14759a57381";
@@ -266,7 +270,7 @@ const AttemptTest = () => {
                     Cookies.remove(`ques/${testId}`);
                     // Cookies.remove(`time/${testId}`);
 
-                    console.log(receievedMsg);
+                  console.log(receievedMsg);
                     alert(receievedMsg);
 
                     //navigating to student dashboard
@@ -327,6 +331,8 @@ const AttemptTest = () => {
     };
 
     return (
+        <>
+        <Watermark text={email}/>
         <div>
             <div className="test-container">
                 <div className="test-header">
@@ -381,6 +387,7 @@ const AttemptTest = () => {
                 </div>
             </div>
         </div>
+        </>
     )
 }
 

@@ -6,8 +6,8 @@ from api.models import Test
 
 
 class UserImage(models.Model):
-    user_id = models.OneToOneField(
-        User, related_name="userdetails", default=1, on_delete=models.CASCADE
+    user_id = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_image"
     )
     image_url = models.CharField(max_length=255, blank=True, null=True)
     image_base64 = models.TextField(blank=True, null=True)

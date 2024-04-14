@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view
 import traceback
 from datetime import timedelta
 from django.utils import timezone
+import uuid
 
 
 # Create your views here.
@@ -18,12 +19,13 @@ class RegisterStudentForTestView(APIView):
     def post(self, request):
         try:
             student_email = request.user.username
+            uuid.UUID(request.data["test_id"])
             test_id = request.data["test_id"]
         except:
             print(traceback.format_exc())
             jsonresponse = {
                 "ok": False,
-                "error": "Invlaid Input format. required test_id, test_code. Also ensure that you are logged in.",
+                "error": "Invlaid Input format. required test_id, test_code.",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -82,6 +84,13 @@ class GetResultForStudent(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
+        try:
+            uuid.UUID(request.GET.get("test_id"))
+        except:
+            return Response(
+                {"ok": False, "error": "Invalid Input format."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         try:
             student_email = request.user.email
             test_id = request.GET.get("test_id")

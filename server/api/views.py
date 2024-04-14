@@ -12,11 +12,12 @@ from .serializers import (
 )
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Test, UserProfile, Question
+from .models import Test, UserProfile, Question, Student
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from django.utils.crypto import get_random_string
 import json
+import uuid
 
 
 class LoginView(TokenObtainPairView):
@@ -97,12 +98,21 @@ class SignUpView(APIView):
                     "bio": "",
                     "profile_url": "",
                 }
+                if request.data["type"] == "student":
+                    Student.objects.create(
+                        student_id=user.id,
+                        phone_number="",
+                        cgpa=0.0,
+                        batch=0,
+                        course="",
+                    )
+
                 return Response(response, status=status.HTTP_201_CREATED)
             else:
                 response = {"ok": False, "error": "Invalid user type"}
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            # print(str(e))
+            print(str(e))
             response = {"ok": False, "error": "Invalid input"}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
@@ -126,6 +136,7 @@ class getTest(APIView):
                         "start": test.start,
                         "duration": test.duration,
                         "author": test.author,
+                        "code": test.testCode,
                     }
                 )
             return Response(jsonresponse, status=status.HTTP_200_OK)
@@ -162,6 +173,7 @@ class startTest(APIView):
 
     def post(self, request):
         try:
+            uuid.UUID(request.data["test_id"])
             test_id = request.data["test_id"]
         except:
             jsonresponse = {"ok": False, "error": "test_id required"}
@@ -206,6 +218,7 @@ class deleteTest(APIView):
 
     def post(self, request):
         try:
+            uuid.UUID(request.data["test_id"])
             test_id = request.data["test_id"]
         except:
             jsonresponse = {"ok": False, "error": "Invalid input. test_id required"}
@@ -233,9 +246,25 @@ class createTest(APIView):
         try:
             title = request.data["title"]
             start = request.data["start"]
-            duration = request.data["duration"]
+            duration = int(request.data["duration"])
+            if duration < 0:
+                jsonresponse = {"ok": False, "error": "Invalid duration"}
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             questions = request.data["questions"]
             questions = json.loads(questions)
+            for question in questions:
+                if question["type"].split("_")[0] not in (
+                    "single",
+                    "multiple",
+                ):
+                    jsonresponse = {"ok": False, "error": "Invalid question type"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+                if int(question["marks"]) < 0:
+                    jsonresponse = {"ok": False, "error": "Invalid marks"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            jsonresponse = {"ok": False, "error": "Invalid input"}
+        try:
             user_email = request.user.email
             test = Test.objects.create(
                 title=title,
@@ -301,64 +330,127 @@ class createTest(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
-class updateTest(APIView):
+class UpdateTest(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         try:
-            test_id = request.data["test_id"]
-
-        except:
-            jsonresponse = {"ok": False, "error": "Invalid input. test_id required"}
-            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        user_email = request.user.email
-        if not Test.objects.filter(id=test_id).exists():
-            jsonresponse = {"ok": False, "error": "Test not found"}
-            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        test = Test.objects.get(id=test_id)
-        if test.author != user_email:
+            email = request.user.email
+            title = request.data["title"]
+            start = request.data["start"]
+            duration = request.data["duration"]
+            questions = request.data["questions"]
+            questions = json.loads(questions)
+            uuid.UUID(request.data["test_id"])
+            id = request.data["test_id"]
+        except Exception as e:
+            print(str(e))
             jsonresponse = {
                 "ok": False,
-                "error": "You are not authorized to update this test",
+                "error": "body of the request not as intended",
             }
-            return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            test = Test.objects.get(id=id)
+        except Test.DoesNotExist:
+            jsonresponse = {
+                "ok": False,
+                "error": "Test not found",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            userprofile = UserProfile.objects.get(user_id=request.user)
+        except Exception as e:
+            print(str(e))
+            jsonresponse = {
+                "ok": False,
+                "error": "You are not a valid User",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        if userprofile.type != "institute":
+            jsonresponse = {
+                "ok": False,
+                "error": "Only insitute profile allowed access this resource",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        if test.author != request.user.email:
+            jsonresponse = {
+                "ok": False,
+                "error": "You do not have access to update",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if duration < 0:
+                jsonresponse = {"ok": False, "error": "Invalid duration"}
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            for question in questions:
+                if question["type"].split("_")[0] not in (
+                    "single",
+                    "multiple",
+                ):
+                    jsonresponse = {"ok": False, "error": "Invalid question type"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+                if int(question["marks"]) < 0:
+                    jsonresponse = {"ok": False, "error": "Invalid marks"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            jsonresponse = {"ok": False, "error": "Invalid input"}
 
-        test.title = request.data["title"]
-        test.start = request.data["start"]
-        test.duration = request.data["duration"]
+        try:
+            test.title = title
+            test.start = start
+            test.duration = duration
+            question_ids = ""
+            for question in questions:
+                answer = ""
+                options = ""
+                for choice in question["choices"]:
+                    if options == "":
+                        options += choice["value"]
+                    else:
+                        options += "," + choice["value"]
+                    if choice["isCorrect"] == True:
+                        if answer == "":
+                            answer += choice["value"]
+                        else:
+                            answer += "," + choice["value"]
 
-        question_array = request.data["questions"]
+                # check if question already exsists
+                if Question.objects.filter(id=question["id"]).exists():
+                    question_inst = Question.objects.get(id=question["id"])
+                    question_inst.statement = question["statement"]
+                    question_inst.type = question["type"].split("_")[0]
+                    question_inst.marks = question["marks"]
+                    question_inst.options = options
+                    question_inst.answer = answer
+                    question_inst.save()
+                else:
+                    question_inst = Question.objects.create(
+                        statement=question["statement"],
+                        type=question["type"].split("_")[0],
+                        marks=question["marks"],
+                        options=options,
+                        answer=answer,
+                        test_id=test,
+                    )
 
-        test = Test.objects.get(id=test_id)
-        for question in question_array:
-            if not Question.objects.filter(id=question["id"]).exists():
-                question = Question.objects.create(
-                    statement=question["statement"],
-                    type=question["type"],
-                    marks=question["marks"],
-                    options=question["options"],
-                    answer=question["answer"],
-                    test_id=test,
-                )
-            else:
-                question = Question.objects.get(id=question["id"])
-                question.statement = question["statement"]
-                question.type = question["type"]
-                question.marks = question["marks"]
-                question.options = question["options"]
-                question.answer = question["answer"]
-                question.save()
+                question_ids += str(question_inst.id) + ","
 
-        question_ids = ""
-        for question in question_array:
-            question_ids += str(question["id"]) + ","
-        question_ids = question_ids[:-1]
-        test.questions = question_ids
-
-        test.save()
-
-        jsonresponse = {"ok": True, "message": "Test updated successfully"}
-        return Response(jsonresponse, status=status.HTTP_200_OK)
+            question_ids = question_ids[:-1]
+            test.questions = question_ids
+            test.save()
+            jsonresponse = {
+                "ok": True,
+                "message": "Test updated successfully",
+                "test_id": test.id,
+            }
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+        except Exception as e:
+            jsonresponse = {
+                "ok": False,
+                "error": str(e),
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetAllTestStudentView(APIView):
@@ -390,3 +482,38 @@ class GetAllTestStudentView(APIView):
                 "error": str(e),
             }
             return (jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class FetchStudentDetails(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        jsonresponse = {
+            "ok": False,
+            "error": "backend error",
+        }
+        try:
+            user = request.user
+            userprofile = UserProfile.objects.get(user_id=user.id)
+            if userprofile.type != "student":
+                jsonresponse["error"] = "Need to login through student credentials"
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            student = Student.objects.get(student_id=user.id)
+
+            jsonresponse = {
+                "ok": True,
+                "phone_number": student.phone_number,
+                "cgpa": student.cgpa,
+                "batch": student.batch,
+                "course": student.course,
+                "bio": userprofile.bio,
+                "profile_url": userprofile.profile_url,
+            }
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            jsonresponse = {
+                "ok": False,
+                "error": str(e),
+            }
+            return Response(jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)

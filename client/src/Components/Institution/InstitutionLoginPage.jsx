@@ -60,7 +60,7 @@ const InstituteLogin = () => {
           Cookies.set('type', data.type, { expires: 1, path: '/' });      
           Cookies.set('name', data.name, { expires: 1, path: '/' });    
 
-          navigate("/");  
+          navigate("/ ");  
         } else {
           const errMsg = data?.error || "Error in Signup, Please try again";
           notifyError(errMsg);
