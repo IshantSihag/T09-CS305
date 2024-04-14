@@ -6,7 +6,7 @@ import json
 
 class TestResultInstitute(TestCase):
     def setUp(self):
-        
+
         # Basic urls and client set up
         self.client = Client()
         self.signup_url = reverse("signup")
@@ -84,7 +84,6 @@ class TestResultInstitute(TestCase):
         self.assertTrue(self.response.data["test_id"])
         self.test_id = self.response.data["test_id"]
         self.assertTrue(self.response.data["testCode"])
-
 
         # logging in student for registration of test
         login_data = {

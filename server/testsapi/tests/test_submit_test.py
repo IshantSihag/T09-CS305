@@ -3,6 +3,7 @@ from django.urls import reverse
 from datetime import datetime
 import json
 
+
 class TestCreateTest(TestCase):
     def setUp(self):
 
@@ -83,7 +84,6 @@ class TestCreateTest(TestCase):
         self.assertTrue(self.response.data["test_id"])
         self.test_id = self.response.data["test_id"]
         self.assertTrue(self.response.data["testCode"])
-
 
         # logging in student for registration of test
         login_data = {
