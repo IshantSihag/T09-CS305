@@ -13,9 +13,10 @@ import uuid
 from ..api.permissions import IsStudent
 from datetime import datetime
 
+
 # Create your views here.
 class RegisterStudentForTestView(APIView):
-    permission_classes = (IsAuthenticated,IsStudent)
+    permission_classes = (IsAuthenticated, IsStudent)
 
     def post(self, request):
         try:
@@ -144,13 +145,12 @@ class GetResultForStudent(APIView):
             # ongoing test
             start = test.start
             end = start + timedelta(seconds=test.duration)
-            if datetime.now()<=start:
+            if datetime.now() <= start:
                 jsonresponse["error"] = "The test has not yet started"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             elif end >= datetime.now():
                 jsonresponse["error"] = "The test is still ongoing"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-            
 
             # if student attempted the test
             # doubtful about my method to check if student attempted the test,

@@ -18,8 +18,8 @@ from rest_framework.decorators import api_view
 from django.utils.crypto import get_random_string
 import json
 import uuid
-from .permissions import IsStudent,IsInstitute
-from datetime import datetime,timedelta
+from .permissions import IsStudent, IsInstitute
+from datetime import datetime, timedelta
 
 
 class LoginView(TokenObtainPairView):
@@ -171,7 +171,7 @@ class ProfileView(APIView):
 
 
 class startTest(APIView):
-    permission_classes = (IsAuthenticated,IsStudent)
+    permission_classes = (IsAuthenticated, IsStudent)
 
     def post(self, request):
         try:
@@ -188,16 +188,16 @@ class startTest(APIView):
         registrations = test.registrations.split(",")
         if user_email in registrations:
             current_time = datetime.now()
-            if current_time >= test.start:
-                jsonresponse={
-                    'ok':False,
-                    'error':'test has not started yet',
+            if current_time < test.start:
+                jsonresponse = {
+                    "ok": False,
+                    "error": "test has not started yet",
                 }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-            elif current_time>=test.start+timedelta(seconds=test.duration):
-                jsonresponse={
-                    'ok':False,
-                    'error':'test has already finished',
+            elif current_time >= test.start + timedelta(seconds=test.duration):
+                jsonresponse = {
+                    "ok": False,
+                    "error": "test has already finished",
                 }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             questions = []
@@ -255,7 +255,7 @@ class deleteTest(APIView):
 
 
 class createTest(APIView):
-    permission_classes = (IsAuthenticated,IsInstitute)
+    permission_classes = (IsAuthenticated, IsInstitute)
 
     def post(self, request):
         try:
@@ -279,11 +279,11 @@ class createTest(APIView):
                     return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         except:
             jsonresponse = {"ok": False, "error": "Invalid input"}
-       
+
         if start < datetime.now():
-            jsonresponse={
-                "ok":False,
-                "error" :"We expect the start time to be some time in future"
+            jsonresponse = {
+                "ok": False,
+                "error": "We expect the start time to be some time in future",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -403,16 +403,16 @@ class UpdateTest(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         start = test.start
         end = start + timedelta(seconds=test.duration)
-        if start <= datetime.now()  and datetime.now()<=end:
-            jsonresponse={
-                "ok":False,
-                "error" :"The test is ongoing. You can't update."
+        if start <= datetime.now() and datetime.now() <= end:
+            jsonresponse = {
+                "ok": False,
+                "error": "The test is ongoing. You can't update.",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        elif datetime.now()>=end:
-            jsonresponse={
-                "ok":False,
-                "error" :"The test has already ended. You can't update."
+        elif datetime.now() >= end:
+            jsonresponse = {
+                "ok": False,
+                "error": "The test has already ended. You can't update.",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:

@@ -131,6 +131,11 @@ class SubmitTestView(APIView):
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         end_time = test.start + timedelta(seconds=test.duration)
+        if datetime.now() < test.start:
+            return Response(
+                {"ok": False, "error": "The test has not started yet."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if datetime.now() > end_time:
             return Response(
                 {"ok": False, "error": "The test has already ended."},
