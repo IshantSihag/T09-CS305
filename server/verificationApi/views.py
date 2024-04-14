@@ -159,8 +159,6 @@ class TestRatingView(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class FetchTestView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -187,7 +185,7 @@ class FetchTestView(APIView):
                         "type": question.type,
                         "marks": question.marks,
                         "options": question.options.split(","),
-                        "answer": question.answer
+                        "answer": question.answer,
                     }
                 )
             jsonresponse = {
