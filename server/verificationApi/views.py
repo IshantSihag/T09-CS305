@@ -157,3 +157,50 @@ class TestRatingView(APIView):
         except:
             jsonresponse = {"ok": False, "error": "Invalid request"}
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class FetchTestView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            uuid.UUID(request.data["test_id"])
+            test_id = request.data["test_id"]
+        except:
+            jsonresponse = {"ok": False, "error": "test_id required"}
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        user_email = request.user.email
+        if not Test.objects.filter(id=test_id).exists():
+            jsonresponse = {"ok": False, "error": "Test not found"}
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        test = Test.objects.get(id=test_id)
+        if test.author == user_email:
+            questions = []
+            listquestions = Question.objects.filter(test_id=test_id)
+            for question in listquestions:
+                questions.append(
+                    {
+                        "id": question.id,
+                        "statement": question.statement,
+                        "type": question.type,
+                        "marks": question.marks,
+                        "options": question.options.split(","),
+                        "answer": question.answer
+                    }
+                )
+            jsonresponse = {
+                "ok": True,
+                "start": test.start,
+                "duration": test.duration,
+                "author": test.author,
+                "questions": questions,
+            }
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+        else:
+            jsonresponse = {
+                "ok": False,
+                "error": "You are not authorized to view this test",
+            }
+            return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
