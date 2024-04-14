@@ -19,6 +19,7 @@
     - [Test Result](#test-result)
     - [Submit Test](#submit-test)
     - [Test Rating](#test-rating)
+    - [Fetch Test](#fetch-test)
 4. [Student](#student)
     - [Fetch Student Details](#fetch-student-details)
     
@@ -693,6 +694,52 @@ Content-Type: application/json
     "error": "Invalid request"
 }
 ```
+
+### Fetch Test
+
+This endpoint retrieves the test details with answer key for the authenticated institute.
+
+Fetch Test Request:
+```http
+GET /fetchTest?test_id=ID of the test to fetch
+```
+
+Fetch Test Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing the test details.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "start": "YYYY-MM-DDTHH:MM:SSZ",
+    "duration": "3600",      // in seconds
+    "author": "Author's Email",
+    "title": "Test Title",
+    "questions": [
+        {
+            "statement": "Question Statement",
+            "type": "Question Type",
+            "marks": "Question Marks",
+            "options": ["Option 1", "Option 2", ...],
+            "answer": "Answer to the question"
+        },
+        ...
+    ]
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message describing the issue"
+}
+```
+
+
 
 ## Student
 
