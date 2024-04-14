@@ -279,6 +279,13 @@ class createTest(APIView):
                     return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         except:
             jsonresponse = {"ok": False, "error": "Invalid input"}
+       
+        if start < datetime.now():
+            jsonresponse={
+                "ok":False,
+                "error" :"We expect the start time to be some time in future"
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
             user_email = request.user.email
             test = Test.objects.create(
@@ -392,6 +399,20 @@ class UpdateTest(APIView):
             jsonresponse = {
                 "ok": False,
                 "error": "You do not have access to update",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        start = test.start
+        end = start + timedelta(seconds=test.duration)
+        if start <= datetime.now()  and datetime.now()<=end:
+            jsonresponse={
+                "ok":False,
+                "error" :"The test is ongoing. You can't update."
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        elif datetime.now()>=end:
+            jsonresponse={
+                "ok":False,
+                "error" :"The test has already ended. You can't update."
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
