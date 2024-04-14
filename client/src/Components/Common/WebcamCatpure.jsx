@@ -1,7 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
 
-const WebcamCapture = () => {
+const WebcamCapture = ({
+    voilation,
+    setVoilation,
+    handleTestSubmit,
+    testId
+}) => {
     const videoRef = useRef(null);
     const intervalRef = useRef(null);
 
@@ -65,8 +70,22 @@ const WebcamCapture = () => {
             if (response.ok) {
                 const data = await response.json();
                 if (data.ok) {
-                    console.log('Image sent successfully');
+                    console.log('Image verified successfully');
                 } else {
+                    //checking warning 
+                    const warningsLeft = Cookies.get(`warn/${testId}`);
+                    
+                    if (warningsLeft === 0) {
+                        //submit the test
+                        alert("Voilation detected. No warning left. Submitting the test");
+                        handleTestSubmit();
+                    } else {
+                        //reduce the number of warnings
+                        alert(`Voilation detected. You have ${warningsLeft} warnings left`);
+                        warningsLeft--;
+                        Cookies.set(`warn/${testId}`, warningsLeft, { expires: 1 });
+                    }
+
                     console.log(`Error(sending-image) : ${data.error}`);
                 }
             } else {
@@ -78,7 +97,7 @@ const WebcamCapture = () => {
     };
 
     return <video ref={videoRef} autoPlay playsInline
-        // style={{ display: "none" }}
+    // style={{ display: "none" }}
     />
 
 };
