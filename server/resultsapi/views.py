@@ -10,7 +10,7 @@ import traceback
 from datetime import timedelta
 from django.utils import timezone
 import uuid
-from ..api.permissions import IsStudent
+from api.permissions import IsStudent
 from datetime import datetime
 
 
@@ -43,7 +43,7 @@ class RegisterStudentForTestView(APIView):
             # if userProfile.type not in ("Student", "student"):
             #     jsonresponse["error"] = "user must be student"
             #     return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-            current_time = datetime.now()
+            current_time = timezone.now()
             if current_time >= test.start:
                 jsonresponse = {
                     "ok": False,
@@ -145,10 +145,10 @@ class GetResultForStudent(APIView):
             # ongoing test
             start = test.start
             end = start + timedelta(seconds=test.duration)
-            if datetime.now() <= start:
+            if timezone.now() <= start:
                 jsonresponse["error"] = "The test has not yet started"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-            elif end >= datetime.now():
+            elif end >= timezone.now():
                 jsonresponse["error"] = "The test is still ongoing"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 

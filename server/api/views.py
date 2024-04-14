@@ -20,6 +20,8 @@ import json
 import uuid
 from .permissions import IsStudent, IsInstitute
 from datetime import datetime, timedelta
+from dateutil import parser
+from django.utils import timezone
 
 
 class LoginView(TokenObtainPairView):
@@ -187,7 +189,7 @@ class startTest(APIView):
         test = Test.objects.get(id=test_id)
         registrations = test.registrations.split(",")
         if user_email in registrations:
-            current_time = datetime.now()
+            current_time = timezone.now()
             if current_time < test.start:
                 jsonresponse = {
                     "ok": False,
@@ -227,6 +229,11 @@ class startTest(APIView):
             }
             return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
 
+def remove(id, tests):
+    testsList = tests.split(',')
+    testsList = [i for i in testsList if i != str(id)]
+    return ','.join(testsList)
+    
 
 class deleteTest(APIView):
     permission_classes = (IsAuthenticated,)
@@ -249,6 +256,16 @@ class deleteTest(APIView):
                 "error": "You are not authorized to delete this test",
             }
             return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+        author = User.objects.get(username=user_email)
+        institute = UserProfile.objects.get(user_id=author)
+        institute.tests = remove(test.id, institute.tests)
+        institute.save()
+        if(test.registrations != ""):
+            for student in test.registrations.split(','):
+                studentUser = User.objects.get(username=student)
+                studentProfile = UserProfile.objects.get(user_id=studentUser)
+                studentProfile.tests = remove(test.id, studentProfile.tests)
+                studentProfile.save()
         test.delete()
         jsonresponse = {"ok": True, "message": "Test deleted successfully"}
         return Response(jsonresponse, status=status.HTTP_200_OK)
@@ -280,7 +297,8 @@ class createTest(APIView):
         except:
             jsonresponse = {"ok": False, "error": "Invalid input"}
 
-        if start < datetime.now():
+        if parser.parse(start) < timezone.now():
+            
             jsonresponse = {
                 "ok": False,
                 "error": "We expect the start time to be some time in future",
@@ -401,15 +419,15 @@ class UpdateTest(APIView):
                 "error": "You do not have access to update",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        start = test.start
-        end = start + timedelta(seconds=test.duration)
-        if start <= datetime.now() and datetime.now() <= end:
+        old_start = test.start
+        old_end = old_start + timedelta(seconds=test.duration)
+        if old_start <= timezone.now() and timezone.now() <= old_end:
             jsonresponse = {
                 "ok": False,
                 "error": "The test is ongoing. You can't update.",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        elif datetime.now() >= end:
+        elif timezone.now() >= old_end:
             jsonresponse = {
                 "ok": False,
                 "error": "The test has already ended. You can't update.",
@@ -418,6 +436,12 @@ class UpdateTest(APIView):
         try:
             if duration < 0:
                 jsonresponse = {"ok": False, "error": "Invalid duration"}
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            if parser.parse(start) < timezone.now():
+                jsonresponse = {
+                    "ok": False,
+                    "error": "We expect the start time to be some time in future",
+                }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             for question in questions:
                 if question["type"].split("_")[0] not in (

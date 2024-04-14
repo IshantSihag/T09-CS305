@@ -26,6 +26,7 @@ import datetime
 from datetime import timedelta
 import pytz
 import uuid
+from django.utils import timezone
 
 utc = pytz.UTC
 
@@ -131,12 +132,12 @@ class SubmitTestView(APIView):
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         end_time = test.start + timedelta(seconds=test.duration)
-        if datetime.now() < test.start:
+        if timezone.now() < test.start:
             return Response(
                 {"ok": False, "error": "The test has not started yet."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if datetime.now() > end_time:
+        if timezone.now() > end_time:
             return Response(
                 {"ok": False, "error": "The test has already ended."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -255,9 +256,9 @@ class DashboardView(APIView):
         for test_id in tests:
             if test_id != "":
                 test = Test.objects.get(id=test_id)
-                if test.start.replace(tzinfo=utc) + timedelta(
+                if test.start + timedelta(
                     seconds=test.duration
-                ) > datetime.datetime.now().replace(tzinfo=utc):
+                ) > timezone.now():
                     jsonresponse["upcomingtests"].append(
                         {
                             "id": test.id,
