@@ -197,8 +197,6 @@ class TestGetResultForStudentAPI(APITestCase):
         self.assertIn("Test not found", result["error"])
 
 
-
-
 class RegisterStudentForTestViewTest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(
