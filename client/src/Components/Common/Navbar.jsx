@@ -44,6 +44,7 @@ const Navbar = () => {
             Cookies.remove('refresh');
             Cookies.remove('type');
             Cookies.remove('name');
+            Cookies.remove('email');
             navigate('/');
           } else {
             console.log("Logout Failed Please try again");
@@ -63,7 +64,7 @@ const Navbar = () => {
               {
                 type==='institute'?(
                   <div>
-                    <a href="http://localhost:3000/institute" class="navbar-brand">
+                    <a href="http://localhost:3000/institution" class="navbar-brand">
                       Institute
                     </a>
                     <button onClick={handleLogout} class="navbar-brand">LOGOUT</button>

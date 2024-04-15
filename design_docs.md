@@ -13,10 +13,15 @@
     - [Get Test](#get-test)
     - [Start Test](#start-test)
     - [Delete Test](#delete-test)
+    - [Update Test](#update-test)
     - [Register Student for Test](#register-student-for-test)
     - [Get Result for Student](#get-result-for-student)
     - [Test Result](#test-result)
     - [Submit Test](#submit-test)
+    - [Test Rating](#test-rating)
+    - [Fetch Test](#fetch-test)
+4. [Student](#student)
+    - [Fetch Student Details](#fetch-student-details)
     
 
 ## Introduction
@@ -346,6 +351,106 @@ Content-Type: application/json
     "error": "Invalid request"
 }
 ```
+### Update Test
+
+This endpoint updates a test for the authenticated institute.
+
+Update Test Request:
+
+```http
+POST /api/update-test
+Content-Type: application/json
+
+{
+    "title": "New Test Title",
+    "start": "2024-04-10 10:00:00",
+    "duration": 60,
+    "questions": [
+        {
+            "id": "Question ID",
+            "statement": "What is the capital of France?",
+            "type": "single_choice",
+            "marks": 5,
+            "choices": [
+                {
+                    "value": "Paris",
+                    "isCorrect": true
+                },
+                {
+                    "value": "London",
+                    "isCorrect": false
+                }
+            ]
+        }
+    ],
+    "test_id": "Test ID"
+}
+```
+
+Update Test Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "ok": true,
+    "message": "Test updated successfully",
+    "test_id": "Test ID"
+}
+```
+2. **Invalid Request Body:** If the request body is not as intended or missing required fields, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+    "ok": false,
+    "error": "body of the request not as intended"
+}
+
+```
+
+3. **Test Not Found:** If the specified test ID does not correspond to any existing test in the database, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+    "ok": false,
+    "error": "Test not found"
+}
+```
+
+
+
+4. **User Not Valid:** If the user making the request is not considered a valid user, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+    "ok": false,
+    "error": "Only insitute profile allowed access this resource"
+}
+
+```
+
+5. **Other:** Any other error apart from the one mentioned above, the server response with a 400 Bad Request status code and a JSON object containing an error message.
+```
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+    "ok": false,
+    "error": "Error message specific to the error"
+}
+```
 
 ### Register Student for Test
 
@@ -470,7 +575,7 @@ Content-Type: application/json
 
 ### Test Result
 
-This endpoint retrieves the test result for a student.
+This endpoint retrieves the test result for an Institute.
 
 Test Result Request:
 ```http
@@ -487,8 +592,12 @@ Content-Type: application/json
     "ok": true,
     "result": [
         {
-            "name": "Student Name",
-            "score": "Score obtained by the student"
+            "name": "Name of Student",
+            "cgpa": "Student's CGPA",
+            "phoneNo": "Student's Phone number",
+            "batch": "Student's Batch eg. 2021",
+            "course": "Student's Course eg. BTech",
+            "score": "total score achieved by the student"
         },
         ...
     ]
@@ -549,3 +658,203 @@ Content-Type: application/json
 }
 ```
 
+### Test Rating
+
+This endpoint rates a test for the authenticated student.
+
+Test Rating Request:
+```http
+POST /submitTestRating
+Content-Type: application/json
+{
+    "test_id": "ID of the test to rate",
+    "rating": "Rating for the test",
+    "suggestion": "Suggestion for the test"
+}
+```
+
+Test Rating Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "message": "Rating saved successfully"
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Invalid request"
+}
+```
+
+### Fetch Test
+
+This endpoint retrieves the test details with answer key for the authenticated institute.
+
+Fetch Test Request:
+```http
+GET /fetchTest?test_id=ID of the test to fetch
+```
+
+Fetch Test Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing the test details.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "start": "YYYY-MM-DDTHH:MM:SSZ",
+    "duration": "3600",      // in seconds
+    "author": "Author's Email",
+    "title": "Test Title",
+    "questions": [
+        {
+            "statement": "Question Statement",
+            "type": "Question Type",
+            "marks": "Question Marks",
+            "options": ["Option 1", "Option 2", ...],
+            "answer": "Answer to the question"
+        },
+        ...
+    ]
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message describing the issue"
+}
+```
+
+
+
+## Student
+
+
+### Fetch Student Details
+
+This API endpoint retrieves details of the authenticated student.
+
+The Fetch Student Detail request:
+```http
+
+GET /student/fetchStudentDetails
+```
+
+Fetch Student Response
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "phone_number": "123-456-7890",
+    "cgpa": 8.7,
+    "batch": "2021",
+    "course": "Computer Science"
+    "bio": "An aspiring Computer Scientist in the field of Cybersecurity and zero knowledge proofs"
+    "profile_url":"https://drive/sdasa.png"
+}
+```
+
+2. If the login credentials are not that of a student, the server responds with a 400 Bad Request and a JSON object containing an error message.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Need to login through a student credentials"
+}
+```
+3. Any other error apart from the one mentioned above, the server response with 500 Internal Server Error
+
+```http
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message specific to the error"
+}
+```
+
+### Update Student Details
+
+This endpoint allows authenticated students to update their details, including both their student information and user profile.
+
+The Update Student Detail request:
+
+```http
+POST student/updateStudentDetails
+Content-Type: application/json
+
+{
+    "phone_number": "Phone number of the student",
+    "cgpa": "Cumulative grade point average (CGPA) of the student",
+    "batch": "Batch/joining year of the student",
+    "course": "Course of study of the student",
+    "bio": "Bio information of the user",
+    "profile_url": "URL to the user's profile picture"
+}
+```
+
+
+Update Student Details Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "message": "Successfully updated the details"
+}
+```
+
+2. If incorrect body is passed to the request, then server returns the required fields that it is expecting
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Body fields not correct. Expecting phone_number, cgpa, batch, course, bio, profile_url"
+}
+```
+3. If the authenticated user is not of type student then, the server cannot provide the resource and hence error
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Need to login through student credentials"
+}
+```
+
+4. General error, the ones that are not mentioned above, the server response with 500 Internal Server Error
+
+```http
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message specific to the error"
+}
+```
