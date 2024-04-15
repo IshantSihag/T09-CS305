@@ -19,6 +19,7 @@
     - [Test Result](#test-result)
     - [Submit Test](#submit-test)
     - [Test Rating](#test-rating)
+    - [Fetch Test](#fetch-test)
 4. [Student](#student)
     - [Fetch Student Details](#fetch-student-details)
     
@@ -694,6 +695,52 @@ Content-Type: application/json
 }
 ```
 
+### Fetch Test
+
+This endpoint retrieves the test details with answer key for the authenticated institute.
+
+Fetch Test Request:
+```http
+GET /fetchTest?test_id=ID of the test to fetch
+```
+
+Fetch Test Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing the test details.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "start": "YYYY-MM-DDTHH:MM:SSZ",
+    "duration": "3600",      // in seconds
+    "author": "Author's Email",
+    "title": "Test Title",
+    "questions": [
+        {
+            "statement": "Question Statement",
+            "type": "Question Type",
+            "marks": "Question Marks",
+            "options": ["Option 1", "Option 2", ...],
+            "answer": "Answer to the question"
+        },
+        ...
+    ]
+}
+```
+
+2. If the request is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message.
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message describing the issue"
+}
+```
+
+
+
 ## Student
 
 
@@ -736,6 +783,72 @@ Content-Type: application/json
 }
 ```
 3. Any other error apart from the one mentioned above, the server response with 500 Internal Server Error
+
+```http
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Error message specific to the error"
+}
+```
+
+### Update Student Details
+
+This endpoint allows authenticated students to update their details, including both their student information and user profile.
+
+The Update Student Detail request:
+
+```http
+POST student/updateStudentDetails
+Content-Type: application/json
+
+{
+    "phone_number": "Phone number of the student",
+    "cgpa": "Cumulative grade point average (CGPA) of the student",
+    "batch": "Batch/joining year of the student",
+    "course": "Course of study of the student",
+    "bio": "Bio information of the user",
+    "profile_url": "URL to the user's profile picture"
+}
+```
+
+
+Update Student Details Response:
+
+1. If the request is successful, the server will respond with a 200 OK status code and a JSON object containing a success message.
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "ok": true,
+    "message": "Successfully updated the details"
+}
+```
+
+2. If incorrect body is passed to the request, then server returns the required fields that it is expecting
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Body fields not correct. Expecting phone_number, cgpa, batch, course, bio, profile_url"
+}
+```
+3. If the authenticated user is not of type student then, the server cannot provide the resource and hence error
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "ok": false,
+    "error": "Need to login through student credentials"
+}
+```
+
+4. General error, the ones that are not mentioned above, the server response with 500 Internal Server Error
 
 ```http
 HTTP/1.1 500 Internal Server Error

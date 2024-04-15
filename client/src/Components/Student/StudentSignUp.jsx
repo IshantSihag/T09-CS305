@@ -11,6 +11,8 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 
+import { ToastContainer, notifyError, notifySuccess } from '../UI/ToastNotification';
+
 export default function InstitutionSignUp() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
@@ -20,12 +22,18 @@ export default function InstitutionSignUp() {
 
   const validateEmail = () => {
     // Simple email validation
+    setIsValidEmail(true);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setIsValidEmail(emailRegex.test(email));
   };
 
   const handleSignup = async() => {
     validateEmail();
+    if(!name || !email || !password) {
+      console.log("Please fill all the fields");
+      notifyError("Please fill all the fields");
+      return;
+    }
     if (isValidEmail) {
       console.log("Signup with name : ", name, "email:", email, "and password:", password);
        
@@ -42,23 +50,25 @@ export default function InstitutionSignUp() {
 
       console.log(response);
 
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         if (data.ok) {
           console.log("Signup Successfully");
+          notifySuccess("Signup Successful");
           navigate("/student/login");  
         } else {
           const errMsg = data?.error || "Error in Signup, Please try again";
-          alert(errMsg);
+          notifyError(errMsg);
           console.log(errMsg);
         }
       } else {
         console.log("Signup Failed Please try again");
+        notifyError(data?.error || "Error in Signup, Please try again");
       }
 
 
     } else {
-      alert("Please enter a valid email");
+      notifyError("Please enter a valid email");
       console.error("Invalid email address");
     }
   };
@@ -110,6 +120,7 @@ export default function InstitutionSignUp() {
           </Typography>
         </CardFooter>
       </Card>
+      <ToastContainer />
     </div>
   );
 }
