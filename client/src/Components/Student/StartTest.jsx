@@ -42,29 +42,8 @@ const StartTest = () => {
     }
   };
 
-  const handleFullscreen = () => {
-    const element = document.documentElement;
-    if (element.requestFullscreen) {
-      element.requestFullscreen().catch((err) => {
-        console.error("Fullscreen request failed:", err);
-      });
-    } else if (element.mozRequestFullScreen) {
-      element.mozRequestFullScreen().catch((err) => {
-        console.error("Fullscreen request failed:", err);
-      });
-    } else if (element.webkitRequestFullscreen) {
-      element.webkitRequestFullscreen().catch((err) => {
-        console.error("Fullscreen request failed:", err);
-      });
-    } else if (element.msRequestFullscreen) {
-      element.msRequestFullscreen().catch((err) => {
-        console.error("Fullscreen request failed:", err);
-      });
-    }
-  };
-
   const handleStartTest = async () => {
-    ocument.getElementById("studentName").value &&
+      const isDetailsFilled = document.getElementById("studentName").value &&
       document.getElementById("dob").value &&
       document.getElementById("email").value &&
       document.getElementById("phone").value;
