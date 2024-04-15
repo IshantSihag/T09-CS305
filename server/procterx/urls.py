@@ -25,4 +25,5 @@ urlpatterns = [
     path("", include("api.urls")),
     path("", include("resultsapi.urls")),
     path("", include("testsapi.urls")),
+    path("", include("verificationApi.urls")),
 ]

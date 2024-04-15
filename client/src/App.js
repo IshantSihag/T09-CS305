@@ -41,7 +41,7 @@ const App = () => {
           <Route exact path="/institution/createtest/preview" element={<CreateTestPreview />} />
           <Route exact path="/student/result" element={<StudentResultPage />} />
           <Route exact path="/institution/testresult" element={<InstituteTestResult />} />
-          <Route exact path="/student/review" element={<StudentReview />} />
+          <Route exact path="/student/review/:id" element={<StudentReview />} />
           <Route exact path="/student/info" element={<Studentinfo />} />
         </Routes>
       </Router>
