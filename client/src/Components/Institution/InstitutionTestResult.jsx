@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import Footer from '../Common/Footer';
 import Navbar from '../Common/Navbar';
 import { Card, CardHeader, CardBody, CardFooter, Typography, Button } from '@material-tailwind/react'; // Import your component library
+import fetchAPI from '../Tools/FetchAPI';
 
 const InstituteTestResult = () => {
   const [students, setStudents] = useState([
-    { id: 1, name: 'John', marks: 85 },
-    { id: 2, name: 'Alice', marks: 90 },
-    { id: 3, name: 'Bob', marks: 75 },
-    { id: 4, name: 'Eve', marks: 88 },
-    { id: 5, name: 'Charlie', marks: 92 },
+    { id: 1, name: 'John', marks: 85, cgpa: 8.5, phoneNo: '1234567890', batch: '2023', course: 'Computer Science' },
+    { id: 2, name: 'Alice', marks: 90, cgpa: 9.0, phoneNo: '9876543210', batch: '2022', course: 'Electrical Engineering' },
+    { id: 3, name: 'Bob', marks: 75, cgpa: 7.5, phoneNo: '2345678901', batch: '2024', course: 'Mechanical Engineering' },
+    { id: 4, name: 'Eve', marks: 88, cgpa: 8.8, phoneNo: '8901234567', batch: '2023', course: 'Civil Engineering' },
+    { id: 5, name: 'Charlie', marks: 92, cgpa: 9.2, phoneNo: '3456789012', batch: '2022', course: 'Chemical Engineering' },
   ]);
+
+  const [testid, setTestId] = useState('')
   const [mean, setMean] = useState(0);
   const [median, setMedian] = useState(0);
   const [mode, setMode] = useState(0);
@@ -18,6 +21,30 @@ const InstituteTestResult = () => {
   const [aboveAverageCount, setAboveAverageCount] = useState(0);
   const [belowAverageCount, setBelowAverageCount] = useState(0);
 
+  let api = `http://localhost:5000/api`
+  useEffect(() => {
+    const fetchResult = async () => {
+      let response = await fetchAPI(`${api}/testresult?test_id=${testid}`, {}, "GET", false)
+      if (response.ok) {
+        let students = response.result
+        for (let i = 0; i < students.length; i++) {
+          students[i] = {
+            id: i + 1,
+            name: students[i].name,
+            marks: parseInt(students[i].score),
+            cgpa: students[i].cgpa,
+            phoneNo: students[i].phoneNo,
+            batch: students[i].batch,
+            course: students[i].course
+          }
+        }
+        setStudents(students)
+      }
+      else {
+        // error statement
+      }
+    }
+  }, [])
   useEffect(() => {
     calculateMean(students);
     calculateMedian(students);
@@ -69,19 +96,19 @@ const InstituteTestResult = () => {
   return (
     <div>
       <Navbar />
-      <div className="mt-4 h-screen flex items-center place-content-center">
-        <Card className="w-96">
+      <div className="mt-8 flex items-center justify-center">
+        <Card className="w-full md:w-4/4 lg:w-1/2 xl:w-1/2">
           <CardHeader
             variant="gradient"
             color="gray"
-            className="flex-1 mb-4 grid h-28 place-items-center"
+            className="mb-4 grid h-28 place-items-center"
           >
             <Typography variant="h3" color="white">
               Student Marks
             </Typography>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
-            <table className="w-full mb-8">
+            <table className="w-full mb-8 table-auto sm:w-auto md:w-full lg:w-auto xl:w-full">
               <thead>
                 <tr>
                   <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -90,6 +117,18 @@ const InstituteTestResult = () => {
                   <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Marks
                   </th>
+                  <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    CGPA
+                  </th>
+                  <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Phone Number
+                  </th>
+                  <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Batch
+                  </th>
+                  <th className="px-6 py-3 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Course
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -97,6 +136,10 @@ const InstituteTestResult = () => {
                   <tr key={student.id}>
                     <td className="border px-6 py-4">{student.name}</td>
                     <td className="border px-6 py-4">{student.marks}</td>
+                    <td className="border px-6 py-4">{student.cgpa}</td>
+                    <td className="border px-6 py-4">{student.phoneNo}</td>
+                    <td className="border px-6 py-4">{student.batch}</td>
+                    <td className="border px-6 py-4">{student.course}</td>
                   </tr>
                 ))}
               </tbody>

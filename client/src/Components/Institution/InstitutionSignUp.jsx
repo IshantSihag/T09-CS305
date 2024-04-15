@@ -11,13 +11,15 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 
+import { ToastContainer, notifyError, notifySuccess } from '../UI/ToastNotification';
+
 export default function InstitutionSignUp() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleValidation = async() => {
+  const handleValidation = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);  
   };
@@ -25,6 +27,10 @@ export default function InstitutionSignUp() {
   const handleSignup = async() => {
     // Handle signup logic here
     console.log("Signing up with:", name, email, password);
+    if(!name || !email || !password) {
+      notifyError("Please fill all the fields");
+      return;
+    }
     if (handleValidation()) {
       const formData = new FormData();
 
@@ -38,23 +44,25 @@ export default function InstitutionSignUp() {
         body: formData
       });
 
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         if (data.ok) {
           console.log("Signup Successfully");
+          notifySuccess("Signup Successful");
           navigate("/institution/login");  
         } else {
           const errMsg = data?.error || "Error in Signup, Please try again";
-          alert(errMsg);
+          notifyError(errMsg);
           console.log(errMsg);
         }
       } else {
         console.log("Signup Failed Please try again");
+        notifyError(data?.error || "Error in Signup, Please try again");
       }
 
       console.log(response);
     } else {
-      alert("Please enter a valid email");
+      notifyError("Please enter a valid email");
       console.error("Invalid email address");
     }
   };
@@ -85,6 +93,7 @@ export default function InstitutionSignUp() {
           <Input
             label="Password"
             size="lg"
+            type="password"
             onChange={(e) => setPassword(e.target.value)}
           />
           <div className="-ml-2.5">
@@ -118,6 +127,7 @@ export default function InstitutionSignUp() {
           </Typography>
         </CardFooter>
       </Card>
+      <ToastContainer />
     </div>
   );
 }

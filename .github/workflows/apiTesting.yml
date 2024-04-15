@@ -33,3 +33,4 @@ jobs:
         python server/manage.py makemigrations
         python server/manage.py test api
         python server/manage.py test resultsapi
+        python server/manage.py test testsapi

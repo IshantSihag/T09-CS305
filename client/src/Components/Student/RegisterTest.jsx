@@ -11,46 +11,101 @@ import {
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import { useNavigate, useParams } from 'react-router-dom';
+import secondsToHMS from '../../Utils/secondsToHMS';
 
 function RegisterTest() {
   const navigate = useNavigate();
 
   const { id } = useParams();
   const [testData, setTestData] = useState({
-    tittle: "",
-    description: "",
+    title: "",
     duration: "",
-    total_marks: "",
-    questions_no: "",
+    marks: "",
+    questions: "",
     date: "",
-    start_time: "",
+    time: "",
   })
-
-  const fetchData = async () => {
-    const response = await fetch('http://localhost:8000/gettest/1', {
-      method: "GET",
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Cookies.get('access')}`
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data);
-      setTestData(data);
-    } else {
-      console.log("Failed to fetch data");
-    }
-  }
 
   useEffect(() => {
     let access = Cookies.get('access')
     if (!access) {
       navigate('/student/login');
     }
-    // fetchData();
-  }, [])
+  })
+
+  // useEffect(() => {
+  //   let access = Cookies.get('access')
+  //   if (!access) {
+  //     navigate('/student/login');
+  //   }
+  //   // fetchData();
+  // }, [])
+
+  useEffect(() => {
+    const fetchTestDetails = async () => {
+      try {
+        //accessing access token from cookies 
+        const accessToken = Cookies.get('access');
+
+        if (!accessToken) {
+          console.log("Access token not found, User not authorized");
+          alert("User not authorized, Please Login");
+          navigate('/student/login');
+
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('test_id', id);
+
+        const res = await fetch(`http://127.0.0.1:8000/getTestDetails/`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: formData
+        })
+
+        if (res.ok) {
+          const data = await res.json();
+
+          if (data.ok) {
+            const logMsg = "Test Details fetched successfully";
+            console.log(logMsg);
+
+            setTestData({
+              title: data.title,
+              duration: data.duration,
+              marks: data.marks,
+              questions: data.questions,
+              date: data.date,
+              time: data.time,
+            });
+
+          } else {
+            console.log(`Error in fetching test details: ${data.error}`);
+          }
+        } else {
+          //CHECK: for unauthorized request, user redirected to login
+          if (res.status === 401) {
+            console.log("Unauthorized : Please login");
+            alert("Unauthorized : Please login");
+            navigate('/student/login');
+
+            return;
+          }
+          console.log(`Error in fetching test details`);
+        }
+      } catch (err) {
+        console.log(`Error in fetching test details : ${err.message}`);
+        alert('Error in fetching test details');
+      }
+    };
+
+    fetchTestDetails();
+  }, []);
+
+
 
 
   const testTitle = "UI/UX Review Check"
@@ -62,14 +117,9 @@ function RegisterTest() {
   const testStartTime = "09:00 am"
   const testInstructions = "1. Log in to your account to access the test.\n2. Read all instructions carefully before beginning the test.\n3. Ensure you have a stable internet connection throughout the test.\n4. You will be proctored during the test to maintain integrity.\n5. Manage your time wisely and answer each question to the best of your ability.\n6. Submit the test before the designated time limit expires."
 
-  useEffect(() => {
-    let access = Cookies.get('access')
-    if (!access) {
-      navigate('/student/login');
-    } 
-  })
+  
 
-  const handleRegister = async() => {
+  const handleRegister = async () => {
     let access = Cookies.get('access');
     if (!access) {
       navigate('/student/login');
@@ -77,7 +127,7 @@ function RegisterTest() {
     const sendData = new FormData();
     sendData.append('test_id', id);
     console.log(id);
-    try{
+    try {
       const response = await fetch('http://localhost:8000/student/registerForTest/', {
         method: "POST",
         headers: {
@@ -91,20 +141,19 @@ function RegisterTest() {
         console.log(data);
         navigate('/student');
       }
-    } catch(err) {
+    } catch (err) {
       console.log("Failed to register for test. error:", err);
     }
   }
 
-  
   return (
     <div>
       <Navbar />
       <div className='flex p-3 gap-x-2 items-center bg-gray-50'>
         <Card className="h-svh w-screen">
-          <CardHeader floated={false} shadow={false} >  
+          <CardHeader floated={false} shadow={false} >
             <Typography variant="h4" color="blue-gray" className="mb-2">
-              {testTitle}
+              {testData.title}
             </Typography>
             <Typography className='text-justify'>
               {testDescription}
@@ -123,10 +172,10 @@ function RegisterTest() {
               <div className=' w-1/2 h-full grid grid-cols-2 place-content-evenly place-items-center gap-y-4'>
                 <div className=' w-5/6 p-2 h-fit bg-gray-100 rounded-[30px]'>
                   <Typography variant="h6" color="blue-gray" className="text-center">
-                    Test Duration 
+                    Test Duration
                   </Typography>
                   <Typography className='text-center'>
-                    {testDuration} minutes
+                    {secondsToHMS(testData.duration)} 
                   </Typography>
                 </div>
                 <div className=' w-5/6 p-2 h-fit bg-gray-100 rounded-[30px]'>
@@ -134,7 +183,7 @@ function RegisterTest() {
                     Test Date
                   </Typography>
                   <Typography className='text-center'>
-                    {testDate} 
+                    {testData.date}
                   </Typography>
                 </div>
                 <div className=' w-5/6 p-2 h-fit bg-gray-100 rounded-[30px]'>
@@ -142,7 +191,7 @@ function RegisterTest() {
                     Test Start time
                   </Typography>
                   <Typography className='text-center'>
-                    {testStartTime}
+                    {testData.time}
                   </Typography>
                 </div>
                 <div className=' w-5/6 p-2 h-fit bg-gray-100 rounded-[30px]'>
@@ -150,7 +199,7 @@ function RegisterTest() {
                     Test Marks
                   </Typography>
                   <Typography className='text-center'>
-                    {testMarks}
+                    {testData.marks}
                   </Typography>
                 </div>
                 <div className=' w-5/6 p-2 h-fit bg-gray-100 rounded-[30px]'>
@@ -158,22 +207,22 @@ function RegisterTest() {
                     Test Questions
                   </Typography>
                   <Typography className='text-center'>
-                    {testQuestions}
+                    {testData.questions}
                   </Typography>
                 </div>
-              </div>              
+              </div>
             </div>
           </CardBody>
           <CardFooter className="pt-0 flex justify-center">
-            <Button 
-            className='w-1/2 rounded-2xl'
-            onClick={() => {
-              window.location.href = '/student';
-              handleRegister(); 
-            }}
+            <Button
+              className='w-1/2 rounded-2xl'
+              onClick={() => {
+                window.location.href = '/student';
+                handleRegister();
+              }}
             >
               Register
-              </Button>
+            </Button>
           </CardFooter>
         </Card>
       </div>
