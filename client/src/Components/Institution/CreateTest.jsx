@@ -207,7 +207,7 @@ export default function CreattTest() {
     
     const sendData = new FormData();
     sendData.append("title", testData.title);
-    sendData.append("start", testData.start);
+    sendData.append("start", testData.start+" +0530");
     sendData.append("duration", testData.duration);
     sendData.append("questions", JSON.stringify(questions));
 

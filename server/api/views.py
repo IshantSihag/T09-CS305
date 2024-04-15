@@ -229,11 +229,12 @@ class startTest(APIView):
             }
             return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
 
+
 def remove(id, tests):
-    testsList = tests.split(',')
+    testsList = tests.split(",")
     testsList = [i for i in testsList if i != str(id)]
-    return ','.join(testsList)
-    
+    return ",".join(testsList)
+
 
 class deleteTest(APIView):
     permission_classes = (IsAuthenticated,)
@@ -256,12 +257,26 @@ class deleteTest(APIView):
                 "error": "You are not authorized to delete this test",
             }
             return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+        old_start = test.start
+        old_end = old_start + timedelta(seconds=test.duration)
+        if old_start <= timezone.now() and timezone.now() <= old_end:
+            jsonresponse = {
+                "ok": False,
+                "error": "The test is ongoing. You can't delete.",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        elif timezone.now() >= old_end:
+            jsonresponse = {
+                "ok": False,
+                "error": "The test has already ended. You can't delete.",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         author = User.objects.get(username=user_email)
         institute = UserProfile.objects.get(user_id=author)
         institute.tests = remove(test.id, institute.tests)
         institute.save()
-        if(test.registrations != ""):
-            for student in test.registrations.split(','):
+        if test.registrations != "":
+            for student in test.registrations.split(","):
                 studentUser = User.objects.get(username=student)
                 studentProfile = UserProfile.objects.get(user_id=studentUser)
                 studentProfile.tests = remove(test.id, studentProfile.tests)
@@ -298,7 +313,7 @@ class createTest(APIView):
             jsonresponse = {"ok": False, "error": "Invalid input"}
 
         if parser.parse(start) < timezone.now():
-            
+
             jsonresponse = {
                 "ok": False,
                 "error": "We expect the start time to be some time in future",

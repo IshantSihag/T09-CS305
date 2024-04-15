@@ -256,9 +256,7 @@ class DashboardView(APIView):
         for test_id in tests:
             if test_id != "":
                 test = Test.objects.get(id=test_id)
-                if test.start + timedelta(
-                    seconds=test.duration
-                ) > timezone.now():
+                if test.start + timedelta(seconds=test.duration) > timezone.now():
                     jsonresponse["upcomingtests"].append(
                         {
                             "id": test.id,
