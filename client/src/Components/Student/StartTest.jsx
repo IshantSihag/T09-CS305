@@ -21,7 +21,37 @@ const StartTest = () => {
     navigate("/student/");
   };
 
+  const handleFullscreen = () => {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      element.requestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    }
+  };
+
   const handleStartTest = async () => {
+      const isDetailsFilled = document.getElementById("studentName").value &&
+      document.getElementById("dob").value &&
+      document.getElementById("email").value &&
+      document.getElementById("phone").value;
+
+    if (!isDetailsFilled) {
+      alert("Please fill in all details before starting the test.");
+      return;
+    }
     if (!photoCaptured) {
       alert("Please capture a photo before starting the test.");
       return;
@@ -43,6 +73,8 @@ const StartTest = () => {
       navigate(`/student/attemptest/${id}`);
     }
     // Redirect to test page
+    handleFullscreen();
+    navigate(`/student/attemptest/${id}`);
   };
 
   const handleCheckboxChange = () => {
