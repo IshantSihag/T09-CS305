@@ -26,6 +26,7 @@ import datetime
 from datetime import timedelta
 import pytz
 import uuid
+from django.utils import timezone
 
 utc = pytz.UTC
 
@@ -276,9 +277,7 @@ class DashboardView(APIView):
         for test_id in tests:
             if test_id != "":
                 test = Test.objects.get(id=test_id)
-                if test.start.replace(tzinfo=utc) + timedelta(
-                    seconds=test.duration
-                ) > datetime.datetime.now().replace(tzinfo=utc):
+                if test.start + timedelta(seconds=test.duration) > timezone.now():
                     jsonresponse["upcomingtests"].append(
                         {
                             "id": test.id,
