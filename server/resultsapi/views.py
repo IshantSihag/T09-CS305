@@ -50,9 +50,20 @@ class RegisterStudentForTestView(APIView):
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
             registrations = test.registrations.split(",")
             registrations = [registration.strip() for registration in registrations]
+
             if str(user.email) in registrations:
                 jsonresponse["error"] = "You are already registered for the Test"
                 return Response(jsonresponse, status=status.HTTP_409_CONFLICT)
+
+            start = test.start
+            end = start + timedelta(seconds=test.duration)  # end time of the test
+
+            if end <= timezone.now():
+                # when the request is recieved at the server. All calcutaion are timezone sensitive
+                # it is ok, even if the timezone of the tiem stored in the start is different
+                # form the current timezone.
+                jsonresponse["error"] = "Test already ended"
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
             # adding student_id to registrations for the test
             if len(test.registrations):
@@ -62,6 +73,7 @@ class RegisterStudentForTestView(APIView):
             test.save()
 
             # adding test_id to registrations for the student
+            # I have used str convertion otherwise it would throw error
             if len(userProfile.tests):
                 userProfile.tests += "," + str(test.id)
             else:
