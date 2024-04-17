@@ -11,6 +11,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 
+import { ToastContainer, notifyError, notifySuccess } from '../UI/ToastNotification';
+
 const InstituteLogin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -26,6 +28,11 @@ const InstituteLogin = () => {
   const handleLogin = async() => {
     // Perform login logic here
     validateEmail();
+    if(!email || !password) {
+      console.log("Please fill all the fields");
+      notifyError("Please fill all the fields");
+      return;
+    }
     if (isValidEmail) {
       console.log("Institute Login with email:", email, "and password:", password);
       
@@ -41,10 +48,11 @@ const InstituteLogin = () => {
       });
 
       console.log(response);
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         if (data.ok) {
           console.log("Login Successfully");
+          notifySuccess("Login Successful");
 
           //setting up the cookies with the fetched data
           Cookies.set('access', data.access, { expires: 1, path: '/' });          
@@ -52,18 +60,20 @@ const InstituteLogin = () => {
           Cookies.set('type', data.type, { expires: 1, path: '/' });      
           Cookies.set('name', data.name, { expires: 1, path: '/' });    
 
-          navigate("/");  
+          navigate("/ ");  
         } else {
           const errMsg = data?.error || "Error in Signup, Please try again";
-          alert(errMsg);
+          notifyError(errMsg);
           console.log(errMsg);
         }
       } else {
         console.log("Login Failed Please try again");
+        notifyError(data?.error || "Error in Login, Please try again");
       }
 
     } else {
       console.error("Invalid email address");
+      notifyError("Please enter a valid email");
     }
   };
 
@@ -117,6 +127,7 @@ const InstituteLogin = () => {
           </Typography>
         </CardFooter>
       </Card>
+      <ToastContainer />
     </div>
   );
 };
