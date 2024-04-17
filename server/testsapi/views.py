@@ -115,6 +115,7 @@ class SubmitTestView(APIView):
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         # If test_id is not valid
+
         if not Test.objects.filter(id=test_id).exists():
             return Response(
                 {
@@ -124,22 +125,43 @@ class SubmitTestView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         test = Test.objects.get(id=test_id)
-        registrations = test.registrations.split(",")
-        if request.user.email not in registrations:
-            jsonresponse = {
-                "ok": False,
-                "error": "You were not registered for this test",
-            }
-            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-        end_time = test.start + timedelta(seconds=test.duration)
-        if timezone.now() < test.start:
+        if request.user.email not in test.registrations.split(","):
             return Response(
-                {"ok": False, "error": "The test has not started yet."},
+                {
+                    "ok": False,
+                    "error": "You are not registered for this test",
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if timezone.now() > end_time:
+
+        startTime = test.start
+        duration = test.duration
+        endTime = startTime + timedelta(seconds=duration + 5)
+
+        if datetime.datetime.now().replace(tzinfo=utc) < startTime:
             return Response(
-                {"ok": False, "error": "The test has already ended."},
+                {
+                    "ok": False,
+                    "error": "Test has not started yet",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if datetime.datetime.now().replace(tzinfo=utc) > endTime:
+            return Response(
+                {
+                    "ok": False,
+                    "error": "Test has ended",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if Result.objects.filter(student_id=request.user.id, test_id=test).exists():
+            return Response(
+                {
+                    "ok": False,
+                    "error": "You have already submitted the test",
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -195,7 +217,6 @@ class SubmitTestView(APIView):
             {
                 "ok": True,
                 "message": "Test submitted successfully",
-                "score": score,
             },
             status=status.HTTP_200_OK,
         )
