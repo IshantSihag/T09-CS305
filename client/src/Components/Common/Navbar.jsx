@@ -49,6 +49,7 @@ const Navbar = () => {
             } else {
                 console.log("Logout Failed Please try again");
             }
+
         } catch (err) {
             console.log("Error in Logout, Please try again");
         }

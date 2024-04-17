@@ -136,6 +136,7 @@ class getTest(APIView):
                         "start": test.start,
                         "duration": test.duration,
                         "author": test.author,
+                        "code": test.testCode,
                     }
                 )
             return Response(jsonresponse, status=status.HTTP_200_OK)
@@ -297,7 +298,7 @@ class createTest(APIView):
                     answer=answer,
                     test_id=test,
                 )
-            question_ids += str(question.id) + ","
+                question_ids += str(question.id) + ","
             question_ids = question_ids[:-1]
             test.questions = question_ids
             test.save()
@@ -378,6 +379,22 @@ class UpdateTest(APIView):
                 "error": "You do not have access to update",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if duration < 0:
+                jsonresponse = {"ok": False, "error": "Invalid duration"}
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            for question in questions:
+                if question["type"].split("_")[0] not in (
+                    "single",
+                    "multiple",
+                ):
+                    jsonresponse = {"ok": False, "error": "Invalid question type"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+                if int(question["marks"]) < 0:
+                    jsonresponse = {"ok": False, "error": "Invalid marks"}
+                    return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            jsonresponse = {"ok": False, "error": "Invalid input"}
 
         try:
             test.title = title
@@ -402,7 +419,7 @@ class UpdateTest(APIView):
                 if Question.objects.filter(id=question["id"]).exists():
                     question_inst = Question.objects.get(id=question["id"])
                     question_inst.statement = question["statement"]
-                    question_inst.type = question["type"]
+                    question_inst.type = question["type"].split("_")[0]
                     question_inst.marks = question["marks"]
                     question_inst.options = options
                     question_inst.answer = answer
@@ -492,6 +509,61 @@ class FetchStudentDetails(APIView):
                 "bio": userprofile.bio,
                 "profile_url": userprofile.profile_url,
             }
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            jsonresponse = {
+                "ok": False,
+                "error": str(e),
+            }
+            return Response(jsonresponse, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UpdateStudentDetails(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+
+        jsonresponse = {
+            "ok": False,
+            "error": "backend error",
+        }
+        try:
+            try:
+                user = request.user
+                phone_number = request.data["phone_number"]
+                cgpa = request.data["cgpa"]
+                batch = request.data["batch"]
+                course = request.data["course"]
+                bio = request.data["bio"]
+                profile_url = request.data["profile_url"]
+            except:
+                jsonresponse["error"] = (
+                    "body fields not correct. Expecting phone_number, cgpa, batch, course, bio, profile_url"
+                )
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
+            userprofile = UserProfile.objects.get(user_id=user.id)
+            if userprofile.type != "student":
+                jsonresponse["error"] = "Need to login through student credentials"
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            student = Student.objects.get(student_id=user.id)
+
+            # Update student attributes
+            student.phone_number = phone_number
+            student.cgpa = cgpa
+            student.batch = batch
+            student.course = course
+            # Save the updated student instance
+            student.save()
+
+            # Update userprofile attributes
+            userprofile.bio = bio
+            userprofile.profile_url = profile_url
+            # Save the updated userprofile instance
+            userprofile.save()
+
+            jsonresponse = {"ok": True, "message": "Succesfully updated the details"}
             return Response(jsonresponse, status=status.HTTP_200_OK)
 
         except Exception as e:

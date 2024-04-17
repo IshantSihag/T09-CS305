@@ -1,9 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { Button, Checkbox } from "@material-tailwind/react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import PhotoCaptureWindow from "./PhotoCaptureWindow";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import Cookies from "js-cookie";
 
 const StartTest = () => {
@@ -15,11 +16,42 @@ const StartTest = () => {
   const [isCaptureWindowOpen, setCaptureWindowOpen] = useState(false);
   const videoRef = useRef(null); // Initialize with null
 
+  const handle = useFullScreenHandle();
   const handleBackToDashboard = () => {
     navigate("/student/");
   };
 
+  const handleFullscreen = () => {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      element.requestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen().catch((err) => {
+        console.error("Fullscreen request failed:", err);
+      });
+    }
+  };
+
   const handleStartTest = async () => {
+      const isDetailsFilled = document.getElementById("studentName").value &&
+      document.getElementById("dob").value &&
+      document.getElementById("email").value &&
+      document.getElementById("phone").value;
+
+    if (!isDetailsFilled) {
+      alert("Please fill in all details before starting the test.");
+      return;
+    }
     if (!photoCaptured) {
       alert("Please capture a photo before starting the test.");
       return;
@@ -30,6 +62,7 @@ const StartTest = () => {
       return;
     }
 
+    // Redirect to test page
     // Continue with test initiation or redirection logic
     alert("Test initiated successfully!");
 
@@ -40,6 +73,8 @@ const StartTest = () => {
       navigate(`/student/attemptest/${id}`);
     }
     // Redirect to test page
+    handleFullscreen();
+    navigate(`/student/attemptest/${id}`);
   };
 
   const handleCheckboxChange = () => {
@@ -64,6 +99,7 @@ const StartTest = () => {
     setCapturedPhoto(null);
     openCaptureWindow();
   };
+
 
   const sendPhotoToBackend = async (photoDataURL) => {
     const formData = new FormData();

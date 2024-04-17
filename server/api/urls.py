@@ -20,4 +20,9 @@ urlpatterns = [
     ),
     path("getTest/", views.getTest.as_view(), name="getTest"),
     path("student/fetchStudentDetails", views.FetchStudentDetails.as_view()),
+    path(
+        "student/updateStudentDetails",
+        views.UpdateStudentDetails.as_view(),
+        name="updateStudentDetails",
+    ),
 ]
