@@ -12,6 +12,7 @@ import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import { useNavigate, useParams } from 'react-router-dom';
 import secondsToHMS from '../../Utils/secondsToHMS';
+import {notifySuccess, notifyError} from "../UI/ToastNotification.jsx";
 
 function RegisterTest() {
   const navigate = useNavigate();
@@ -24,11 +25,15 @@ function RegisterTest() {
     questions: "",
     date: "",
     time: "",
+    description: "",
+    instructions: "",
   })
 
   useEffect(() => {
     let access = Cookies.get('access')
     if (!access) {
+      console.log("User not authorized, Please Login");
+      notifyError("User not authorized, Please Login");
       navigate('/student/login');
     }
   })
@@ -49,7 +54,8 @@ function RegisterTest() {
 
         if (!accessToken) {
           console.log("Access token not found, User not authorized");
-          alert("User not authorized, Please Login");
+          // alert("User not authorized, Please Login");
+          notifyError("User not authorized, Please Login");
           navigate('/student/login');
 
           return;
@@ -70,8 +76,10 @@ function RegisterTest() {
           const data = await res.json();
 
           if (data.ok) {
+            console.log("data: ", data);
             const logMsg = "Test Details fetched successfully";
             console.log(logMsg);
+            notifySuccess(logMsg);
 
             setTestData({
               title: data.title,
@@ -80,48 +88,42 @@ function RegisterTest() {
               questions: data.questions,
               date: data.date,
               time: data.time,
+              description: data.description,
+              instructions: data.instructions
             });
 
           } else {
             console.log(`Error in fetching test details: ${data.error}`);
+            notifyError(`Error in fetching test details: ${data.error}`);
           }
         } else {
           //CHECK: for unauthorized request, user redirected to login
           if (res.status === 401) {
             console.log("Unauthorized : Please login");
-            alert("Unauthorized : Please login");
+            // alert("Unauthorized : Please login");
+            notifyError("Unauthorized : Please login");
             navigate('/student/login');
 
             return;
           }
           console.log(`Error in fetching test details`);
+          notifyError("Error in fetching test details");
         }
       } catch (err) {
         console.log(`Error in fetching test details : ${err.message}`);
-        alert('Error in fetching test details');
+        // alert('Error in fetching test details');
+        notifyError('Error in fetching test details');
       }
     };
 
     fetchTestDetails();
   }, []);
 
-
-
-
-  const testTitle = "UI/UX Review Check"
-  const testDescription = "Lorem ipsum Not far stuff she think the jokes. Going as by do known noise he wrote round leave. Warmly put branch people narrow see. Winding its waiting yet parlors married own feeling. Marry fruit do spite jokes an times. Whether at it unknown warrant herself winding if. Him same none name sake had post love. An busy feel form hand am up help. Parties it brother amongst an fortune of. Twenty behind wicket why age now itself ten. In it except to so temper mutual tastes mother. Interested cultivated its continuing now yet are. Out interested acceptance our partiality affronting unpleasant why add. Esteem garden men yet shy course. Consulted up my tolerably sometimes perpetual oh. Expression acceptance imprudence particular had eat unsatiable.  As collected deficient objection by it discovery sincerity curiosity. Quiet decay who round three world whole has mrs man. Built the china there tried jokes which gay why. Assure in adieus wicket it is. But spoke round point and one joy. Offending her moonlight men sweetness see unwilling. Often of it tears whole oh balls share an."
-  const testDuration = "60"
-  const testMarks = "100"
-  const testQuestions = "10"
-  const testDate = "2021-09-01"
-  const testStartTime = "09:00 am"
-  const testInstructions = "1. Log in to your account to access the test.\n2. Read all instructions carefully before beginning the test.\n3. Ensure you have a stable internet connection throughout the test.\n4. You will be proctored during the test to maintain integrity.\n5. Manage your time wisely and answer each question to the best of your ability.\n6. Submit the test before the designated time limit expires."
-
-  
-
   const handleRegister = async () => {
     let access = Cookies.get('access');
     if (!access) {
+      console.log("User not authorized, Please Login");
+      notifyError("User not authorized, Please Login");
       navigate('/student/login');
     }
     const sendData = new FormData();
@@ -139,10 +141,19 @@ function RegisterTest() {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        navigate('/student');
+
+        if (data.ok) {
+          notifySuccess("User registered successfully");
+          console.log("User registered successfully");
+          navigate('/student');
+        } else {
+          console.log("Error while registering");
+          notifyError("Error while registering");
+        }
       }
     } catch (err) {
       console.log("Failed to register for test. error:", err);
+      notifyError("Failed to register for test");
     }
   }
 
@@ -156,17 +167,17 @@ function RegisterTest() {
               {testData.title}
             </Typography>
             <Typography className='text-justify'>
-              {testDescription}
+              {testData.description}
             </Typography>
           </CardHeader>
-          <CardBody className='flex-row flex-1 flex gap-x-2'>
-            <div className='flex h-fit'>
+          <CardBody className='flex-row w-full flex-1 flex gap-x-2'>
+            <div className='flex w-full h-fit'>
               <div className='w-1/2 pr-2 border-r-2'>
                 <Typography variant="h6" color="blue-gray" className="mb-2">
                   Test Instruction
                 </Typography>
                 <Typography className='text-justify'>
-                  {testInstructions}
+                  {testData.instructions}
                 </Typography>
               </div>
               <div className=' w-1/2 h-full grid grid-cols-2 place-content-evenly place-items-center gap-y-4'>

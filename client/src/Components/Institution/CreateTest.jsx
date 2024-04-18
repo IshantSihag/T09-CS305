@@ -8,8 +8,8 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
-  Input,
-  Radio,
+  IconButton,
+  Drawer,
   Textarea,
   Select,
   Option,
@@ -20,7 +20,8 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
-import { useNavigate } from "react-router-dom";
+import { ToastContainer, notifyError, notifySuccess } from "../UI/ToastNotification";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Ques_Types = ["single_correct", "multi_correct", "long_answer"];
 
@@ -155,15 +156,84 @@ const LongAnswer = ({ currentQuestion_, handleQuestionAnswerChange_ }) => {
   );
 };
 
-export default function CreattTest() {
+const DetailDrawer = ({ drawerOpen_, setDrawerOpen_, setTestData_, testData_ }) => {
+  return (
+    <Drawer open={drawerOpen_} onClose={setDrawerOpen_} className="p-4">
+      <div className="mb-6 flex items-center justify-between">
+        <Typography variant="h5" color="blue-gray">
+          Test Details
+        </Typography>
+        <IconButton variant="text" color="blue-gray" onClick={()=>{setDrawerOpen_(!drawerOpen_)}}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="h-5 w-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </IconButton>
+      </div>
+      <div className="flex flex-col h-full">
+        <div>
+          <Typography variant="h6" color="blue-gray">
+            Description
+          </Typography>
+          <Textarea
+            variant="outlined"
+            placeholder="Type description here"
+            className="mt-2 border-1 flex-1 rounded-lg w-full h-72"
+            labelProps={{
+              className: "before:content-none after:content-none",
+            }}
+            containerProps={{
+              className: "border-black",
+            }}
+            value={testData_.description}
+            onChange={(e) => {setTestData_({ ...testData_, description: e.target.value })}}
+          />
+        </div>
+        <div>
+          <Typography variant="h6" color="blue-gray" className="mt-2">
+            Instructions
+          </Typography>
+          <Textarea
+            variant="outlined"
+            placeholder="Type instructions here"
+            className="mt-2 border-1 flex-1 rounded-lg w-full h-72"
+            labelProps={{
+              className: "before:content-none after:content-none",
+            }}
+            containerProps={{
+              className: "border-black",
+            }}
+            value={testData_.instructions}
+            onChange={(e) => {setTestData_({ ...testData_, instructions: e.target.value })}}
+          />
+        </div>
+      </div>
+    </Drawer>
+  );
+};
+
+
+export default function CreattTest({type}) {
+  const { id: testId } = useParams();
   const navigate = useNavigate();
   let date = new Date();
-  const [testData, setTestData] = useState({ title: "", start: "", duration: "" });
+  const [loading, setLoading] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [testData, setTestData] = useState({ title: "", start: "", duration: "", description: "", instructions: ""});
 
   const [questions, setQuestions] = useState([
     {
       id: 1,
-      title: "",
       statement: "",
       type: "single_correct",
       choices: [
@@ -182,7 +252,7 @@ export default function CreattTest() {
   useEffect(() => {
     let access = Cookies.get("access");
     if (!access) {
-      window.location.href = "/institution/login";
+      navigate("/institution/login");
     }
     const questions_ = Cookies.get("questions");
     const currentQuestionIndex_ = Cookies.get("currentQuestionIndex");
@@ -198,17 +268,51 @@ export default function CreattTest() {
 
   setInterval(() => {
     setCookies();
-  }, 10000);
+  }, 2000);
 
   const handleSave = async() => {
-    // console.log(questions);
     let access = Cookies.get("access");
-    // console.log("access", access);
+    if (!access) {
+      navigate("/institution/login");
+    }
+    for (let i = 0; i < questions.length; i++) {
+      if (questions[i].statement === "" || questions[i].marks === "") {
+        notifyError("Please fill all the fields in question " + (i + 1));
+        return;
+      }
+      if (questions[i].type === "single_correct" || questions[i].type === "multi_correct") {
+        let flag = false;
+        let flag1 = false;
+        for (let j = 0; j < questions[i].choices.length; j++) {
+          if (questions[i].choices[j].value === "") {
+            flag = true;
+            break;
+          }
+          if (questions[i].choices[j].isCorrect) {
+            flag1 = true;
+          }
+        }
+        if (flag) {
+          notifyError("Please fill all the fields in question " + (i + 1));
+          return;
+        }
+        if (!flag1) {
+          notifyError("Please select the correct answer in question " + (i + 1));
+          return;
+        }
+      }
+    }
+    if (testData.title === "" || testData.start === "" || testData.duration === "") {
+      notifyError("Please fill all the fields");
+      return;
+    }
     
     const sendData = new FormData();
     sendData.append("title", testData.title);
-    sendData.append("start", testData.start);
+    sendData.append("start", testData.start+" +0530");
     sendData.append("duration", testData.duration);
+    sendData.append("description", testData.description);
+    sendData.append("instructions", testData.instructions);
     sendData.append("questions", JSON.stringify(questions));
 
     // console.log(sendData);
@@ -222,14 +326,27 @@ export default function CreattTest() {
       })
 
       console.log("RES : ", res);
+      if (!res.ok) {
+        const data = await res.json();
+        notifyError("Failed to create test, Please try again", data.error);
+        return;
+      }
+      const data = await res.json();
+      if (data.ok) {
+        notifySuccess("Test created successfully");
+        deleteCookies();
+        navigate("/institution/");
+      }      
     } catch (err) {
       console.log("Failed to create test. error:", err);
+      notifyError("Failed to create test. Please try again");
     }
 
   };
 
   const setCookies = () => {
     // console.log("Setting cookies");
+    deleteCookies();
     Cookies.set("testData", JSON.stringify(testData));
     Cookies.set("questions", JSON.stringify(questions));
     Cookies.set("currentQuestionIndex", JSON.stringify(currentQuestionIndex));
@@ -246,7 +363,6 @@ export default function CreattTest() {
       ...prevQuestions,
       {
         id: prevQuestions.length + 1,
-        title: "",
         statement: "",
         type: "single_correct",
         choices: [
@@ -264,16 +380,6 @@ export default function CreattTest() {
       prevQuestions.filter((question, index) => index !== currentQuestionIndex)
     );
     setCurrentQuestionIndex(currentQuestionIndex - 1);
-  };
-
-  const handleQuestionTitleChange = (value) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((question, index) =>
-        index === currentQuestionIndex
-          ? { ...question, title: value }
-          : question
-      )
-    );
   };
 
   const handleQuestionChange = (value) => {
@@ -366,18 +472,26 @@ export default function CreattTest() {
   return (
     <div>
       <Navbar />
+      <DetailDrawer drawerOpen_={drawerOpen} setDrawerOpen_={setDrawerOpen} setTestData_={setTestData} testData_={testData} />
       <div className="bg-gray-50 flex px-6 py-2 h-full">
         <div className="flex w-1/2 gap-x-4 h-full">
           <Typography variant="h3" color="blue-gray" className="text-center">
             Test
           </Typography>
           <input
-            type="text"
             placeholder="Test Title"
-            className="w-1/4 p-1.5 border-1 border-blue-gray-100 rounded-md"
+            className="flex w-1/3 p-1.5 mr-4 border-1 border-blue-gray-100 rounded-md"
             value={testData.title}
             onChange={(e) => setTestData({ ...testData, title: e.target.value })}
           />
+          <Button
+            className="flex rounded-lg"
+            onClick={() => {
+              setDrawerOpen(!drawerOpen);
+            }}
+          >
+            Add Details
+          </Button>
         </div>
         <div className="flex w-1/2">
           <div className="flex w-full gap-x-4 h-full">
@@ -403,15 +517,16 @@ export default function CreattTest() {
               color="blue-gray"
               className="pt-2 align-middle"
             >
-              Duration
+              Duration (sec)
             </Typography>
             <input
               type="number"
-              placeholder="Duration in min"
+              placeholder="Duration in sec"     
               className="w-fit p-1.5 border-1 border-blue-gray-100 rounded-md"
-              value={testData.duration / 60}
+              min={0}
+              value={testData.duration}
               onChange={(e) =>
-                setTestData({ ...testData, duration: e.target.value * 60 })
+                setTestData({ ...testData, duration: e.target.value})
               }
             />
           </div>
@@ -453,9 +568,6 @@ export default function CreattTest() {
                     className="font-bold justify-between"
                   >
                     Q. {index + 1}{" "}
-                    {question.title.length > 13
-                      ? question.title.slice(0, 13) + "..."
-                      : question.title}
                   </Typography>
                   <Chip
                     variant="ghost"
@@ -511,12 +623,6 @@ export default function CreattTest() {
           <CardBody className="flex-1 overflow-auto">
             <div>
               <Typography variant="h6">Question</Typography>
-              <input
-                placeholder="Question Title"
-                className="w-1/3 p-1.5 border-1 border-blue-gray-100 rounded-md"
-                value={currentQuestion.title}
-                onChange={(e) => handleQuestionTitleChange(e.target.value)}
-              />
               <Textarea
                 variant="outlined"
                 placeholder="Type question here"
@@ -589,7 +695,6 @@ export default function CreattTest() {
                 size="sm"
                 onClick={() => {
                   handleSave();
-                  navigate("/institution/");
                 }}
               >
                 Save
@@ -599,6 +704,7 @@ export default function CreattTest() {
         </Card>
       </div>
       <Footer />
+      <ToastContainer />
     </div>
   );
 }

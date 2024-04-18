@@ -12,6 +12,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 
+import { notifyError, notifySuccess } from '../UI/ToastNotification';
+
 
 const StudentLogin = () => {
   const navigate = useNavigate();
@@ -27,6 +29,11 @@ const StudentLogin = () => {
 
   const handleLogin = async() => {
     validateEmail();
+    if(!email || !password) {
+      console.log("Please fill all the fields");
+      notifyError("Please fill all the fields");
+      return;
+    }
     if (isValidEmail) {
       console.log("Login with email:", email, "and password:", password);
       
@@ -43,12 +50,11 @@ const StudentLogin = () => {
 
       console.log("student response: ", response);
 
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
-
-        console.log("data : ", data);
         if (data.ok) {
           console.log("Login Successfully");
+          notifySuccess("Login Successful");
 
           //setting up the cookies with the fetched data
           Cookies.set('access', data.access, { expires: 1, path: '/' });          
@@ -60,16 +66,18 @@ const StudentLogin = () => {
           navigate("/");  
         } else {
           const errMsg = data?.error || "Error in Signup, Please try again";
-          alert(errMsg);
+          notifyError(errMsg);
           console.log(errMsg);
         }
       } else {
         console.log("Login Failed Please try again");
+        notifyError(data?.error || "Error in Login, Please try again");
       }
 
       // Perform login action here
     } else {
       console.error("Invalid email address");
+      notifyError("Please enter a valid email");
     }
   };
 

@@ -12,7 +12,7 @@ from api.serializers import (
 )
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from api.models import Test, UserProfile, Question
+from api.models import Test, UserProfile, Question, AttemptingTest
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 import cv2
@@ -60,25 +60,52 @@ class VerifyUserView(APIView):
     def post(self, request):
         try:
             user_pic_base64 = request.data["user_pic_base64"]
+            test_id = request.data["test_id"]
             user_email = request.user.email
             user = User.objects.get(email=user_email)
             user_image = UserImage.objects.get(user_id=user)
+            if not Test.objects.filter(id=test_id).exists():
+                jsonresponse = {
+                    "ok": False,
+                    "error": "Test not found",
+                }
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             user_initial_image = user_image.image_base64
             known_face_enc, _ = find_face_encodings(user_initial_image)
+            test = Test.objects.get(id=test_id)
+            if not AttemptingTest.objects.filter(
+                studentEmail=user_email, test_id=test
+            ).exists():
+                jsonresponse = {"ok": False, "error": "please start the Test first."}
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            user_attempt_test = AttemptingTest.objects.get(
+                studentEmail=user_email, test_id=test
+            )
+
             # assert known_face_enc is not None # initial image not found
             unknown_face_enc, cnt = find_face_encodings(user_pic_base64)
             if cnt == 0:
+                user_attempt_test.profile_warnings -= 1
+                user_attempt_test.fullScreen_warnings -= 1
+                user_attempt_test.save()
                 jsonresponse = {
                     "ok": True,
                     "verified": False,
+                    "profile_warnings_left": user_attempt_test.profile_warnings,
+                    "fullScreen_warnings": user_attempt_test.fullScreen_warnings,
                     "message": "No Face Found in the image",
                 }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
             elif cnt > 1:
+                user_attempt_test.profile_warnings -= 1
+                user_attempt_test.fullScreen_warnings -= 1
+                user_attempt_test.save()
                 jsonresponse = {
                     "ok": True,
                     "verified": False,
                     "message": "Multiple Faces Found in the image",
+                    "profile_warnings_left": user_attempt_test.profile_warnings,
+                    "fullScreen_warnings": user_attempt_test.fullScreen_warnings,
                 }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
             result = compare_face_encodings(known_face_enc, unknown_face_enc)
@@ -89,13 +116,20 @@ class VerifyUserView(APIView):
                     "ok": True,
                     "verified": True,
                     "message": "Face Verified",
+                    "profile_warnings_left": user_attempt_test.profile_warnings,
+                    "fullScreen_warnings": user_attempt_test.fullScreen_warnings,
                 }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
             else:
+                user_attempt_test.profile_warnings -= 1
+                user_attempt_test.fullScreen_warnings -= 1
+                user_attempt_test.save()
                 jsonresponse = {
                     "ok": True,
                     "verified": False,
                     "message": "Face didn't match",
+                    "profile_warnings_left": user_attempt_test.profile_warnings,
+                    "fullScreen_warnings": user_attempt_test.fullScreen_warnings,
                 }
                 return Response(jsonresponse, status=status.HTTP_200_OK)
 
@@ -157,3 +191,48 @@ class TestRatingView(APIView):
         except:
             jsonresponse = {"ok": False, "error": "Invalid request"}
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FetchTestView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            uuid.UUID(request.data["test_id"])
+            test_id = request.data["test_id"]
+        except:
+            jsonresponse = {"ok": False, "error": "test_id required"}
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        user_email = request.user.email
+        if not Test.objects.filter(id=test_id).exists():
+            jsonresponse = {"ok": False, "error": "Test not found"}
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        test = Test.objects.get(id=test_id)
+        if test.author == user_email:
+            questions = []
+            listquestions = Question.objects.filter(test_id=test_id)
+            for question in listquestions:
+                questions.append(
+                    {
+                        "id": question.id,
+                        "statement": question.statement,
+                        "type": question.type,
+                        "marks": question.marks,
+                        "options": question.options.split(","),
+                        "answer": question.answer,
+                    }
+                )
+            jsonresponse = {
+                "ok": True,
+                "start": test.start,
+                "duration": test.duration,
+                "author": test.author,
+                "questions": questions,
+            }
+            return Response(jsonresponse, status=status.HTTP_200_OK)
+        else:
+            jsonresponse = {
+                "ok": False,
+                "error": "You are not authorized to view this test",
+            }
+            return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)

@@ -9,4 +9,5 @@ urlpatterns = [
         name="submitInitialImage",
     ),
     path("submitTestRating/", views.TestRatingView.as_view(), name="submitTestRating"),
+    path("fetchTest/", views.FetchTestView.as_view(), name="fetchTest"),
 ]
