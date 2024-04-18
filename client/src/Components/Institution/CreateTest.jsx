@@ -23,6 +23,7 @@ import Footer from "../Common/Footer";
 import { ToastContainer, notifyError, notifySuccess } from "../UI/ToastNotification";
 import { useNavigate, useParams } from "react-router-dom";
 
+
 const Ques_Types = ["single_correct", "multi_correct", "long_answer"];
 
 const SingleCorrect = ({
@@ -156,14 +157,18 @@ const LongAnswer = ({ currentQuestion_, handleQuestionAnswerChange_ }) => {
   );
 };
 
+
 const DetailDrawer = ({ drawerOpen_, setDrawerOpen_, setTestData_, testData_ }) => {
   return (
     <Drawer open={drawerOpen_} onClose={setDrawerOpen_} className="p-4">
+
       <div className="mb-6 flex items-center justify-between">
         <Typography variant="h5" color="blue-gray">
           Test Details
         </Typography>
+
         <IconButton variant="text" color="blue-gray" onClick={()=>{setDrawerOpen_(!drawerOpen_)}}>
+
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -197,6 +202,7 @@ const DetailDrawer = ({ drawerOpen_, setDrawerOpen_, setTestData_, testData_ }) 
             }}
             value={testData_.description}
             onChange={(e) => {setTestData_({ ...testData_, description: e.target.value })}}
+
           />
         </div>
         <div>
@@ -215,6 +221,7 @@ const DetailDrawer = ({ drawerOpen_, setDrawerOpen_, setTestData_, testData_ }) 
             }}
             value={testData_.instructions}
             onChange={(e) => {setTestData_({ ...testData_, instructions: e.target.value })}}
+
           />
         </div>
       </div>
@@ -228,6 +235,7 @@ export default function CreattTest({type}) {
   const navigate = useNavigate();
   let date = new Date();
   const [loading, setLoading] = useState(false);
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [testData, setTestData] = useState({ title: "", start: "", duration: "", description: "", instructions: ""});
 
@@ -277,6 +285,7 @@ export default function CreattTest({type}) {
     }
     for (let i = 0; i < questions.length; i++) {
       if (questions[i].statement === "" || questions[i].marks === "") {
+
         notifyError("Please fill all the fields in question " + (i + 1));
         return;
       }
@@ -329,6 +338,7 @@ export default function CreattTest({type}) {
       if (!res.ok) {
         const data = await res.json();
         notifyError("Failed to create test, Please try again", data.error);
+
         return;
       }
       const data = await res.json();
@@ -336,6 +346,7 @@ export default function CreattTest({type}) {
         notifySuccess("Test created successfully");
         deleteCookies();
         navigate("/institution/");
+
       }      
     } catch (err) {
       console.log("Failed to create test. error:", err);
@@ -473,6 +484,7 @@ export default function CreattTest({type}) {
     <div>
       <Navbar />
       <DetailDrawer drawerOpen_={drawerOpen} setDrawerOpen_={setDrawerOpen} setTestData_={setTestData} testData_={testData} />
+
       <div className="bg-gray-50 flex px-6 py-2 h-full">
         <div className="flex w-1/2 gap-x-4 h-full">
           <Typography variant="h3" color="blue-gray" className="text-center">

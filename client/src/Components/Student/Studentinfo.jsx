@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {notifyError, notifySuccess} from "../UI/ToastNotification.jsx"; 
+
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import "./Studentinfo.css";
 import fetchAPI from '../Tools/FetchAPI'
 const port = process.env.REACT_APP_API_URL
+
 
 const Studentinfo = () => {
   const [instituteName, setInstituteName] = useState('');
@@ -34,6 +36,7 @@ const Studentinfo = () => {
         // alert("Error in fetching data")
         console.log("Error in fetching data")
         notifyError("Error in fetching data")
+
       }
     }
     fetchData()
@@ -152,6 +155,7 @@ const Studentinfo = () => {
       // alert("Profile Updation failed");
       console.log("Profile Updation failed");
       notifyError("Profile Updation failed, Please try again");
+
     }
   };
 

@@ -173,7 +173,7 @@ class ProfileView(APIView):
 
 
 class startTest(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsStudent)
 
     def post(self, request):
         try:

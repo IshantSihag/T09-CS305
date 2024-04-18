@@ -115,6 +115,7 @@ class SubmitTestView(APIView):
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         # If test_id is not valid
+
         if not Test.objects.filter(id=test_id).exists():
             return Response(
                 {
@@ -200,7 +201,6 @@ class SubmitTestView(APIView):
             {
                 "ok": True,
                 "message": "Test submitted successfully",
-                "score": score,
             },
             status=status.HTTP_200_OK,
         )
@@ -274,7 +274,6 @@ class DashboardView(APIView):
                     )
                 elif test.start + timedelta(seconds=test.duration + 5) > timezone.now():
                     test = Test.objects.get(id=test_id)
-                    print("HERE##############################")
                     if Result.objects.filter(
                         student_id=request.user.id, test_id=test
                     ).exists():

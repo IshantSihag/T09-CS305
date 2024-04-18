@@ -11,7 +11,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 
-import { notifyError, notifySuccess } from '../UI/ToastNotification';
+
+import { ToastContainer, notifyError, notifySuccess } from '../UI/ToastNotification';
+
 
 const InstituteLogin = () => {
   const navigate = useNavigate();
@@ -127,6 +129,7 @@ const InstituteLogin = () => {
           </Typography>
         </CardFooter>
       </Card>
+      <ToastContainer />
     </div>
   );
 };

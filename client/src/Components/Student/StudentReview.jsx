@@ -6,8 +6,8 @@ import { faAsterisk } from '@fortawesome/free-solid-svg-icons';
 import "./StudentReview.css";
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
-
 import { notifyError, notifySuccess } from '../UI/ToastNotification';
+
 
 const StudentReview = () => {
   const navigate = useNavigate();
@@ -44,6 +44,7 @@ const StudentReview = () => {
         console.log("User not logged in, Please login");
         //alert("User not logged in, Please login");
         notifyError("User not logged in, Please login");
+
         navigate("/student/login");
       }
 
@@ -70,6 +71,7 @@ const StudentReview = () => {
           console.log(data.message);
           notifySuccess(data.message || "Feedback submitted successfully");
 
+
           // Reset form fields
           setRating(0);
           setImprovements('');
@@ -84,11 +86,13 @@ const StudentReview = () => {
       } else {
         setError(data.error); 
         notifyError(data.error || "Error in submitting feedback, Please try again"); 
+
       }
     } catch (error) {
       console.error('Error:', error);
       setError('Failed to submit rating. Please try again.');
       notifyError('Failed to submit rating. Please try again.');
+
     }
   };
 

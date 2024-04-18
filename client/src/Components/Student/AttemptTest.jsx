@@ -67,6 +67,15 @@ const AttemptTest = () => {
     };
 
     useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+              // Tab is active 
+            } else {
+              alert("TAB SWITCHHH!!!");
+            }
+          };
+      
+          document.addEventListener("visibilitychange", handleVisibilityChange);
         const fetchQuestions = async () => {
             try {
                 //fetching the questions list, if it is available in cookies
@@ -295,6 +304,7 @@ const AttemptTest = () => {
                     console.log(receievedMsg);
                     // alert(receievedMsg);
                     notifySuccess(receievedMsg);
+
 
                     //navigating to student dashboard
                     navigate(`/student/review/${testId}`);

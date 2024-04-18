@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
-
 import {notifyError, notifyWarn} from "../UI/ToastNotification.jsx";
 
 const WebcamCapture = ({
@@ -92,6 +91,7 @@ const WebcamCapture = ({
                     }
 
                     //console.log(`Error(sending-image) : ${data.error}`);
+
                 }
             } else {
                 console.error('Error(sending-image) : Failed to send image');
