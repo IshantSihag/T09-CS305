@@ -115,7 +115,6 @@ class SubmitTestView(APIView):
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         # If test_id is not valid
-
         if not Test.objects.filter(id=test_id).exists():
             return Response(
                 {
@@ -125,43 +124,22 @@ class SubmitTestView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         test = Test.objects.get(id=test_id)
-        if request.user.email not in test.registrations.split(","):
+        registrations = test.registrations.split(",")
+        if request.user.email not in registrations:
+            jsonresponse = {
+                "ok": False,
+                "error": "You were not registered for this test",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        end_time = test.start + timedelta(seconds=test.duration)
+        if timezone.now() < test.start:
             return Response(
-                {
-                    "ok": False,
-                    "error": "You are not registered for this test",
-                },
+                {"ok": False, "error": "The test has not started yet."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        startTime = test.start
-        duration = test.duration
-        endTime = startTime + timedelta(seconds=duration + 5)
-
-        if datetime.datetime.now().replace(tzinfo=utc) < startTime:
+        if timezone.now() > end_time:
             return Response(
-                {
-                    "ok": False,
-                    "error": "Test has not started yet",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if datetime.datetime.now().replace(tzinfo=utc) > endTime:
-            return Response(
-                {
-                    "ok": False,
-                    "error": "Test has ended",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if Result.objects.filter(student_id=request.user.id, test_id=test).exists():
-            return Response(
-                {
-                    "ok": False,
-                    "error": "You have already submitted the test",
-                },
+                {"ok": False, "error": "The test has already ended."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -185,6 +163,11 @@ class SubmitTestView(APIView):
                 )
 
         student_id = request.user.id
+        if Result.objects.filter(student_id=student_id, test_id=test).exists():
+            return Response(
+                {"ok": False, "error": "You have already submitted the test."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         score = 0
         for question in user_response:
             question_id = question["id"]
@@ -217,6 +200,7 @@ class SubmitTestView(APIView):
             {
                 "ok": True,
                 "message": "Test submitted successfully",
+                "score": score,
             },
             status=status.HTTP_200_OK,
         )
@@ -272,13 +256,30 @@ class DashboardView(APIView):
             "profile_url": profile.profile_url,
             "upcomingtests": [],
             "pasttests": [],
+            "ongoingtests": [],
         }
         tests = profile.tests.split(",")
         for test_id in tests:
             if test_id != "":
                 test = Test.objects.get(id=test_id)
-                if test.start + timedelta(seconds=test.duration) > timezone.now():
+                if test.start > timezone.now():
                     jsonresponse["upcomingtests"].append(
+                        {
+                            "id": test.id,
+                            "title": test.title,
+                            "start": test.start,
+                            "duration": test.duration,
+                            "testCode": test.testCode,
+                        }
+                    )
+                elif test.start + timedelta(seconds=test.duration + 5) > timezone.now():
+                    test = Test.objects.get(id=test_id)
+                    print("HERE##############################")
+                    if Result.objects.filter(
+                        student_id=request.user.id, test_id=test
+                    ).exists():
+                        continue
+                    jsonresponse["ongoingtests"].append(
                         {
                             "id": test.id,
                             "title": test.title,
@@ -346,6 +347,8 @@ class getTestDetailsView(APIView):
             "time": time,
             "marks": marks,
             "questions": numofquestions,
+            "description": test.description,
+            "instructions": test.instructions,
         }
 
         return Response(jsonresponse, status=status.HTTP_200_OK)

@@ -10,7 +10,7 @@ import {
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
-// TODO : Replaces alert with react-toast notification
+import {notifyError, notifySuccess} from "../UI/ToastNotification.jsx"; 
 
 const DialogBox = ({
     dialogBtnText, dialogHeading, dialogText, dialogConfirmBtnText 
@@ -26,7 +26,8 @@ const DialogBox = ({
         e.preventDefault();
         if (!testCode) {
             console.log("Test code is required");
-            alert("Test code is required");
+            //alert("Test code is required");
+            notifyError("Test code is required");
 
             return ;
         }    
@@ -35,8 +36,9 @@ const DialogBox = ({
             const access = Cookies.get("access");
             
             if (!access) {
-                console.log("Access token not found");
-                alert("Access token not found");
+                console.log("Access token not found, Please login");
+                //alert("Access token not found");
+                notifyError("User not authorized, Please login");
                 return ;
             }
 
@@ -57,21 +59,25 @@ const DialogBox = ({
 
                     console.log("fetched test_id : ", testId);
                     console.log(resMsg);
-                    alert(resMsg);
+                    //alert(resMsg);
+                    notifySuccess(resMsg);
                     
                     //TODO: navigate to the startTest page along with testId
                     navigate(`/student/registertest/${testId}`); 
                 } else {
                     console.log(`Failed to fetch Test Id : ${resData.error}`);
-                    alert("Error in fetching data from server. Please try again later.");
+                    //alert("Error in fetching data from server. Please try again later.");
+                    notifyError("Error in fetching data from server. Please try again later.");
                 }
             } else {
                 console.log(`Failed to fetch Test Id`);
-                alert("Error in fetching data from server. Please try again later.");
+                //alert("Error in fetching data from server. Please try again later.");
+                notifyError("Error in fetching data from server. Please try again later.");
             }
         } catch (err) {
             console.log(`ERROR (dialog-box) : ${err.message}`);
-            alert("Error in fetching data from server. Please try again later.");
+            //alert("Error in fetching data from server. Please try again later.");
+            notifyError("Error in fetching data from server. Please try again later.");
         }       
     };
 

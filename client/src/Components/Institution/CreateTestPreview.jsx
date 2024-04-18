@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { notifyError } from "../UI/ToastNotification";
+
 function TestPreview() {
     const [testData, setTestData] = useState(null);
     const [question, setQuestion] = useState(null);
@@ -11,6 +13,7 @@ function TestPreview() {
             setTestData(data);
             setQuestion(data2);
         } else {
+            notifyError("Error while previewing test data, Please try again");
             window.location.href = '/';
         }
     }, []);

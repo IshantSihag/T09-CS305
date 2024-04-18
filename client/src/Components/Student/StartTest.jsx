@@ -7,6 +7,8 @@ import PhotoCaptureWindow from "./PhotoCaptureWindow";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import Cookies from "js-cookie";
 
+import {notifyError, notifySuccess} from "../UI/ToastNotification.jsx";
+
 const StartTest = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -21,50 +23,23 @@ const StartTest = () => {
     navigate("/student/");
   };
 
-  const handleFullscreen = () => {
-    const element = document.documentElement;
-    if (element.requestFullscreen) {
-      element.requestFullscreen().catch((err) => {
-        console.error("Fullscreen request failed:", err);
-      });
-    } else if (element.mozRequestFullScreen) {
-      element.mozRequestFullScreen().catch((err) => {
-        console.error("Fullscreen request failed:", err);
-      });
-    } else if (element.webkitRequestFullscreen) {
-      element.webkitRequestFullscreen().catch((err) => {
-        console.error("Fullscreen request failed:", err);
-      });
-    } else if (element.msRequestFullscreen) {
-      element.msRequestFullscreen().catch((err) => {
-        console.error("Fullscreen request failed:", err);
-      });
-    }
-  };
-
   const handleStartTest = async () => {
-      const isDetailsFilled = document.getElementById("studentName").value &&
-      document.getElementById("dob").value &&
-      document.getElementById("email").value &&
-      document.getElementById("phone").value;
-
-    if (!isDetailsFilled) {
-      alert("Please fill in all details before starting the test.");
-      return;
-    }
     if (!photoCaptured) {
-      alert("Please capture a photo before starting the test.");
+      // alert("Please capture a photo before starting the test.");
+      notifyError("Please capture a photo before starting the test.");
       return;
     }
 
     if (!agreeTerms) {
-      alert("Please agree to the terms and conditions to start the test.");
+      // alert("Please agree to the terms and conditions to start the test.");
+      notifyError("Please agree to the terms and conditions to start the test.");
       return;
     }
 
     // Redirect to test page
     // Continue with test initiation or redirection logic
-    alert("Test initiated successfully!");
+    // alert("Test initiated successfully!");
+    notifySuccess("Test initiated successfully!");
 
     let result = await sendPhotoToBackend(capturedPhoto);
     if (result === 0) {
@@ -73,8 +48,6 @@ const StartTest = () => {
       navigate(`/student/attemptest/${id}`);
     }
     // Redirect to test page
-    handleFullscreen();
-    navigate(`/student/attemptest/${id}`);
   };
 
   const handleCheckboxChange = () => {
@@ -109,6 +82,7 @@ const StartTest = () => {
 
     if (!accessToken) {
       console.log("Access token not found, User not authorized");
+      notifyError("User not authorized, Please login again");
       navigate("/student/");
       return 0;
     }
@@ -129,9 +103,11 @@ const StartTest = () => {
       // const data = await res.json();
       // console.log(data);
       console.log("Photo sent to backend successfully");
+      notifySuccess("Photo sent to backend successfully");
       return 1;
     } else {
       console.error("Failed to send photo to backend");
+      notifyError("Failed to send photo to backend");
       return 0;
     }
   };

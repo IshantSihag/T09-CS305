@@ -12,7 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 
-import { ToastContainer, notifyError, notifySuccess } from '../UI/ToastNotification';
+import { notifyError, notifySuccess } from '../UI/ToastNotification';
 
 
 const StudentLogin = () => {
@@ -137,7 +137,6 @@ const StudentLogin = () => {
           </Typography>
         </CardFooter>
       </Card>
-      <ToastContainer />
     </div>
   );
 };

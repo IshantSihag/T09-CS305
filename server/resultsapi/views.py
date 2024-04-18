@@ -43,13 +43,6 @@ class RegisterStudentForTestView(APIView):
             # if userProfile.type not in ("Student", "student"):
             #     jsonresponse["error"] = "user must be student"
             #     return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
-            current_time = timezone.now()
-            if current_time >= test.start:
-                jsonresponse = {
-                    "ok": False,
-                    "error": "Registration is closed. The test has already started.",
-                }
-                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
             try:
                 test = Test.objects.get(id=test_id)
@@ -57,6 +50,13 @@ class RegisterStudentForTestView(APIView):
                 print(traceback.format_exc())
                 jsonresponse["error"] = "Test not found"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
+            current_time = timezone.now()
+            if current_time >= test.start:
+                jsonresponse = {
+                    "ok": False,
+                    "error": "Registration is closed. The test has already started.",
+                }
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             registrations = test.registrations.split(",")
             registrations = [registration.strip() for registration in registrations]
             if str(user.email) in registrations:

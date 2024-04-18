@@ -11,7 +11,7 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 
-import { ToastContainer, notifyError, notifySuccess } from '../UI/ToastNotification';
+import { notifyError, notifySuccess } from '../UI/ToastNotification';
 
 export default function InstitutionSignUp() {
   const navigate = useNavigate();
@@ -127,7 +127,6 @@ export default function InstitutionSignUp() {
           </Typography>
         </CardFooter>
       </Card>
-      <ToastContainer />
     </div>
   );
 }

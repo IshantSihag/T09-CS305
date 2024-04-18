@@ -22,6 +22,8 @@ import { ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import Watermark from "../Common/Watermark";
 import WebcamCapture from "../Common/WebcamCatpure";
 
+import {notifySuccess, notifyError, notifyWarn} from "../UI/ToastNotification.jsx";
+
 //TODO: REPLACE ALL ALERTS TO REACT TOAST
 
 const AttemptTest = () => {
@@ -65,15 +67,6 @@ const AttemptTest = () => {
     };
 
     useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-              // Tab is active 
-            } else {
-              alert("TAB SWITCHHH!!!");
-            }
-          };
-      
-          document.addEventListener("visibilitychange", handleVisibilityChange);
         const fetchQuestions = async () => {
             try {
                 //fetching the questions list, if it is available in cookies
@@ -101,7 +94,8 @@ const AttemptTest = () => {
 
                 if (!accessToken) {
                     console.log("Access token not found, User not authorized");
-                    alert("User not authorized, Please Login");
+                    // alert("User not authorized, Please Login");
+                    notifyError("User not authorized, Please Login");
                     navigate('/student/login');
                     return;
                 }
@@ -117,6 +111,9 @@ const AttemptTest = () => {
                     },
                     body: formData
                 });
+                console.log(res);
+                if(res.ok == false)
+                    console.log(res.error);
 
                 if (res.ok) {
                     const data = await res.json();
@@ -135,7 +132,8 @@ const AttemptTest = () => {
 
                     const logMsg = "Data fetched, setting up cookies with fetched data...";
                     console.log(logMsg);
-                    alert("Data fetched successfully");
+                    // alert("Data fetched successfully");
+                    notifySuccess("Questions Data fetched successfully");
 
                     //setting cookies data
                     await storeListToCookies(questionsList);
@@ -148,6 +146,7 @@ const AttemptTest = () => {
                     //CHECK: for unauthorized request, user redirected to login
                     if (res.status === 401) {
                         console.log("Unauthorized : Please login");
+                        notifyError("Unauthorized : Please login");
                         navigate('/student/login');
 
                         return;
@@ -155,6 +154,7 @@ const AttemptTest = () => {
                     console.log(`Fetch Error : ${res.status}`);
                 }
             } catch (err) {
+                notifyError("Error while fetching test");
                 console.log(`Error while fetching test: ${err.message}`);
             }
         };
@@ -171,7 +171,8 @@ const AttemptTest = () => {
 
                 if (!accessToken) {
                     console.log("Access token not found, User not authorized");
-                    alert("User not authorized, Please Login");
+                    // alert("User not authorized, Please Login");
+                    notifyError("User not authorized, Please Login");
                     navigate('/student/login');
 
                     return;
@@ -203,7 +204,8 @@ const AttemptTest = () => {
                     //CHECK: for unauthorized request, user redirected to login
                     if (res.status === 401) {
                         console.log("Unauthorized : Please login");
-                        alert("Unauthorized : Please login");
+                        // alert("Unauthorized : Please login");
+                        notifyError("Unauthorized : Please login");
                         navigate('/student/login');
 
                         return;
@@ -212,7 +214,8 @@ const AttemptTest = () => {
                 }
             } catch (err) {
                 console.log(`Error in fetching test timings : ${err.message}`);
-                alert('Error in fetching test timings');
+                // alert('Error in fetching test timings');
+                notifyError('Error in fetching test timings');
             }
         };
 
@@ -251,7 +254,8 @@ const AttemptTest = () => {
 
             if (!accessToken) {
                 console.log("Access token not found, User not authorized");
-                alert("User not authorized, Please Login");
+                // alert("User not authorized, Please Login");
+                notifyError("User not authorized, Please Login");
                 navigate('/student/login');
                 return;
             }
@@ -289,26 +293,30 @@ const AttemptTest = () => {
                     // Cookies.remove(`time/${testId}`);
 
                     console.log(receievedMsg);
-                    alert(receievedMsg);
+                    // alert(receievedMsg);
+                    notifySuccess(receievedMsg);
 
                     //navigating to student dashboard
-                    navigate("/student/review");
+                    navigate(`/student/review/${testId}`);
                 } else {
                     // Handle the error response
                     let errMsg = `Test submission failed: ${resData.error}` || "Error (submit-test)";
                     console.log(`Error (submit-test) : ${errMsg}`);
-                    alert("Submit test failed");
+                    // alert("Submit test failed");
+                    notifyError("Submit test failed");
                 }
             } else {
                 // Handle the error response
                 let errMsg = `Error while submitting test`;
                 console.log(errMsg);
-                alert("Submit test failed");
+                // alert("Submit test failed");
+                notifyError("Submit test failed");
             };
         } catch (err) {
             let errMsg = `Error while submitting test: ${err.message}`;
             console.log(`Error (submit-test) : ${err}`);
-            alert(errMsg);
+            // alert(errMsg);
+            notifyError(errMsg);
         }
     };
 

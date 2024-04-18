@@ -16,6 +16,8 @@ class Test(models.Model):
     )
     title = models.CharField(max_length=100, blank=False, null=False)
     start = models.DateTimeField()
+    description = models.TextField(blank=True)
+    instructions = models.TextField(blank=True)
     duration = models.IntegerField()  # Number of seconds
     author = models.CharField(max_length=100, blank=False, null=False)
     questions = models.TextField()
@@ -70,3 +72,10 @@ class Student(models.Model):
     )
     batch = models.IntegerField()
     course = models.CharField(max_length=100)
+
+
+class AttemptingTest(models.Model):
+    studentEmail = models.EmailField()
+    test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
+    profile_warnings = models.IntegerField(default=5)
+    fullScreen_warnings = models.IntegerField(default=2)

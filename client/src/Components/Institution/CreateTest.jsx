@@ -21,7 +21,7 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 import { ToastContainer, notifyError, notifySuccess } from "../UI/ToastNotification";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Ques_Types = ["single_correct", "multi_correct", "long_answer"];
 
@@ -156,14 +156,14 @@ const LongAnswer = ({ currentQuestion_, handleQuestionAnswerChange_ }) => {
   );
 };
 
-const DetailDrawer = ({ drawerOpen, setDrawerOpen, setTestData }) => {
+const DetailDrawer = ({ drawerOpen_, setDrawerOpen_, setTestData_, testData_ }) => {
   return (
-    <Drawer open={drawerOpen} onClose={setDrawerOpen} className="p-4">
+    <Drawer open={drawerOpen_} onClose={setDrawerOpen_} className="p-4">
       <div className="mb-6 flex items-center justify-between">
         <Typography variant="h5" color="blue-gray">
           Test Details
         </Typography>
-        <IconButton variant="text" color="blue-gray" onClick={()=>{setDrawerOpen(!drawerOpen)}}>
+        <IconButton variant="text" color="blue-gray" onClick={()=>{setDrawerOpen_(!drawerOpen_)}}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -195,7 +195,8 @@ const DetailDrawer = ({ drawerOpen, setDrawerOpen, setTestData }) => {
             containerProps={{
               className: "border-black",
             }}
-            onChange={(e) => {setTestData({ ...setTestData, description: e.target.value })}}
+            value={testData_.description}
+            onChange={(e) => {setTestData_({ ...testData_, description: e.target.value })}}
           />
         </div>
         <div>
@@ -212,7 +213,8 @@ const DetailDrawer = ({ drawerOpen, setDrawerOpen, setTestData }) => {
             containerProps={{
               className: "border-black",
             }}
-            onChange={(e) => {setTestData({ ...setTestData, instructions: e.target.value })}}
+            value={testData_.instructions}
+            onChange={(e) => {setTestData_({ ...testData_, instructions: e.target.value })}}
           />
         </div>
       </div>
@@ -221,16 +223,17 @@ const DetailDrawer = ({ drawerOpen, setDrawerOpen, setTestData }) => {
 };
 
 
-export default function CreattTest() {
+export default function CreattTest({type}) {
+  const { id: testId } = useParams();
   const navigate = useNavigate();
   let date = new Date();
+  const [loading, setLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [testData, setTestData] = useState({ title: "", start: "", duration: "", description: "", instructions: ""});
 
   const [questions, setQuestions] = useState([
     {
       id: 1,
-      title: "",
       statement: "",
       type: "single_correct",
       choices: [
@@ -265,7 +268,7 @@ export default function CreattTest() {
 
   setInterval(() => {
     setCookies();
-  }, 10000);
+  }, 2000);
 
   const handleSave = async() => {
     let access = Cookies.get("access");
@@ -273,7 +276,7 @@ export default function CreattTest() {
       navigate("/institution/login");
     }
     for (let i = 0; i < questions.length; i++) {
-      if (questions[i].title === "" || questions[i].statement === "" || questions[i].marks === "") {
+      if (questions[i].statement === "" || questions[i].marks === "") {
         notifyError("Please fill all the fields in question " + (i + 1));
         return;
       }
@@ -324,14 +327,15 @@ export default function CreattTest() {
 
       console.log("RES : ", res);
       if (!res.ok) {
-        notifyError("Failed to create test, Please try again");
+        const data = await res.json();
+        notifyError("Failed to create test, Please try again", data.error);
         return;
       }
       const data = await res.json();
       if (data.ok) {
         notifySuccess("Test created successfully");
-        navigate("/institution/");
         deleteCookies();
+        navigate("/institution/");
       }      
     } catch (err) {
       console.log("Failed to create test. error:", err);
@@ -359,7 +363,6 @@ export default function CreattTest() {
       ...prevQuestions,
       {
         id: prevQuestions.length + 1,
-        title: "",
         statement: "",
         type: "single_correct",
         choices: [
@@ -377,16 +380,6 @@ export default function CreattTest() {
       prevQuestions.filter((question, index) => index !== currentQuestionIndex)
     );
     setCurrentQuestionIndex(currentQuestionIndex - 1);
-  };
-
-  const handleQuestionTitleChange = (value) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((question, index) =>
-        index === currentQuestionIndex
-          ? { ...question, title: value }
-          : question
-      )
-    );
   };
 
   const handleQuestionChange = (value) => {
@@ -479,7 +472,7 @@ export default function CreattTest() {
   return (
     <div>
       <Navbar />
-      <DetailDrawer drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} setTestData={setTestData} />
+      <DetailDrawer drawerOpen_={drawerOpen} setDrawerOpen_={setDrawerOpen} setTestData_={setTestData} testData_={testData} />
       <div className="bg-gray-50 flex px-6 py-2 h-full">
         <div className="flex w-1/2 gap-x-4 h-full">
           <Typography variant="h3" color="blue-gray" className="text-center">
@@ -524,11 +517,11 @@ export default function CreattTest() {
               color="blue-gray"
               className="pt-2 align-middle"
             >
-              Duration (min)
+              Duration (sec)
             </Typography>
             <input
               type="number"
-              placeholder="Duration in min"     
+              placeholder="Duration in sec"     
               className="w-fit p-1.5 border-1 border-blue-gray-100 rounded-md"
               min={0}
               value={testData.duration}
@@ -575,9 +568,6 @@ export default function CreattTest() {
                     className="font-bold justify-between"
                   >
                     Q. {index + 1}{" "}
-                    {question.title.length > 13
-                      ? question.title.slice(0, 13) + "..."
-                      : question.title}
                   </Typography>
                   <Chip
                     variant="ghost"
@@ -633,12 +623,6 @@ export default function CreattTest() {
           <CardBody className="flex-1 overflow-auto">
             <div>
               <Typography variant="h6">Question</Typography>
-              <input
-                placeholder="Question Title"
-                className="w-1/3 p-1.5 border-1 border-blue-gray-100 rounded-md"
-                value={currentQuestion.title}
-                onChange={(e) => handleQuestionTitleChange(e.target.value)}
-              />
               <Textarea
                 variant="outlined"
                 placeholder="Type question here"

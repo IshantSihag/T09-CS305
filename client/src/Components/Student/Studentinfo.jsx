@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import {notifyError, notifySuccess} from "../UI/ToastNotification.jsx"; 
 import Navbar from '../Common/Navbar';
 import Footer from '../Common/Footer';
 import "./Studentinfo.css";
 import fetchAPI from '../Tools/FetchAPI'
 const port = process.env.REACT_APP_API_URL
+
 const Studentinfo = () => {
   const [instituteName, setInstituteName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -23,11 +25,15 @@ const Studentinfo = () => {
         setMobileNumber(response.phone_number)
         setCgpa(response.cgpa)
         setBioGraphy(response.bio)
+
+        console.log("Student data fetched successfully")
+        notifySuccess("Student data fetched successfully")
       }
       else
       {
-        alert("Error in fetching data")
-      
+        // alert("Error in fetching data")
+        console.log("Error in fetching data")
+        notifyError("Error in fetching data")
       }
     }
     fetchData()
@@ -98,6 +104,17 @@ const Studentinfo = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+
+      if (errors.instituteName) {
+        notifyError(errors.instituteName);
+      } else if (errors.mobileNumber) {
+        notifyError(errors.mobileNumber);
+      } else if (errors.cgpa) {
+        notifyError(errors.cgpa);
+      } else if (errors.resume) {
+        notifyError(errors.resume);
+      }
+
       return;
     }
 
@@ -115,7 +132,10 @@ const Studentinfo = () => {
     }
     let response = await fetchAPI(`${port}/student/updateStudentDetails`, { dataToSend }, "POST", true)
     if (response.ok) {
-      alert("Profile Updated successfully");
+      // alert("Profile Updated successfully");
+      console.log("Profile Updated successfully");
+      notifySuccess("Profile Updated successfully");
+
       setInstituteName('');
       setMobileNumber('');
       setCgpa('');
@@ -129,7 +149,9 @@ const Studentinfo = () => {
 
     }
     else {
-      alert("Profile Updation failed");
+      // alert("Profile Updation failed");
+      console.log("Profile Updation failed");
+      notifyError("Profile Updation failed, Please try again");
     }
   };
 

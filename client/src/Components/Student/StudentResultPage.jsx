@@ -11,6 +11,7 @@ import {
   TabsBody,
   TabPanel,
 } from "@material-tailwind/react";
+import Navbar from "../Common/Navbar"; 
 
 let api = `http://localhost:8000/api`
 const StudentResultPage = () => {
@@ -29,6 +30,8 @@ const StudentResultPage = () => {
     }
   }, [])
   return (
+    <>
+    <Navbar />
     <div>
       <h2 className="result-title">Result for TEST NAME</h2>
 
@@ -49,6 +52,7 @@ const StudentResultPage = () => {
 
       <Footer />
     </div>
+    </>
   );
 };
 

@@ -7,12 +7,15 @@ import profileImage from "../../Assets/profile_image.jpg"; // Import the image
 import Cookies from "js-cookie"; // Import Cookies
 import DialogBox from "../Common/DialogBox";
 
+import {notifyError, notifySuccess} from "../UI/ToastNotification.jsx";
+
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [studentDetails, setStudentDetails] = useState({});
   const [image, setImage] = useState(null);
   const [upcomingTests, setUpcomingTests] = useState([]);
   const [pastTests, setPastTests] = useState([]);
+  const [ongoingTests, setOngoingTests] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(true);
 
   useEffect(() => {
@@ -26,6 +29,7 @@ const StudentDashboard = () => {
 
       if (!accessToken) {
         console.log("Access token not found, User not authorized");
+        notifyError("User not authorized, Please Login again");
         navigate("/student/login");
         return;
       }
@@ -47,13 +51,19 @@ const StudentDashboard = () => {
 
         console.log(data.upcomingtests);
         console.log(data.pasttests);
+        console.log(data.ongoingTests);
         setUpcomingTests(data.upcomingtests);
         setPastTests(data.pasttests);
+        setOngoingTests(data.ongoingtests);
+
+        notifySuccess("Tests details fetched successfully");
       } else {
         console.error("Failed to fetch student profile data");
+        notifyError("Failed to fetch student profile data, Please try again");
       }
     } catch (error) {
       console.error("Error while fetching data:", error);
+      notifyError("Error while fetching data, Please try again");
     }
   };
 
@@ -107,6 +117,11 @@ const StudentDashboard = () => {
               <div className="mt-4 px-3 w-full">
                 {isDialogOpen && <DialogBox onClose={handleCloseDialog} />}
               </div>
+              <div className="mt-4 px-3 w-full">
+                <Button onClick={() => navigate("/student/info")} className="w-32">
+                  Profile
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -129,7 +144,6 @@ const StudentDashboard = () => {
                       <th className="border border-black px-4 py-2">
                         Duration
                       </th>
-                      <th className="border border-black px-4 py-2">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -145,17 +159,9 @@ const StudentDashboard = () => {
                           {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.duration} minutes
+                          {test.duration} seconds
                         </td>
-                        <td className="border border-black px-4 py-2">
-                          <Button
-                            color="blue"
-                            ripple="light"
-                            onClick={()=>handleAttemptTest(test.id)}
-                          >
-                            Attempt Test
-                          </Button>
-                        </td>
+
                       </tr>
                     ))}
                   </tbody>
@@ -163,6 +169,58 @@ const StudentDashboard = () => {
               </>
             ) : (
               <p className="text-xl font-bold mb-2">No upcoming tests.</p>
+            )}
+
+            {ongoingTests.length > 0 ? (
+              <>
+              <h2 className="text-xl font-bold mb-4 text-left">Ongoing Tests</h2>
+              <table className="border-collapse border border-black w-full">
+                <thead>
+                  <tr>
+                    <th className="border border-black px-4 py-2">Sr No.</th>
+                    <th className="border border-black px-4 py-2">
+                      Test Title
+                    </th>
+                    <th className="border border-black px-4 py-2">
+                      Start Time
+                    </th>
+                    <th className="border border-black px-4 py-2">
+                      Duration
+                    </th>
+                    <th className="border border-black px-4 py-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ongoingTests.map((test, index) => (
+                    <tr key={test.id}>
+                      <td className="border border-black px-4 py-2">
+                        {index + 1}
+                      </td>
+                      <td className="border border-black px-4 py-2">
+                        {test.title}
+                      </td>
+                      <td className="border border-black px-4 py-2">
+                        {new Date(test.start).toLocaleString()}
+                      </td>
+                      <td className="border border-black px-4 py-2">
+                        {test.duration} seconds
+                      </td>
+                      <td className="border border-black px-4 py-2">
+                        <Button
+                          color="blue"
+                          ripple="light"
+                          onClick={()=>handleAttemptTest(test.id)}
+                        >
+                          Attempt Test
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+            ) : (
+              <p className="text-xl font-bold mb-2">No Ongoing tests.</p>
             )}
 
             {pastTests.length > 0 ? (
@@ -197,7 +255,7 @@ const StudentDashboard = () => {
                           {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {(test.duration)} minutes
+                          {(test.duration)} seconds
                         </td>
                         <td className="border border-black px-4 py-2">
                           <Button

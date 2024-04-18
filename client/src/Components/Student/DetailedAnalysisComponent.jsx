@@ -32,8 +32,8 @@ const DetailedAnalysisComponent = () => {
                     <div className="test-header-heading">ProctorX Test</div>
                     <div className="test-header-content">
                         <Pagination 
-                            total={totalQuestions}
-                            currentIndex={currentQuestion}
+                            total={1}
+                            currentIndex={1}
                             setCurrentIndex={setCurrentQuestion}
                         />
                         <div className="quick-links-container">
@@ -52,13 +52,9 @@ const DetailedAnalysisComponent = () => {
                     <div className="question-container">
                         <div className="question-meta-data">
                             <div className="question-number">Question No. 1</div>
-                            <div className="question-points">Points: 10</div>
+                            <div className="question-points">Marks: 2</div>
                         </div>
-                        <div className="question-statement">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                        Duis aute irure dolor in reprehenderit in 
-                        voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-                        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+                        <div className="question-statement">Question 1</div>
                     </div>
                     <div className="answer-container">
                         <div className="answer-statement">Answer Statement</div>

@@ -12,7 +12,7 @@ from .serializers import (
 )
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Test, UserProfile, Question, Student
+from .models import Test, UserProfile, Question, Student, AttemptingTest
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from django.utils.crypto import get_random_string
@@ -173,11 +173,10 @@ class ProfileView(APIView):
 
 
 class startTest(APIView):
-    permission_classes = (IsAuthenticated, IsStudent)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         try:
-            uuid.UUID(request.data["test_id"])
             test_id = request.data["test_id"]
         except:
             jsonresponse = {"ok": False, "error": "test_id required"}
@@ -188,6 +187,12 @@ class startTest(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         test = Test.objects.get(id=test_id)
         registrations = test.registrations.split(",")
+        user = User.objects.get(email=user_email)
+        profile = UserProfile.objects.get(user_id=user)
+        if profile.type != "student":
+            jsonresponse = {"ok": False, "error": "You are not eligible to give test."}
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
         if user_email in registrations:
             current_time = timezone.now()
             if current_time < test.start:
@@ -202,6 +207,10 @@ class startTest(APIView):
                     "error": "test has already finished",
                 }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            if not AttemptingTest.objects.filter(
+                studentEmail=user_email, test_id=test
+            ).exists():
+                AttemptingTest.objects.create(studentEmail=user_email, test_id=test)
             questions = []
             listquestions = Question.objects.filter(test_id=test_id)
             for question in listquestions:
@@ -217,7 +226,7 @@ class startTest(APIView):
             jsonresponse = {
                 "ok": True,
                 "start": test.start,
-                "duration": test.duration,
+                "duration": int(test.duration) * 60,
                 "author": test.author,
                 "questions": questions,
             }
@@ -293,6 +302,8 @@ class createTest(APIView):
         try:
             title = request.data["title"]
             start = request.data["start"]
+            description = request.data["description"]
+            instructions = request.data["instructions"]
             duration = int(request.data["duration"])
             if duration < 0:
                 jsonresponse = {"ok": False, "error": "Invalid duration"}
@@ -329,6 +340,8 @@ class createTest(APIView):
                 questions="",
                 testCode="",
                 registrations="",
+                description=description,
+                instructions=instructions,
             )
             question_ids = ""
             for question in questions:
