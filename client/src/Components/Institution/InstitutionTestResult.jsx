@@ -6,11 +6,11 @@ import fetchAPI from '../Tools/FetchAPI';
 
 const InstituteTestResult = () => {
   const [students, setStudents] = useState([
-    { id: 1, name: 'John', marks: 85, cgpa: 8.5, phoneNo: '1234567890', batch: '2023', course: 'Computer Science' },
-    { id: 2, name: 'Alice', marks: 90, cgpa: 9.0, phoneNo: '9876543210', batch: '2022', course: 'Electrical Engineering' },
-    { id: 3, name: 'Bob', marks: 75, cgpa: 7.5, phoneNo: '2345678901', batch: '2024', course: 'Mechanical Engineering' },
-    { id: 4, name: 'Eve', marks: 88, cgpa: 8.8, phoneNo: '8901234567', batch: '2023', course: 'Civil Engineering' },
-    { id: 5, name: 'Charlie', marks: 92, cgpa: 9.2, phoneNo: '3456789012', batch: '2022', course: 'Chemical Engineering' },
+    { id: 1, name: 'anshul', marks: 2, cgpa: 9.8, phoneNo: '1234567890', batch: '2021', course: 'Computer Science' },
+    // { id: 2, name: 'Alice', marks: 90, cgpa: 9.0, phoneNo: '9876543210', batch: '2022', course: 'Electrical Engineering' },
+    // { id: 3, name: 'Bob', marks: 75, cgpa: 7.5, phoneNo: '2345678901', batch: '2024', course: 'Mechanical Engineering' },
+    // { id: 4, name: 'Eve', marks: 88, cgpa: 8.8, phoneNo: '8901234567', batch: '2023', course: 'Civil Engineering' },
+    // { id: 5, name: 'Charlie', marks: 92, cgpa: 9.2, phoneNo: '3456789012', batch: '2022', course: 'Chemical Engineering' },
   ]);
 
   const [testid, setTestId] = useState('')
@@ -21,7 +21,7 @@ const InstituteTestResult = () => {
   const [aboveAverageCount, setAboveAverageCount] = useState(0);
   const [belowAverageCount, setBelowAverageCount] = useState(0);
 
-  let api = `http://localhost:5000/api`
+  let api = `http://localhost:8000/api`
   useEffect(() => {
     const fetchResult = async () => {
       let response = await fetchAPI(`${api}/testresult?test_id=${testid}`, {}, "GET", false)

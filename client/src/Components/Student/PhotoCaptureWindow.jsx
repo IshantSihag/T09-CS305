@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import {notifyError} from "../UI/ToastNotification.jsx";
 
 const PhotoCaptureWindow = ({ onCapture, onClose }) => {
   const [cameraStream, setCameraStream] = useState(null);
@@ -14,6 +15,7 @@ const PhotoCaptureWindow = ({ onCapture, onClose }) => {
         videoRef.current.srcObject = stream;
       }
     } catch (error) {
+      notifyError("Error while accessing camera");
       console.error("Error accessing camera:", error);
     }
   };

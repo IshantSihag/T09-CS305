@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Papa from "papaparse";
-import { ToastContainer, notifySuccess, notifyError } from "../../Components/UI/ToastNotification";
+import { notifySuccess, notifyError, notifyWarn } from "../../Components/UI/ToastNotification";
 import Cookies from "js-cookie";
 
 import { Typography } from "@material-tailwind/react";
@@ -78,7 +78,8 @@ const CreateTestUpload = () => {
         data.append('start', testData.start);
         data.append('duration', testData.duration);
         data.append('questions', JSON.stringify(questions));
-        alert('Are you absolutely sure you want to create this test? Please preview once before creating!')
+        //alert('Are you absolutely sure you want to create this test? Please preview once before creating!')
+        notifyWarn('Are you absolutely sure you want to create this test? Please preview once before creating!')
         if (window.confirm('Are you absolutely sure you want to create this test? Please preview once before creating!')) {
             fetch("http://localhost:8000/createTest/", {
                 method: "POST",
@@ -109,7 +110,6 @@ const CreateTestUpload = () => {
     return (
         <div>
             <Navbar />
-            <ToastContainer />
             <div style={{ display: 'flex', flexDirection: 'column', height: '60vh' }}>
                 <div className="bg-gray-50 flex px-6 py-2 mt-10">
                     <Typography variant="h3" color="blue-gray" className="my-auto">
