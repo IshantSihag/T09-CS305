@@ -12,7 +12,7 @@ import {
   TabPanel,
 } from "@material-tailwind/react";
 
-let api = `http://localhost:5000/api`
+let api = `http://localhost:8000/api`
 const StudentResultPage = () => {
   const [selectedTab, setSelectedTab] = useState("score");
   const [testid, setTestId] = useState('')

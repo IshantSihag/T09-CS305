@@ -21,7 +21,7 @@ const InstituteTestResult = () => {
   const [aboveAverageCount, setAboveAverageCount] = useState(0);
   const [belowAverageCount, setBelowAverageCount] = useState(0);
 
-  let api = `http://localhost:5000/api`
+  let api = `http://localhost:8000/api`
   useEffect(() => {
     const fetchResult = async () => {
       let response = await fetchAPI(`${api}/testresult?test_id=${testid}`, {}, "GET", false)
