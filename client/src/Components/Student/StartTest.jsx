@@ -45,15 +45,15 @@ const StartTest = () => {
   };
 
   const handleStartTest = async () => {
-      const isDetailsFilled = document.getElementById("studentName").value &&
-      document.getElementById("dob").value &&
-      document.getElementById("email").value &&
-      document.getElementById("phone").value;
+      // const isDetailsFilled = document.getElementById("studentName").value &&
+      // document.getElementById("dob").value &&
+      // document.getElementById("email").value &&
+      // document.getElementById("phone").value;
 
-    if (!isDetailsFilled) {
-      alert("Please fill in all details before starting the test.");
-      return;
-    }
+    // if (!isDetailsFilled) {
+    //   alert("Please fill in all details before starting the test.");
+    //   return;
+    // }
     if (!photoCaptured) {
       // alert("Please capture a photo before starting the test.");
       notifyError("Please capture a photo before starting the test.");

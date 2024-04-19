@@ -86,7 +86,6 @@ class VerifyUserView(APIView):
             unknown_face_enc, cnt = find_face_encodings(user_pic_base64)
             if cnt == 0:
                 user_attempt_test.profile_warnings -= 1
-                user_attempt_test.fullScreen_warnings -= 1
                 user_attempt_test.save()
                 jsonresponse = {
                     "ok": True,
@@ -98,7 +97,6 @@ class VerifyUserView(APIView):
                 return Response(jsonresponse, status=status.HTTP_200_OK)
             elif cnt > 1:
                 user_attempt_test.profile_warnings -= 1
-                user_attempt_test.fullScreen_warnings -= 1
                 user_attempt_test.save()
                 jsonresponse = {
                     "ok": True,
@@ -122,7 +120,6 @@ class VerifyUserView(APIView):
                 return Response(jsonresponse, status=status.HTTP_200_OK)
             else:
                 user_attempt_test.profile_warnings -= 1
-                user_attempt_test.fullScreen_warnings -= 1
                 user_attempt_test.save()
                 jsonresponse = {
                     "ok": True,

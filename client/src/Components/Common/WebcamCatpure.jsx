@@ -57,13 +57,13 @@ const WebcamCapture = ({
 
     const sendImageToBackend = async (imageStr) => {
         const formData = new FormData();
-        formData.append('image', imageStr);
-        formData.append('testId', testId);
+        formData.append('user_pic_base64', imageStr);
+        formData.append('test_id', testId);
 
         try {
             const access = Cookies.get("access");
 
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/verifyUser`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/verifyUser/`, {
                 method: 'POST',
                 headers: {
                     "Authorization": `Bearer ${access}`
@@ -72,13 +72,14 @@ const WebcamCapture = ({
             });
             if (response.ok) {
                 const data = await response.json();
+                console.log(data);
                 if (data.ok) {
-                    if (!data.voilation) {
+                    if (data.verified) {
                         console.log('Image verified successfully, No voilation detected');
                         return ;
                     } 
 
-                    const warningsLeft = data["warning_left"];
+                    const warningsLeft = data["profile_warnings_left"];
                     if (warningsLeft === 0) {
                         //submit the test
                         //alert("Voilation detected. No warning left. Submitting the test");
