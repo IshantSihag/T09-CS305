@@ -81,8 +81,8 @@ const StudentDashboard = () => {
     navigate(`/student/starttest/${id}`);
   };
 
-  const handleViewAnalysis = () => {
-    navigate("/student/result");
+  const handleViewAnalysis = (id) => {
+    navigate(`/student/result/${id}`);
   };
 
   return (
@@ -261,7 +261,7 @@ const StudentDashboard = () => {
                           <Button
                             color="blue"
                             ripple="light"
-                            onClick={handleViewAnalysis}
+                            onClick={() => handleViewAnalysis(test.id)}
                           >
                             View Analysis
                           </Button>

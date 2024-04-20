@@ -1,80 +1,51 @@
-import React from 'react'
-import { 
-    Checkbox, Typography
-} from "@material-tailwind/react";
+import React from "react";
+import { Checkbox, Typography } from "@material-tailwind/react";
 
-//css 
+//css
 import "./DetailedAnalysisPage.css";
 
-const CheckAnswer = ({}) => {
-    return (
-        <div className="checklist">
-                  <div style={{border: '', padding: '10px'}}>
-            {/* <p style={{color: 'red', fontWeight: 'bold'}}>Your Answer</p> */}
-    <div className="checklist-item">
-        {/* <Checkbox 
-          
-            id="checkbox-3"
-            ripple={false}
-            className="hover:before:opacity-0"
-            containerProps={{
-                className: "p-0",
-            }}
-        /> */}
-      
-        <Typography color="blue-gray" className="font-medium">
-            Option A
-        </Typography>
-    </div>
-   
-</div>
-            <div className="checklist-item">
-                {/* <Checkbox 
-                    id="checkbox-2"
-                    ripple={false}
-                    className="hover:before:opacity-0"
-                    containerProps={{
-                    className: "p-0",
-                    }}
-                /> */}
-                <Typography color="blue-gray" className="font-medium">
-                    Option B
-                </Typography>
-            </div>
-            <div style={{border: '2px solid green', padding: '10px'}}>
-            <p style={{color: 'green', fontWeight: 'bold'}}>Your Answer</p>
-    <div className="checklist-item">
-        {/* <Checkbox 
-          
-            id="checkbox-3"
-            ripple={false}
-            className="hover:before:opacity-0"
-            containerProps={{
-                className: "p-0",
-            }}
-        /> */}
-      
-        <Typography color="blue-gray" className="font-medium">
-        Option C
-        </Typography>
-    </div>
-   
-</div>
-             <div className="checklist-item">
-                {/* <Checkbox 
-                    id="checkbox-4"
-                    ripple={false}
-                    className="hover:before:opacity-0"
-                    containerProps={{
-                    className: "p-0",
-                    }}
-                /> */}
-                <Typography color="blue-gray" className="font-medium">
-                Option D
-                </Typography>
-            </div>
-        </div>
-    )
-}
+const CheckAnswer = ({ currentQuestion }) => {
 
-export default CheckAnswer
+    const getColor=(index)=>
+    {
+        if(currentQuestion.attempted_options_indices.includes(index) && currentQuestion.answer_options_indices.includes(index))
+        {
+            return "green"
+        }
+        else if(currentQuestion.attempted_options_indices.includes(index))
+        {
+            return "red"
+        }
+        else if(currentQuestion.answer_options_indices.includes(index))
+        {
+            return "green"
+        }
+        else
+        {
+            return "white"
+        }
+    }
+
+  return (
+    <div className="checklist">
+      {currentQuestion.options.map((item, index) => (
+        <div style={{ border: `2px solid ${getColor(index)}`, padding: "10px" }}>
+          {currentQuestion.attempted_options_indices
+.includes(index) && (
+            <p style={{ color: `${getColor(index)}`, fontWeight: "bold" }}>Your Answer</p>
+          )}
+
+          <div className="checklist-item">
+            {item && (
+              <Typography color="blue-gray" className="font-medium">
+                {item}
+              </Typography>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default CheckAnswer;
