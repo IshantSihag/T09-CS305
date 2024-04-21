@@ -10,11 +10,13 @@ import traceback
 from datetime import timedelta
 from django.utils import timezone
 import uuid
+from api.permissions import IsStudent
+from datetime import datetime
 
 
 # Create your views here.
 class RegisterStudentForTestView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsStudent)
 
     def post(self, request):
         try:
@@ -38,9 +40,17 @@ class RegisterStudentForTestView(APIView):
                 jsonresponse["error"] = "No user with the given email or username"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
             userProfile = UserProfile.objects.get(user_id=user.id)
-            if userProfile.type not in ("Student", "student"):
-                jsonresponse["error"] = "user must be student"
-                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            # if userProfile.type not in ("Student", "student"):
+            #     jsonresponse["error"] = "user must be student"
+            #     return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
+            #             current_time = timezone.now()
+            #             if current_time >= test.start:
+            #                 jsonresponse = {
+            #                     "ok": False,
+            #                     "error": "Registration is closed. The test has already started.",
+            #                 }
+            #                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 
             try:
                 test = Test.objects.get(id=test_id)
@@ -48,6 +58,13 @@ class RegisterStudentForTestView(APIView):
                 print(traceback.format_exc())
                 jsonresponse["error"] = "Test not found"
                 return Response(jsonresponse, status=status.HTTP_404_NOT_FOUND)
+            current_time = timezone.now()
+            if current_time >= test.start:
+                jsonresponse = {
+                    "ok": False,
+                    "error": "Registration is closed. The test has already started.",
+                }
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             registrations = test.registrations.split(",")
             registrations = [registration.strip() for registration in registrations]
             if str(user.email) in registrations:
@@ -136,7 +153,10 @@ class GetResultForStudent(APIView):
             # ongoing test
             start = test.start
             end = start + timedelta(seconds=test.duration)
-            if end >= timezone.now():
+            if timezone.now() <= start:
+                jsonresponse["error"] = "The test has not yet started"
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            elif end >= timezone.now():
                 jsonresponse["error"] = "The test is still ongoing"
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
 

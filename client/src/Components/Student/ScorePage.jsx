@@ -9,9 +9,9 @@ import Chart from "react-apexcharts";
 import { Square3Stack3DIcon } from "@heroicons/react/24/outline";
 
 const ScorePage = () => {
-  const correctedPercentage = 60;
-  const incorrectedPercentage = 23;
-  const unattemptedPercentage = 17;
+  const correctedPercentage = 100;
+  const incorrectedPercentage = 0;
+  const unattemptedPercentage = 0;
 
   const totalPercentage =
     correctedPercentage + incorrectedPercentage + unattemptedPercentage;
@@ -51,13 +51,13 @@ const ScorePage = () => {
       <div className="result-column">
         <div className="result-list">
           <div className="result-type">
-            <strong>Correct:</strong> {correctedPercentage}
+            <strong>Correct:</strong> {correctedPercentage} %
           </div>
           <div className="result-type">
-            <strong>Incorrect:</strong> {incorrectedPercentage}
+            <strong>Incorrect:</strong> {incorrectedPercentage} %
           </div>
           <div className="result-type">
-            <strong>Unattempted:</strong> {unattemptedPercentage}
+            <strong>Unattempted:</strong> {unattemptedPercentage} %
           </div>
         </div>
       </div>

@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import './Navbar.css';
+
+import {notifyError, notifySuccess} from "../UI/ToastNotification.jsx"; 
+
 const Navbar = () => {
     const [name, setName] = useState('');
     const [type, setType] = useState('');
@@ -45,12 +48,17 @@ const Navbar = () => {
             Cookies.remove('type');
             Cookies.remove('name');
             Cookies.remove('email');
+
+            notifySuccess("Logout Successfully");
+
             navigate('/');
           } else {
             console.log("Logout Failed Please try again");
+            notifyError("Logout Failed Please try again");
           }
         } catch (err) {
           console.log("Error in Logout, Please try again");
+          notifyError("Error in Logout, Please try again");
         }
       }
 

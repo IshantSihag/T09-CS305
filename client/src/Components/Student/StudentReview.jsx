@@ -6,6 +6,8 @@ import { faAsterisk } from '@fortawesome/free-solid-svg-icons';
 import "./StudentReview.css";
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { notifyError, notifySuccess } from '../UI/ToastNotification';
+
 
 const StudentReview = () => {
   const navigate = useNavigate();
@@ -30,6 +32,7 @@ const StudentReview = () => {
     console.log("feedback submitted");
 
     if (rating === 0) {
+      notifyError("Please fill all the fields");
       setError('Please fill this field');
       return;
     }
@@ -39,7 +42,9 @@ const StudentReview = () => {
 
       if (!access) {
         console.log("User not logged in, Please login");
-        alert("User not logged in, Please login");
+        //alert("User not logged in, Please login");
+        notifyError("User not logged in, Please login");
+
         navigate("/student/login");
       }
 
@@ -64,21 +69,30 @@ const StudentReview = () => {
 
         if (data.ok) {
           console.log(data.message);
+          notifySuccess(data.message || "Feedback submitted successfully");
+
 
           // Reset form fields
           setRating(0);
           setImprovements('');
+
+          //navigating to the student dashbaord
+          navigate('/student');
         } else {
-          console.log("Error in submitting review");
-          console.log("ERROR: ", data.error);
+          console.log(`Error (submit-feedback): ${data.error}`);
           setError('Failed to submit rating. Please try again.');
+          notifyError('Failed to submit rating. Please try again.');
         }
       } else {
         setError(data.error); 
+        notifyError(data.error || "Error in submitting feedback, Please try again"); 
+
       }
     } catch (error) {
       console.error('Error:', error);
       setError('Failed to submit rating. Please try again.');
+      notifyError('Failed to submit rating. Please try again.');
+
     }
   };
 
@@ -91,7 +105,7 @@ const StudentReview = () => {
       </div>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          {error && <p className="error">{error}</p>} 
+          {/*{error && <p className="error">{error}</p>}*/} 
           <label htmlFor="rating">
             <span style={{ color: '#FF6666', fontSize: '10px', verticalAlign: 'super'}}><FontAwesomeIcon icon={faAsterisk} /></span>
             How was your overall experience? {' '}
