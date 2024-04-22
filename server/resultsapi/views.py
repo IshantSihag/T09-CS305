@@ -271,7 +271,10 @@ class GetResultForStudent(APIView):
             resultResponse["total"] = total_test
             resultResponse["score"] = score_student
             resultResponse["questionwise_score"] = questionwise_score
-
+            resultResponse["correct"] = 2
+            resultResponse["unattempted"] = 3
+            resultResponse["incorrect"] = 4
+            resultResponse["title"] = test.title
             return Response(resultResponse, status=status.HTTP_200_OK)
 
         except Exception as e:

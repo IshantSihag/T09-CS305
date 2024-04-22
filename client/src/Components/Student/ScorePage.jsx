@@ -8,21 +8,21 @@ import {
 import Chart from "react-apexcharts";
 import { Square3Stack3DIcon } from "@heroicons/react/24/outline";
 
-const ScorePage = () => {
-  const correctedPercentage = 100;
-  const incorrectedPercentage = 0;
-  const unattemptedPercentage = 0;
+const ScorePage = ({quesData}) => {
+  const correctedPercentage = quesData.correct;
+  const incorrectedPercentage = quesData.incorrect;
+  const unattemptedPercentage = quesData.unattempted; 
 
   const totalPercentage =
     correctedPercentage + incorrectedPercentage + unattemptedPercentage;
 
-  const correctedAngle = (correctedPercentage / totalPercentage) * 360;
-  const incorrectedAngle = (incorrectedPercentage / totalPercentage) * 360;
-  const unattemptedAngle = (unattemptedPercentage / totalPercentage) * 360;
+  const correctedAngle = Math.round((correctedPercentage / totalPercentage) * 100, 2);
+  const incorrectedAngle = Math.round((incorrectedPercentage / totalPercentage) * 100, 2);
+  const unattemptedAngle = Math.round((unattemptedPercentage / totalPercentage) * 100, 2);
   
   const chartConfig = {
-    type: "pie",
-    series: [correctedPercentage, incorrectedPercentage, unattemptedPercentage],
+    type: "pie", 
+    series: [correctedAngle, incorrectedAngle, unattemptedAngle],
     options: {
       chart: {
         width: 280,
@@ -51,13 +51,13 @@ const ScorePage = () => {
       <div className="result-column">
         <div className="result-list">
           <div className="result-type">
-            <strong>Correct:</strong> {correctedPercentage} %
+            <strong>Correct:</strong> {correctedAngle} %
           </div>
           <div className="result-type">
-            <strong>Incorrect:</strong> {incorrectedPercentage} %
+            <strong>Incorrect:</strong> {incorrectedAngle} %
           </div>
           <div className="result-type">
-            <strong>Unattempted:</strong> {unattemptedPercentage} %
+            <strong>Unattempted:</strong> {unattemptedAngle} %
           </div>
         </div>
       </div>
