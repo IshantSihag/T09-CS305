@@ -9,14 +9,8 @@ const QuickLink = ({
     total, currentIndex, setCurrentIndex, setOpen
 }) => {
     
-    const [quickLinksArr, setQuickLinksArr] = useState([]);
-    useEffect(() => {
-        const arr = [];
-        for (let k=1; k<=total; k++) {
-            arr.push(k);
-        } 
-        setQuickLinksArr(arr);
-    }, []);  
+    const [quickLinksArr, setQuickLinksArr] = useState(Array.from({ length: total }, (_, i) => i + 1));
+    
 
     const getItemProps = (index) => ({
         variant: currentIndex === index ? "filled" : "text",

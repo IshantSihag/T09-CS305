@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-
+import Cookies from 'js-cookie';
 const fetchAPI = async (url, data, method, isTokenRequired = true) => {
     const headers = {
       'Content-Type': 'application/json',
     };
   
     // Check if the token is required and available in localStorage
-    if (isTokenRequired && localStorage.getItem('token')) {
-      headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+    if (isTokenRequired && Cookies.get('access')) {
+      headers['Authorization'] = `Bearer ${Cookies.get('access')}`;
     }
   
     let options = {
