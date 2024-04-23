@@ -28,48 +28,6 @@ const CreateTestAI = () => {
         },
     ]);
 
-    const setQues = (ques, check) => {
-        if(!check) {
-            setQuestions((prev) => 
-                [ 
-                    {
-                        id: 1,
-                        statement: ques.question,
-                        type: "single_correct",
-                        choices: [
-                            { value: ques.option1, isCorrect: ques.option1 === ques.answer },
-                            { value: ques.option2, isCorrect: ques.option2 === ques.answer },
-                            { value: ques.option3, isCorrect: ques.option3 === ques.answer},
-                            { value: ques.option4, isCorrect: ques.option4 === ques.answer},
-                        ],
-                        answer: "",
-                        marks: "",
-                    }
-                ]
-            );
-        }
-        else {
-            setQuestions((prev) => 
-                [
-                    ...prev,
-                    {
-                        id: prev.length + 1,
-                        statement: ques.question,
-                        type: "single_correct",
-                        choices: [
-                            { value: ques.option1, isCorrect: ques.option1 === ques.answer },
-                            { value: ques.option2, isCorrect: ques.option2 === ques.answer },
-                            { value: ques.option3, isCorrect: ques.option3 === ques.answer},
-                            { value: ques.option4, isCorrect: ques.option4 === ques.answer},
-                        ],
-                        answer: "",
-                        marks: "",
-                    }
-                ]
-            );
-        }
-    };
-
     const handleGenerateQuestions = async () => {
         if (topic === '' || quesno === 0) {
             notifyWarn("Please fill all the fields");
@@ -85,21 +43,61 @@ const CreateTestAI = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    topic,
-                    quesno
-                })
+                body: datas
             });
             const data = await res.json();
+            //FOR TESTING
+            // const data = {
+            //     "ok": true,
+            //     "test": {
+            //         "questions": [
+            //             {
+            //                 "question": "What is the process by which green plants and some other organisms use sunlight to synthesize foods with the help of chlorophyll?",
+            //                 "option1": "Photosynthesis",
+            //                 "option2": "Respiration",
+            //                 "option3": "Mitosis",
+            //                 "option4": "Fermentation",
+            //                 "answer": "Photosynthesis"
+            //             },
+            //             {
+            //                 "question": "Who proposed the theory of relativity in physics?",
+            //                 "option1": "Isaac Newton",
+            //                 "option2": "Albert Einstein",
+            //                 "option3": "Galileo Galilei",
+            //                 "option4": "Micheal Faraday",
+            //                 "answer": "Albert Einstein"
+            //             }
+            //         ]
+            //     }
+            // };
             if (data.ok) {
                 console.log(data);
                 notifySuccess("Questions generated successfully");
-                const len = data.test.questions.length;
-                setQues(data.test.questions[0], 0);
-                for(let i=1; i<len; i++) {
-                    setQues(data.test.questions[i], 1);
+
+                const newQuestions = data.test.questions.map((question, index) => {
+                    return {
+                        id: index + 1,
+                        statement: question.question,
+                        type: "single",
+                        choices: [
+                            { value: question.option1, isCorrect: question.option1 === question.answer },
+                            { value: question.option2, isCorrect: question.option2 === question.answer },
+                            { value: question.option3, isCorrect: question.option3 === question.answer },
+                            { value: question.option4, isCorrect: question.option4 === question.answer },
+                        ],
+                        marks: "",
+                    };
+                });
+
+
+                setQuestions(newQuestions);
+                console.log(JSON.stringify(newQuestions));
+                if(Cookies.get("questions") !== undefined) {
+                    Cookies.remove("questions");
+                    console.log("removed");
+                    console.log(JSON.stringify(questions));
                 }
-                Cookies.set("questions", JSON.stringify(questions));
+                Cookies.set("questions", JSON.stringify(newQuestions));
                 navigate('/institution/createtest');
             } else {
                 notifyError(data.message);
