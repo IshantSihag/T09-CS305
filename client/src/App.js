@@ -36,8 +36,8 @@ const App = () => {
           <Route exact path="/institution/signup" element={<InstitutionSignUp />} />
           <Route exact path="/institution/profile" element={<InstitutionProfile />} />
           <Route exact path="/institution/" element={<InstituteDashBoard />} />
-          <Route exact path="/institution/createtest" element={<CreateTest type="create"/>} />
-          <Route exact path="/institution/updatetest/:id" element={<CreateTest type="edit" />} />
+          <Route exact path="/institution/createtest" element={<CreateTest />} />
+          <Route exact path="/institution/updatetest/:id" element={<CreateTest edit={true} />} />
           <Route exact path="/institution/createtest/upload" element={<CreateTestUpload />} />
           <Route exact path="/institution/createtest/preview" element={<CreateTestPreview />} />
           <Route exact path="/student/result/:id" element={<StudentResultPage />} />

@@ -23,7 +23,7 @@ import Footer from "../Common/Footer";
 import { ToastContainer, notifyError, notifySuccess } from "../UI/ToastNotification";
 import { useNavigate, useParams } from "react-router-dom";
 
-const Ques_Types = ["single_correct", "multi_correct", "long_answer"];
+const Ques_Types = ["single", "multiple"];
 
 const SingleCorrect = ({
   currentQuestion_,
@@ -42,6 +42,7 @@ const SingleCorrect = ({
               type="radio"
               name="singleChoice"
               className="m-1.5 p-1.5 border-1 w-4 border-blue-gray-100 rounded-md"
+              checked={choice.isCorrect}
               onChange={() => {
                 handleSelectCorrectAnswer_(index, true);
                 currentQuestion_.choices.map((choice, i) => {
@@ -132,30 +133,6 @@ const MultiCorrect = ({
   );
 };
 
-const LongAnswer = ({ currentQuestion_, handleQuestionAnswerChange_ }) => {
-  return (
-    <div>
-      <Typography variant="h6">Answer</Typography>
-      <Textarea
-        variant="outlined"
-        placeholder="Type answer here"
-        // label="question"
-        className="mt-2 border-1 flex-1 rounded-lg w-full h-32"
-        labelProps={{
-          className: "before:content-none after:content-none",
-        }}
-        containerProps={{
-          className: "border-black",
-        }}
-        onChange={(e) => {
-          handleQuestionAnswerChange_(e.target.value);
-        }}
-        value={currentQuestion_.answer}
-      />
-    </div>
-  );
-};
-
 
 const DetailDrawer = ({ drawerOpen_, setDrawerOpen_, setTestData_, testData_ }) => {
   return (
@@ -229,24 +206,23 @@ const DetailDrawer = ({ drawerOpen_, setDrawerOpen_, setTestData_, testData_ }) 
 };
 
 
-export default function CreattTest({type}) {
+export default function CreattTest({edit = false}) {
   const { id: testId } = useParams();
   const navigate = useNavigate();
   let date = new Date();
   const [loading, setLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [testData, setTestData] = useState({ title: "", start: "", duration: "", description: "", instructions: ""});
-
+  
   const [questions, setQuestions] = useState([
     {
       id: 1,
       statement: "",
-      type: "single_correct",
+      type: "single",
       choices: [
         { value: "", isCorrect: false },
         { value: "", isCorrect: false },
       ],
-      answer: "",
       marks: "",
     },
   ]);
@@ -272,6 +248,70 @@ export default function CreattTest({type}) {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const access = Cookies.get("access");
+      if (!access) {
+        navigate("/institution/login");
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append("test_id", testId);
+
+        const res = await fetch(`http://127.0.0.1:8000/fetchTest/`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+          body: formData,
+        });
+        console.log("RES : ", res);
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log("DATA : ", data);
+          setTestData({
+            title: data.title || "",
+            start: data.start.slice(0,19) || "",
+            duration: data.duration || "",
+            description: data.description || "",
+            instructions: data.instructions || "",
+          });
+
+          
+
+          let questions_ = [];
+          for (let i = 0; i < data.questions.length; i++) {
+            let question = {
+              id: i + 1,
+              statement: data.questions[i].statement || "",
+              type: data.questions[i].type || "",
+              choices: data.questions[i].options || [],
+              marks: data.questions[i].marks || "",
+            };
+            questions_.push(question);
+          }
+
+          setQuestions(questions_);
+          setCurrentQuestionIndex(0);
+
+          notifySuccess("Test Data fetched successfully");
+        } else {
+          const data = await res.json();
+          notifyError("Failed to fetch data, Please try again", data.error);
+        }
+      } catch (error) {
+        console.log("Failed to fetch data. error:", error);
+        notifyError("Failed to fetch data. Please try again");
+      }
+
+    };
+    if (edit) {
+      fetchData();
+    }
+  }, [edit])
+
   setInterval(() => {
     setCookies();
   }, 2000);
@@ -287,7 +327,7 @@ export default function CreattTest({type}) {
         notifyError("Please fill all the fields in question " + (i + 1));
         return;
       }
-      if (questions[i].type === "single_correct" || questions[i].type === "multi_correct") {
+      if (questions[i].type === "single" || questions[i].type === "multiple") {
         let flag = false;
         let flag1 = false;
         for (let j = 0; j < questions[i].choices.length; j++) {
@@ -323,34 +363,64 @@ export default function CreattTest({type}) {
     sendData.append("questions", JSON.stringify(questions));
 
     // console.log(sendData);
-    try{
-      const res = await fetch("http://localhost:8000/createTest/", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
-        body: sendData,
-      })
+    if(edit) {
+      sendData.append("test_id", testId);
 
-      console.log("RES : ", res);
-      if (!res.ok) {
+      try {
+        const res = await fetch("http://localhost:8000/updateTest/", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+          body: sendData,
+        })
+
+        console.log("RES : ", res);
+        if (!res.ok) {
+          const data = await res.json();
+          notifyError("Failed to update test, Please try again", data.error);
+
+          return;
+        }
         const data = await res.json();
-        notifyError("Failed to create test, Please try again", data.error);
-
-        return;
+        if (data.ok) {
+          notifySuccess("Test updated successfully");
+          deleteCookies();
+          navigate("/institution/");
+        }      
+      } catch (err) {
+        console.log("Failed to update test. error:", err);
+        notifyError("Failed to update test. Please try again");
       }
-      const data = await res.json();
-      if (data.ok) {
-        notifySuccess("Test created successfully");
-        deleteCookies();
-        navigate("/institution/");
-
-      }      
-    } catch (err) {
-      console.log("Failed to create test. error:", err);
-      notifyError("Failed to create test. Please try again");
     }
+    else {
+      try{
+        const res = await fetch("http://localhost:8000/createTest/", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+          body: sendData,
+        })
 
+        console.log("RES : ", res);
+        if (!res.ok) {
+          const data = await res.json();
+          notifyError("Failed to create test, Please try again", data.error);
+
+          return;
+        }
+        const data = await res.json();
+        if (data.ok) {
+          notifySuccess("Test created successfully");
+          deleteCookies();
+          navigate("/institution/");
+        }      
+      } catch (err) {
+        console.log("Failed to create test. error:", err);
+        notifyError("Failed to create test. Please try again");
+      }
+    }
   };
 
   const setCookies = () => {
@@ -373,12 +443,11 @@ export default function CreattTest({type}) {
       {
         id: prevQuestions.length + 1,
         statement: "",
-        type: "single_correct",
+        type: "single",
         choices: [
           { value: "", isCorrect: false },
           { value: "", isCorrect: false },
         ],
-        answer: "",
         marks: "",
       },
     ]);
@@ -404,17 +473,16 @@ export default function CreattTest({type}) {
   const handleQuestionTypeChange = (value) => {
     setQuestions((prevQuestions) =>
       prevQuestions.map((question, index) =>
-        index === currentQuestionIndex ? { ...question, type: value } : question
-      )
-    );
-  };
-
-  const handleQuestionAnswerChange = (value) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((question, index) =>
-        index === currentQuestionIndex
-          ? { ...question, answer: value }
-          : question
+        index === currentQuestionIndex 
+        ? { 
+          ...question, 
+          type: value,
+          choices: [
+            { value: "", isCorrect: false },
+            { value: "", isCorrect: false },
+          ],
+         } 
+        : question
       )
     );
   };
@@ -477,6 +545,7 @@ export default function CreattTest({type}) {
       )
     );
   };
+  console.log("real", testData, questions);
 
   return (
     <div>
@@ -504,11 +573,11 @@ export default function CreattTest({type}) {
           </Button>
         </div>
         <div className="flex w-1/2">
-          <div className="flex w-full gap-x-4 h-full">
+          <div className="flex w-full gap-x-1 h-full">
             <Typography
               variant="h6"
               color="blue-gray"
-              className="pt-2 align-middle"
+              className="pt-2.5"
             >
               Start Time
             </Typography>
@@ -516,23 +585,24 @@ export default function CreattTest({type}) {
               type="datetime-local"
               min={date.toISOString().slice(0, 16)}
               placeholder="Start Time"
-              className="w-fit p-1.5 border-1 border-blue-gray-100 rounded-md"
+              className="w-fit p-1.5 m-1 border-1 border-blue-gray-100 rounded-md"
               value={testData.start}
-              onChange={(e) => setTestData({ ...testData, start: e.target.value.slice(0, 16) + ":00"})}
+              onChange={(e) => {
+                setTestData({ ...testData, start: e.target.value + ":00"})}}
             />
           </div>
-          <div className="flex w-full gap-x-4 h-full">
+          <div className="flex w-full gap-x-1 h-full">
             <Typography
               variant="h6"
               color="blue-gray"
-              className="pt-2 align-middle"
+              className="pt-2.5 align-middle"
             >
               Duration (sec)
             </Typography>
             <input
               type="number"
               placeholder="Duration in sec"     
-              className="w-fit p-1.5 border-1 border-blue-gray-100 rounded-md"
+              className="w-fit p-1.5 m-1 border-1 border-blue-gray-100 rounded-md"
               min={0}
               value={testData.duration}
               onChange={(e) =>
@@ -586,10 +656,6 @@ export default function CreattTest({type}) {
                     className="w-fit h-8"
                   />
                 </div>
-
-                {/* <Typography variant="paragraph" color="gray" className="flex-1">
-                  {question.value}
-                </Typography> */}
               </div>
             ))}
           </CardBody>
@@ -607,14 +673,11 @@ export default function CreattTest({type}) {
                 onChange={(val) => handleQuestionTypeChange(val)}
                 labelProps={{ className: "before:content-none" }}
               >
-                <Option value="single_correct" className="mb-1">
+                <Option value="single" className="mb-1">
                   Single Correct (MCQ)
                 </Option>
-                <Option value="multi_correct" className="mb-1">
+                <Option value="multiple" className="mb-1">
                   Multi Correct
-                </Option>
-                <Option value="long_answer" className="mb-1">
-                  Long Answer
                 </Option>
               </Select>
             </div>
@@ -648,7 +711,7 @@ export default function CreattTest({type}) {
                 value={currentQuestion.statement}
               />
             </div>
-            {currentQuestion.type === "single_correct" && (
+            {currentQuestion.type === "single" && (
               <SingleCorrect
                 currentQuestion_={currentQuestion}
                 currentQuestionIndex_={currentQuestionIndex}
@@ -659,7 +722,7 @@ export default function CreattTest({type}) {
               />
             )}
 
-            {currentQuestion.type === "multi_correct" && (
+            {currentQuestion.type === "multiple" && (
               <MultiCorrect
                 currentQuestion_={currentQuestion}
                 currentQuestionIndex_={currentQuestionIndex}
@@ -667,13 +730,6 @@ export default function CreattTest({type}) {
                 handleDeleteChoice_={handleDeleteChoice}
                 handleChoiceChange_={handleChoiceChange}
                 handleSelectCorrectAnswer_={handleSelectCorrectAnswer}
-              />
-            )}
-
-            {currentQuestion.type === "long_answer" && (
-              <LongAnswer
-                currentQuestion_={currentQuestion}
-                handleQuestionAnswerChange_={handleQuestionAnswerChange}
               />
             )}
           </CardBody>
