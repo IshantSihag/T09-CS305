@@ -118,7 +118,7 @@ const StudentDashboard = () => {
                 {isDialogOpen && <DialogBox onClose={handleCloseDialog} />}
               </div>
               <div className="mt-4 px-3 w-full">
-                <Button onClick={() => navigate("/student/profile")} className="w-32">
+                <Button onClick={() => navigate("/student/info")} className="w-32">
                   Profile
                 </Button>
               </div>
