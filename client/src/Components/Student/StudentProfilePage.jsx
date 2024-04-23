@@ -12,7 +12,7 @@ const StudentProfilePage = () => {
   const navigate = useNavigate();
   const [studentName, setStudentName] = useState("");
   const [studentDetails, setStudentDetails] = useState({
-    bio: "",
+    bio: "", // Bio of the student
     cgpa: "",
     batch: "",
     course: "",
@@ -79,23 +79,23 @@ const StudentProfilePage = () => {
       <Navbar />
       <div className="flex  ">
         <div className="flex-1  items-center justify-center   flex-col p-12 pl-64">
-          <h1 className="text-4xl font-bold text-[hsl(0,0%,8%)] lg:text-7xl mb-12">
+          <p className="text-sm font-bold text-[hsl(0,0%,8%)] lg:text-5xl mb-12">
             {studentName}
-          </h1>
+          </p>
           <p className="text-base lg:text-lg my-2 text-[hsl(0,0%,41%)]  font-medium">
-            Bio: {studentDetails.bio}
+            Bio : {studentDetails.bio}
           </p>
           <p className="text-base lg:text-lg my-2 text-[hsl(0,0%,41%)] font-medium">
-            CGPA: {studentDetails.cgpa}
+            CGPA : {studentDetails.cgpa}
           </p>
           <p className="text-base lg:text-lg my-2 text-[hsl(0,0%,41%)] font-medium">
-            Batch: {studentDetails.batch}
+            Batch : {studentDetails.batch}
           </p>
           <p className="text-base lg:text-lg my-2 text-[hsl(0,0%,41%)] font-medium">
-            Course: {studentDetails.course}
+            Course : {studentDetails.course}
           </p>
           <p className="text-base lg:text-lg my-2 text-[hsl(0,0%,41%)] font-medium">
-            Phone Number: {studentDetails.phoneNumber}
+            Phone Number : {studentDetails.phoneNumber}
           </p>
           <button className="bg-[hsl(0,0%,8%)] text-white py-3 px-6 rounded-xl mt-12" onClick = {() => navigate('/student')}>
             Back to Dashboard
