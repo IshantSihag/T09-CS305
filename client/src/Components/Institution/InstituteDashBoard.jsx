@@ -88,8 +88,8 @@ const InstituteDashboard = () => {
     fetchData();
   };
 
-  const handleUpdateTest = () => {
-    navigate("/institution/updatetest");
+  const handleUpdateTest = (id) => {
+    navigate(`/institution/updatetest/${id}`);
   };
 
   const formData = new FormData();
@@ -229,7 +229,7 @@ const InstituteDashboard = () => {
                           <Button
                             color="blue"
                             ripple="light"
-                            onClick={handleUpdateTest}
+                            onClick={() => handleUpdateTest(test.id)}
                             className="ml-2"
                           >
                             Update Test
