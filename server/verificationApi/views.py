@@ -209,14 +209,21 @@ class FetchTestView(APIView):
             questions = []
             listquestions = Question.objects.filter(test_id=test_id)
             for question in listquestions:
+                options = []
+                for op in question.options.split(","):
+                    options.append(
+                        {
+                            "value": op,
+                            "isCorrect": bool(op in question.answer.split(','))
+                        }
+                    )
                 questions.append(
                     {
                         "id": question.id,
                         "statement": question.statement,
                         "type": question.type,
                         "marks": question.marks,
-                        "options": question.options.split(","),
-                        "answer": question.answer,
+                        "options": options,
                     }
                 )
             jsonresponse = {
@@ -225,6 +232,9 @@ class FetchTestView(APIView):
                 "duration": test.duration,
                 "author": test.author,
                 "questions": questions,
+                "description": test.description,
+                "instructions": test.instructions,
+                "title": test.title,
             }
             return Response(jsonresponse, status=status.HTTP_200_OK)
         else:

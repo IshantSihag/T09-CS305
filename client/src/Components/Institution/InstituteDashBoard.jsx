@@ -132,8 +132,9 @@ const InstituteDashboard = () => {
     }
   };
 
-  const handleViewAnalysis = () => {
-    navigate("/institution/testresult");
+  const handleViewAnalysis = (id) => {
+    console.log("IDK", id)
+    navigate(`/institution/testresult/${id}`);
   };
 
   return (
@@ -222,7 +223,7 @@ const InstituteDashboard = () => {
                           {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.duration} minutes
+                          {parseInt(test.duration/60)} minutes
                         </td>
 
                         <td className="border border-black px-2 py-2">
@@ -286,13 +287,13 @@ const InstituteDashboard = () => {
                           {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.duration} minutes
+                          {parseInt(test.duration/60)} minutes
                         </td>
                         <td className="border border-black px-4 py-2">
                           <Button
                             color="blue"
                             ripple="light"
-                            onClick={handleViewAnalysis}
+                            onClick={()=>{handleViewAnalysis(test.id)}}
                           >
                             View Analysis
                           </Button>

@@ -3,8 +3,10 @@ import Footer from '../Common/Footer';
 import Navbar from '../Common/Navbar';
 import { Card, CardHeader, CardBody, CardFooter, Typography, Button } from '@material-tailwind/react'; // Import your component library
 import fetchAPI from '../Tools/FetchAPI';
+import { useParams } from "react-router-dom"
 
 const InstituteTestResult = () => {
+  const { id: testid } = useParams();
   const [students, setStudents] = useState([
     { id: 1, name: 'anshul', marks: 2, cgpa: 9.8, phoneNo: '1234567890', batch: '2021', course: 'Computer Science' },
     // { id: 2, name: 'Alice', marks: 90, cgpa: 9.0, phoneNo: '9876543210', batch: '2022', course: 'Electrical Engineering' },
@@ -13,7 +15,6 @@ const InstituteTestResult = () => {
     // { id: 5, name: 'Charlie', marks: 92, cgpa: 9.2, phoneNo: '3456789012', batch: '2022', course: 'Chemical Engineering' },
   ]);
 
-  const [testid, setTestId] = useState('')
   const [mean, setMean] = useState(0);
   const [median, setMedian] = useState(0);
   const [mode, setMode] = useState(0);
@@ -21,10 +22,10 @@ const InstituteTestResult = () => {
   const [aboveAverageCount, setAboveAverageCount] = useState(0);
   const [belowAverageCount, setBelowAverageCount] = useState(0);
 
-  let api = `http://localhost:8000/api`
+  let api = `http://localhost:8000`
   useEffect(() => {
     const fetchResult = async () => {
-      let response = await fetchAPI(`${api}/testresult?test_id=${testid}`, {}, "GET", false)
+      let response = await fetchAPI(`${api}/testresult?test_id=${testid}`, {}, "GET", true)
       if (response.ok) {
         let students = response.result
         for (let i = 0; i < students.length; i++) {
@@ -44,6 +45,8 @@ const InstituteTestResult = () => {
         // error statement
       }
     }
+
+    fetchResult();
   }, [])
   useEffect(() => {
     calculateMean(students);
