@@ -12,12 +12,16 @@ from .serializers import (
 )
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Test, UserProfile, Question, Student
+from .models import Test, UserProfile, Question, Student, AttemptingTest
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from django.utils.crypto import get_random_string
 import json
 import uuid
+from .permissions import IsStudent, IsInstitute
+from datetime import datetime, timedelta
+from dateutil import parser
+from django.utils import timezone
 
 
 class LoginView(TokenObtainPairView):
@@ -169,11 +173,10 @@ class ProfileView(APIView):
 
 
 class startTest(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsStudent)
 
     def post(self, request):
         try:
-            uuid.UUID(request.data["test_id"])
             test_id = request.data["test_id"]
         except:
             jsonresponse = {"ok": False, "error": "test_id required"}
@@ -184,7 +187,30 @@ class startTest(APIView):
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         test = Test.objects.get(id=test_id)
         registrations = test.registrations.split(",")
+        user = User.objects.get(email=user_email)
+        profile = UserProfile.objects.get(user_id=user)
+        if profile.type != "student":
+            jsonresponse = {"ok": False, "error": "You are not eligible to give test."}
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+
         if user_email in registrations:
+            current_time = timezone.now()
+            if current_time < test.start:
+                jsonresponse = {
+                    "ok": False,
+                    "error": "test has not started yet",
+                }
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            elif current_time >= test.start + timedelta(seconds=test.duration):
+                jsonresponse = {
+                    "ok": False,
+                    "error": "test has already finished",
+                }
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            if not AttemptingTest.objects.filter(
+                studentEmail=user_email, test_id=test
+            ).exists():
+                AttemptingTest.objects.create(studentEmail=user_email, test_id=test)
             questions = []
             listquestions = Question.objects.filter(test_id=test_id)
             for question in listquestions:
@@ -200,7 +226,7 @@ class startTest(APIView):
             jsonresponse = {
                 "ok": True,
                 "start": test.start,
-                "duration": test.duration,
+                "duration": int(test.duration) * 60,
                 "author": test.author,
                 "questions": questions,
             }
@@ -211,6 +237,12 @@ class startTest(APIView):
                 "error": "You are not registered for this test",
             }
             return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+
+
+def remove(id, tests):
+    testsList = tests.split(",")
+    testsList = [i for i in testsList if i != str(id)]
+    return ",".join(testsList)
 
 
 class deleteTest(APIView):
@@ -234,18 +266,44 @@ class deleteTest(APIView):
                 "error": "You are not authorized to delete this test",
             }
             return Response(jsonresponse, status=status.HTTP_401_UNAUTHORIZED)
+        old_start = test.start
+        old_end = old_start + timedelta(seconds=test.duration)
+        if old_start <= timezone.now() and timezone.now() <= old_end:
+            jsonresponse = {
+                "ok": False,
+                "error": "The test is ongoing. You can't delete.",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        elif timezone.now() >= old_end:
+            jsonresponse = {
+                "ok": False,
+                "error": "The test has already ended. You can't delete.",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        author = User.objects.get(username=user_email)
+        institute = UserProfile.objects.get(user_id=author)
+        institute.tests = remove(test.id, institute.tests)
+        institute.save()
+        if test.registrations != "":
+            for student in test.registrations.split(","):
+                studentUser = User.objects.get(username=student)
+                studentProfile = UserProfile.objects.get(user_id=studentUser)
+                studentProfile.tests = remove(test.id, studentProfile.tests)
+                studentProfile.save()
         test.delete()
         jsonresponse = {"ok": True, "message": "Test deleted successfully"}
         return Response(jsonresponse, status=status.HTTP_200_OK)
 
 
 class createTest(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsInstitute)
 
     def post(self, request):
         try:
             title = request.data["title"]
             start = request.data["start"]
+            description = request.data["description"]
+            instructions = request.data["instructions"]
             duration = int(request.data["duration"])
             if duration < 0:
                 jsonresponse = {"ok": False, "error": "Invalid duration"}
@@ -264,6 +322,14 @@ class createTest(APIView):
                     return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         except:
             jsonresponse = {"ok": False, "error": "Invalid input"}
+
+        if parser.parse(start) < timezone.now():
+
+            jsonresponse = {
+                "ok": False,
+                "error": "We expect the start time to be some time in future",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
             user_email = request.user.email
             test = Test.objects.create(
@@ -274,6 +340,8 @@ class createTest(APIView):
                 questions="",
                 testCode="",
                 registrations="",
+                description=description,
+                instructions=instructions,
             )
             question_ids = ""
             for question in questions:
@@ -379,9 +447,29 @@ class UpdateTest(APIView):
                 "error": "You do not have access to update",
             }
             return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        old_start = test.start
+        old_end = old_start + timedelta(seconds=test.duration)
+        if old_start <= timezone.now() and timezone.now() <= old_end:
+            jsonresponse = {
+                "ok": False,
+                "error": "The test is ongoing. You can't update.",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+        elif timezone.now() >= old_end:
+            jsonresponse = {
+                "ok": False,
+                "error": "The test has already ended. You can't update.",
+            }
+            return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
         try:
             if duration < 0:
                 jsonresponse = {"ok": False, "error": "Invalid duration"}
+                return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
+            if parser.parse(start) < timezone.now():
+                jsonresponse = {
+                    "ok": False,
+                    "error": "We expect the start time to be some time in future",
+                }
                 return Response(jsonresponse, status=status.HTTP_400_BAD_REQUEST)
             for question in questions:
                 if question["type"].split("_")[0] not in (

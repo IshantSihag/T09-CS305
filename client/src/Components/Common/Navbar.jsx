@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import './Navbar.css';
+import {notifyError, notifySuccess} from "../UI/ToastNotification.jsx"; 
 
 const Navbar = () => {
     const [name, setName] = useState('');
@@ -25,33 +26,38 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            const refresh = Cookies.get('refresh');
-            const access = Cookies.get('access');
+          const refresh = Cookies.get('refresh');
+          const access = Cookies.get('access');
+    
+          const sendFormData = new FormData();
+          sendFormData.append('refresh', refresh);
+    
+          const response = await fetch('http://127.0.0.1:8000/logout/', {
+            method: "POST",
+            headers: {
+              'Authorization': `Bearer ${access}`
+            },
+            body: sendFormData
+          });
+    
+    
+          if (response.ok) {
+            Cookies.remove('access');
+            Cookies.remove('refresh');
+            Cookies.remove('type');
+            Cookies.remove('name');
+            Cookies.remove('email');
 
-            const sendFormData = new FormData();
-            sendFormData.append('refresh', refresh);
+            notifySuccess("Logout Successfully");
 
-            const response = await fetch('http://127.0.0.1:8000/logout/', {
-                method: "POST",
-                headers: {
-                    'Authorization': `Bearer ${access}`
-                },
-                body: sendFormData
-            });
-
-            if (response.ok) {
-                Cookies.remove('access');
-                Cookies.remove('refresh');
-                Cookies.remove('type');
-                Cookies.remove('name');
-                setType('');
-                navigate('/');
-            } else {
-                console.log("Logout Failed Please try again");
-            }
-
+            navigate('/');
+          } else {
+            console.log("Logout Failed Please try again");
+            notifyError("Logout Failed Please try again");
+          }
         } catch (err) {
-            console.log("Error in Logout, Please try again");
+          console.log("Error in Logout, Please try again");
+          notifyError("Error in Logout, Please try again");
         }
     }
 

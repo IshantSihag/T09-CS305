@@ -11,6 +11,7 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 
+
 import { ToastContainer, notifyError, notifySuccess } from '../UI/ToastNotification';
 
 export default function InstitutionSignUp() {

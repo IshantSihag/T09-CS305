@@ -6,7 +6,6 @@ import Footer from "../Common/Footer";
 import profileImage from "../../Assets/profile_image.jpg"; // Import the image
 import Cookies from "js-cookie"; // Import Cookies
 import {
-  ToastContainer,
   notifyError,
   notifySuccess,
 } from "../UI/ToastNotification";
@@ -35,6 +34,7 @@ const InstituteDashboard = () => {
 
       if (!accessToken) {
         console.log("Access token not found, User not authorized");
+        notifyError("User not authorized, Please login again");
         navigate("/student/login");
         return;
       }
@@ -49,6 +49,8 @@ const InstituteDashboard = () => {
       if (res.ok) {
         const data = await res.json();
         console.log(data);
+        
+        if (data.ok) {
         setInstituteDetails({
           name: data.name,
           bio: data.bio,
@@ -59,11 +61,19 @@ const InstituteDashboard = () => {
         console.log(data.pasttests);
         setUpcomingTests(data.upcomingtests);
         setPastTests(data.pasttests);
+
+        notifySuccess("Dashboard data fetched successfully");
+       } else {
+        console.log("Failed to fetch dashboard data");
+        notifyError("Failed to fetch dashboard data, Please try again");
+       }
       } else {
-        console.error("Failed to fetch student profile data");
+        console.error("Failed to fetch dashboard data");
+        notifyError("Failed to fetch dashboard data, Please try again");
       }
     } catch (error) {
       console.error("Error while fetching data:", error);
+      notifyError("Failed to fetch profile data, Please try again");
     }
   };
 
@@ -90,6 +100,7 @@ const InstituteDashboard = () => {
 
       if (!accessToken) {
         console.log("Access token not found, User not authorized");
+        notifyError("User not authorized, Please login again");
         navigate("/institution");
         return;
       }
@@ -112,11 +123,12 @@ const InstituteDashboard = () => {
         // Handle errors
         console.log(res);
         console.error("Failed to delete test:", res.statusText);
-        notifyError("Failed to delete test");
+        notifyError("Failed to delete test, Please try again");
       }
     } catch (error) {
       // Handle network errors or exceptions
       console.error("An error occurred while deleting the test:", error);
+      notifyError("An error occurred while deleting the test");
     }
   };
 
@@ -126,7 +138,6 @@ const InstituteDashboard = () => {
 
   return (
     <div className="h-screen ">
-      <ToastContainer />
       <Navbar />
       <div className="flex flex-col flex-grow p-4">
         <div className="text-2xl font-bold mb-4 text-center">
