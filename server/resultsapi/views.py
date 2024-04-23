@@ -198,6 +198,9 @@ class GetResultForStudent(APIView):
             }
             score_student = 0
             total_test = 0
+            correct_count = 0
+            incorrect_count = 0
+            total_count = len(test.questions.split(","))
             questionwise_score = []
 
             for question_id in questions:
@@ -259,6 +262,9 @@ class GetResultForStudent(APIView):
                 question_score = 0
                 if attempted_options == answer_options:
                     question_score = int(question.marks)
+                    correct_count += 1
+                elif attempted_options:
+                    incorrect_count += 1
 
                 questionObject["marks_scored"] = question_score
                 score_student += question_score
@@ -271,9 +277,11 @@ class GetResultForStudent(APIView):
             resultResponse["total"] = total_test
             resultResponse["score"] = score_student
             resultResponse["questionwise_score"] = questionwise_score
-            resultResponse["correct"] = 2
-            resultResponse["unattempted"] = 3
-            resultResponse["incorrect"] = 4
+            resultResponse["correct"] = correct_count
+            resultResponse["incorrect"] = incorrect_count
+            resultResponse["unattempted"] = (
+                total_count - correct_count - incorrect_count
+            )
             resultResponse["title"] = test.title
             return Response(resultResponse, status=status.HTTP_200_OK)
 

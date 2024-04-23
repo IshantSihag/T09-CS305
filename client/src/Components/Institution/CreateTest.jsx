@@ -356,8 +356,8 @@ export default function CreattTest({edit = false}) {
     
     const sendData = new FormData();
     sendData.append("title", testData.title);
-    sendData.append("start", testData.start+" +0530");
-    sendData.append("duration", testData.duration);
+    sendData.append("start", testData.start+" +0530");//+" +0530");
+    sendData.append("duration", testData.duration*60);  // pass duration in seconds
     sendData.append("description", testData.description);
     sendData.append("instructions", testData.instructions);
     sendData.append("questions", JSON.stringify(questions));
@@ -597,11 +597,11 @@ export default function CreattTest({edit = false}) {
               color="blue-gray"
               className="pt-2.5 align-middle"
             >
-              Duration (sec)
+              Duration (min)
             </Typography>
             <input
               type="number"
-              placeholder="Duration in sec"     
+              placeholder="Duration in min"     
               className="w-fit p-1.5 m-1 border-1 border-blue-gray-100 rounded-md"
               min={0}
               value={testData.duration}

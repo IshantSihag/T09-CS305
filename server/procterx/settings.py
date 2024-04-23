@@ -29,6 +29,21 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 
+import pytz
+from django.utils import timezone
+
+INDIA_TIMEZONE = pytz.timezone("Asia/Kolkata")
+
+
+class TimezoneMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        timezone.activate(INDIA_TIMEZONE)
+        return self.get_response(request)
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,6 +73,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "procterx.settings.TimezoneMiddleware",
 ]
 
 ROOT_URLCONF = "procterx.urls"

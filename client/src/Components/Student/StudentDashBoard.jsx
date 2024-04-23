@@ -159,7 +159,7 @@ const StudentDashboard = () => {
                           {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {test.duration} seconds
+                          {parseInt(test.duration/60)} minutes
                         </td>
 
                       </tr>
@@ -203,7 +203,7 @@ const StudentDashboard = () => {
                         {new Date(test.start).toLocaleString()}
                       </td>
                       <td className="border border-black px-4 py-2">
-                        {test.duration} seconds
+                        {parseInt(test.duration/60)} minutes
                       </td>
                       <td className="border border-black px-4 py-2">
                         <Button
@@ -255,7 +255,7 @@ const StudentDashboard = () => {
                           {new Date(test.start).toLocaleString()}
                         </td>
                         <td className="border border-black px-4 py-2">
-                          {(test.duration)} seconds
+                          {parseInt(test.duration/60)} minutes
                         </td>
                         <td className="border border-black px-4 py-2">
                           <Button

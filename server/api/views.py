@@ -485,6 +485,14 @@ class UpdateTest(APIView):
             jsonresponse = {"ok": False, "error": "Invalid input"}
 
         try:
+            # get previous questions present in the test and delete it
+            for ques_id in test.questions.split(","):
+                try:
+                    old_q = Question.objects.get(id=int(ques_id))
+                    old_q.delete()
+                except:
+                    print(f"Question with id {ques_id} not found")
+
             test.title = title
             test.start = start
             test.duration = duration
@@ -504,7 +512,9 @@ class UpdateTest(APIView):
                             answer += "," + choice["value"]
 
                 # check if question already exsists
-                if Question.objects.filter(id=question["id"]).exists():
+                if (
+                    False and Question.objects.filter(id=question["id"]).exists()
+                ):  # Not called so that every time new question is created. Problem is that Question.id from frontend and backend are not consistent
                     question_inst = Question.objects.get(id=question["id"])
                     question_inst.statement = question["statement"]
                     question_inst.type = question["type"].split("_")[0]
@@ -515,7 +525,7 @@ class UpdateTest(APIView):
                 else:
                     question_inst = Question.objects.create(
                         statement=question["statement"],
-                        type=question["type"].split("_")[0],
+                        type=question["type"],
                         marks=question["marks"],
                         options=options,
                         answer=answer,
@@ -523,6 +533,7 @@ class UpdateTest(APIView):
                     )
 
                 question_ids += str(question_inst.id) + ","
+                print(question_ids)
 
             question_ids = question_ids[:-1]
             test.questions = question_ids
