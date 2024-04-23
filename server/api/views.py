@@ -486,7 +486,7 @@ class UpdateTest(APIView):
 
         try:
             # get previous questions present in the test and delete it
-            for ques_id in test.questions.split(','):
+            for ques_id in test.questions.split(","):
                 try:
                     old_q = Question.objects.get(id=int(ques_id))
                     old_q.delete()
@@ -512,7 +512,9 @@ class UpdateTest(APIView):
                             answer += "," + choice["value"]
 
                 # check if question already exsists
-                if False and Question.objects.filter(id=question["id"]).exists():   # Not called so that every time new question is created. Problem is that Question.id from frontend and backend are not consistent
+                if (
+                    False and Question.objects.filter(id=question["id"]).exists()
+                ):  # Not called so that every time new question is created. Problem is that Question.id from frontend and backend are not consistent
                     question_inst = Question.objects.get(id=question["id"])
                     question_inst.statement = question["statement"]
                     question_inst.type = question["type"].split("_")[0]

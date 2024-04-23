@@ -214,7 +214,7 @@ class FetchTestView(APIView):
                     options.append(
                         {
                             "value": op,
-                            "isCorrect": bool(op in question.answer.split(','))
+                            "isCorrect": bool(op in question.answer.split(",")),
                         }
                     )
                 questions.append(
