@@ -88,6 +88,16 @@ const InstituteDashboard = () => {
     fetchData();
   };
 
+  const handleCreateTestCSV = () => {
+    navigate("/institution/createtest/upload");
+    fetchData();
+  };
+
+  const handleCreateTestAI = () => {
+    navigate("/institution/createtest/ai");
+    fetchData();
+  };
+
   const handleUpdateTest = () => {
     navigate("/institution/updatetest");
   };
@@ -166,7 +176,7 @@ const InstituteDashboard = () => {
             <div className="text-2xl text-center m-4">
               {instituteDetails.bio}
             </div>
-            <div className="w-25 items-center">
+            <div className="w-45 items-center">
               <Button
                 color="black"
                 onClick={handleCreateTest}
@@ -174,6 +184,26 @@ const InstituteDashboard = () => {
                 ripple="light"
               >
                 Create Test
+              </Button>
+            </div>
+            <div className="w-45 items-center">
+              <Button
+                color="black"
+                onClick={handleCreateTestCSV}
+                className="mt-4 px-6 py-3 w-full"
+                ripple="light"
+              >
+                Upload Test CSV
+              </Button>
+            </div>
+            <div className="w-45 items-center">
+              <Button
+                color="black"
+                onClick={handleCreateTestAI}
+                className="mt-4 px-6 py-3 w-full"
+                ripple="light"
+              >
+                Generate with AI
               </Button>
             </div>
           </div>
