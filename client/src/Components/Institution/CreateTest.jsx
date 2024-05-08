@@ -241,7 +241,7 @@ export default function CreattTest({edit = false}) {
     const testData_ = Cookies.get("testData");
 
     if (questions_ && currentQuestionIndex_) {
-      // console.log("Setting questions from cookies");
+      console.log("Setting questions from cookies");
       setTestData(JSON.parse(testData_));
       setQuestions(JSON.parse(questions_));
       setCurrentQuestionIndex(JSON.parse(currentQuestionIndex_));

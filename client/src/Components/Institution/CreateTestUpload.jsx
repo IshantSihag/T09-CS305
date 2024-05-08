@@ -9,7 +9,7 @@ import Navbar from "../Common/Navbar";
 import Footer from "../Common/Footer";
 
 const CreateTestUpload = () => {
-    const [testData, setTestData] = useState({ title: '', start: '', duration: 0 });
+    const [testData, setTestData] = useState({ title: "", start: "", duration: "", description: "", instructions: "" });
     const [upstate, setUpstate] = useState(false);
     const [loading, setLoading] = useState(false);
     const [questions, setQuestions] = useState([
@@ -59,8 +59,9 @@ const CreateTestUpload = () => {
 
     const handleSubmit = () => {
         setLoading(true);
+        console.log(testData);
         const data = new FormData();
-        if (testData.title === "" || testData.start === "" || testData.duration === 0) {
+        if (testData.title === "" || testData.start === "" || testData.duration === "") {
             setLoading(false);
             return notifyError("Please fill all the fields", 5000);
         }
@@ -69,17 +70,19 @@ const CreateTestUpload = () => {
             return notifyError("Please upload a file first", 5000);
         }
         let access = Cookies.get("access");
-        if(!access) {
+        if (!access) {
             setLoading(false);
             navigator.push('/institution/login');
             return notifyError("Please login first", 5000);
         }
         data.append('title', testData.title);
-        data.append('start', testData.start);
+        data.append('start', testData.start + " +0530");
         data.append('duration', testData.duration);
+        data.append("description", testData.description);
+        data.append("instructions", testData.instructions);
         data.append('questions', JSON.stringify(questions));
         //alert('Are you absolutely sure you want to create this test? Please preview once before creating!')
-        notifyWarn('Are you absolutely sure you want to create this test? Please preview once before creating!')
+        //notifyWarn('Are you absolutely sure you want to create this test? Please preview once before creating!')
         if (window.confirm('Are you absolutely sure you want to create this test? Please preview once before creating!')) {
             fetch("http://localhost:8000/createTest/", {
                 method: "POST",
@@ -110,7 +113,7 @@ const CreateTestUpload = () => {
     return (
         <div>
             <Navbar />
-            <div style={{ display: 'flex', flexDirection: 'column', height: '60vh' }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className="bg-gray-50 flex px-6 py-2 mt-10">
                     <Typography variant="h3" color="blue-gray" className="my-auto">
                         Upload Test
@@ -156,11 +159,12 @@ const CreateTestUpload = () => {
                         </Typography>
                         <input
                             type="number"
-                            placeholder="Duration in min"
+                            placeholder="Duration in sec"
                             className="w-fit p-1.5 border-1 border-blue-gray-100 rounded-md"
-                            value={testData.duration / 60}
+                            min={0}
+                            value={testData.duration}
                             onChange={(e) =>
-                                setTestData({ ...testData, duration: e.target.value * 60 })
+                                setTestData({ ...testData, duration: e.target.value })
                             }
                         />
                     </div>
@@ -176,6 +180,29 @@ const CreateTestUpload = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <p>Find sample CSV file <a className="text-blue-500" href="https://docs.google.com/spreadsheets/d/1w014PNlua2iDwv378ejkR6GdHu9LR5MYO5uuJBMa2Eo/edit?usp=sharing" target="_blank">here</a></p>
+                </div>
+                <div className="flex">
+                    <Typography variant="h6" color="blue-gray" className="my-auto">
+                        Description
+                    </Typography>
+                    <textarea
+                        
+                        placeholder="Type description here"
+                        className="mt-2 border-1 border-blue-gray-100 rounded-md w-1/2 h-20 mx-5"
+                        value={testData.description}
+                        onChange={(e) => { setTestData({ ...testData, description: e.target.value }) }}
+
+                    />
+                    <Typography variant="h6" color="blue-gray" className="my-auto">
+                        Instructions
+                    </Typography>
+                    <textarea
+                        placeholder="Type instructions here"
+                        className="mt-2 border-1 border-blue-gray-100 rounded-md w-1/2 h-20 mx-5"
+                        value={testData.instructions}
+                        onChange={(e) => { setTestData({ ...testData, instructions: e.target.value }) }}
+
+                    />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <button

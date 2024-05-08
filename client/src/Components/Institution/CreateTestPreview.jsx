@@ -29,6 +29,8 @@ function TestPreview() {
                 testData ? (
                     <>
                     <h1>Test Name: {testData.title}</h1>
+                    <h2>Description : {testData.description}</h2>
+                    <h2>Instructions : {testData.instructions}</h2>
                     <div>
                         <p>Start: {String(testData.start)}</p>
                         <p>Duration: {testData.duration}</p>

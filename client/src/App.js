@@ -11,6 +11,7 @@ import InstituteDashBoard from "./Components/Institution/InstituteDashBoard";
 import CreateTest from "./Components/Institution/CreateTest";
 import CreateTestUpload from "./Components/Institution/CreateTestUpload";
 import CreateTestPreview from "./Components/Institution/CreateTestPreview";
+import CreateTestAI from "./Components/Institution/CreateTestAI";
 import AttemptTest from "./Components/Student/AttemptTest";
 import StartTest from "./Components/Student/StartTest";
 import RegisterTest from "./Components/Student/RegisterTest";
@@ -40,6 +41,7 @@ const App = () => {
           <Route exact path="/institution/updatetest/:id" element={<CreateTest edit={true} />} />
           <Route exact path="/institution/createtest/upload" element={<CreateTestUpload />} />
           <Route exact path="/institution/createtest/preview" element={<CreateTestPreview />} />
+          <Route exact path="/institution/createtest/ai" element={<CreateTestAI />} />
           <Route exact path="/student/result/:id" element={<StudentResultPage />} />
           <Route exact path="/institution/testresult/:id" element={<InstituteTestResult />} />
           <Route exact path="/student/review/:id" element={<StudentReview />} />
