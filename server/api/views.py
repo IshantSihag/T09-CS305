@@ -226,7 +226,7 @@ class startTest(APIView):
             jsonresponse = {
                 "ok": True,
                 "start": test.start,
-                "duration": int(test.duration) * 60,
+                "duration": int(test.duration),
                 "author": test.author,
                 "questions": questions,
             }

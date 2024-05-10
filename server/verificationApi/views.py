@@ -21,6 +21,7 @@ import numpy as np
 import base64
 from .models import UserImage, TestRating
 import uuid
+from datetime import timedelta
 
 
 # Face verification utility methods
@@ -228,7 +229,7 @@ class FetchTestView(APIView):
                 )
             jsonresponse = {
                 "ok": True,
-                "start": test.start,
+                "start": test.start + timedelta(hours=5, minutes=30),
                 "duration": test.duration,
                 "author": test.author,
                 "questions": questions,
