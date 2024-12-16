@@ -1,8 +1,26 @@
-/* Style for dropdown container */
+.navbar-brand {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+}
+
+.dashboard-button, .logout-button {
+    background-color: #191a1c;
+    border:solid;
+    border-color: #17a2b8;
+    color: #17a2b8;
+    transition: background-color 0.3s ease;
+    margin-left: 10px;
+    border-radius: 10px;
+    padding: 5px 10px;
+}
+
+ .logout-button:hover {
+    background-color: red;
+}
+
 .dropdown {
     position: relative;
 }
-
 
 .dropdown-toggle::after {
     display: inline-block;
@@ -14,7 +32,6 @@
     border-bottom: 0;
     border-left: .3em solid transparent;
 }
-
 
 .dropdown-menu {
     position: absolute;
@@ -36,7 +53,6 @@
     border-radius: .25rem;
 }
 
-
 .dropdown-menu a {
     display: block;
     padding: .25rem 1.5rem;
@@ -50,8 +66,6 @@
     text-decoration: none;
 }
 
-
 .dropdown-menu a:hover {
     background-color: #f8f9fa;
 }
-
